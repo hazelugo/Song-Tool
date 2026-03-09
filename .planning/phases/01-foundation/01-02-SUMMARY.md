@@ -179,6 +179,17 @@ See checkpoint Task 3 details:
 - Health endpoint wired — Phase 2 and beyond can rely on /api/health for DB connectivity checks
 - Blocker: Migration must be applied to Supabase before live DB connectivity works
 
+## Self-Check: PASSED
+
+- FOUND: src/db/schema.ts
+- FOUND: src/db/index.ts
+- FOUND: drizzle.config.ts
+- FOUND: drizzle/0000_moaning_daredevil.sql
+- FOUND: src/app/api/health/route.ts
+- FOUND: .planning/phases/01-foundation/01-02-SUMMARY.md
+- FOUND commit: f0e8f42 (Task 1)
+- FOUND commit: 7a7c832 (Task 2)
+
 ---
 *Phase: 01-foundation*
 *Completed: 2026-03-09 (partial — awaiting checkpoint verification)*

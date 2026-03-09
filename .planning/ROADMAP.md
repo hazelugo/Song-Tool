@@ -28,11 +28,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. All four database tables exist in Supabase with correct column types: `songs.chord_progressions` is JSONB, `songs.musical_key` is a constrained enum, `songs.deleted_at` exists for soft deletes, all PKs are UUIDs
   3. Drizzle migration files are committed to the repo and run cleanly against the Supabase database
   4. A GIN index on the `songs` tsvector column exists and a test lyric query returns results
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 01-01: Project scaffolding (Next.js 15, Supabase, Drizzle, Tailwind, shadcn/ui setup and Vercel deploy)
-- [ ] 01-02: Database schema and migrations (all four tables, correct types, GIN index, RLS-ready structure)
+- [ ] 01-01-PLAN.md — Next.js 15 project scaffold, nav shell (Songs/Discovery/Playlists sidebar), dark mode, health endpoint, Vercel deploy
+- [ ] 01-02-PLAN.md — Drizzle schema (4 tables, JSONB/pgEnum/tsvector/GIN index), migrations to Supabase, health endpoint wired to db
 
 ### Phase 2: Song Catalog
 **Goal**: Users can add, view, edit, and delete songs with all musical metadata fields. The song library is the foundation on which discovery and playlists are built.
@@ -94,7 +94,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/2 | Not started | - |
+| 1. Foundation | 0/2 | Ready to execute | - |
 | 2. Song Catalog | 0/3 | Not started | - |
 | 3. Discovery | 0/2 | Not started | - |
 | 4. Playlist Builder | 0/4 | Not started | - |

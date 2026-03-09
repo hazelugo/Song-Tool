@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Completed 01-foundation 01-01-PLAN.md
-last_updated: "2026-03-09T21:21:42.881Z"
+stopped_at: "Checkpoint: 01-02 awaiting human verification of Supabase migration and /api/health"
+last_updated: "2026-03-09T22:15:24.232Z"
 last_activity: 2026-03-09 — Roadmap created, phases derived from requirements
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -52,6 +52,7 @@ Progress: [░░░░░░░░░░] 0%
 *Updated after each plan completion*
 | Phase 01-foundation P01 | 18 | 2 tasks | 22 files |
 | Phase 01-foundation P01 | 18 | 3 tasks | 22 files |
+| Phase 01-foundation P02 | 2327 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -69,6 +70,9 @@ Recent decisions affecting current work:
 - [Phase 01-foundation]: ThemeProvider wraps SidebarProvider in root layout — permanent nesting order for all layouts
 - [Phase 01-foundation]: suppressHydrationWarning required on html element when using next-themes
 - [Phase 01-foundation]: Vercel project created at hazelugo-4845s-projects/song-tool — deployment approved 2026-03-09
+- [Phase 01-foundation]: postgres({ prepare: false }) required for Supabase Transaction pool (port 6543) — without this, prepared statement errors occur in production
+- [Phase 01-foundation]: tsvector is a Drizzle customType — generatedAlwaysAs() produces correct STORED generated column syntax; no manual SQL correction needed
+- [Phase 01-foundation]: playlist_songs.song_id FK has no cascade — soft-deleted songs stay accessible in playlists
 
 ### Pending Todos
 
@@ -80,6 +84,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-09T21:21:42.877Z
-Stopped at: Completed 01-foundation 01-01-PLAN.md
+Last session: 2026-03-09T22:15:24.228Z
+Stopped at: Checkpoint: 01-02 awaiting human verification of Supabase migration and /api/health
 Resume file: None

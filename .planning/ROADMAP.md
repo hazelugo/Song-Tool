@@ -12,7 +12,7 @@ Four phases from empty repo to a working music database and playlist builder. Ph
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - Project scaffolding, database schema, and Vercel deployment
+- [x] **Phase 1: Foundation** - Project scaffolding, database schema, and Vercel deployment (completed 2026-03-09)
 - [ ] **Phase 2: Song Catalog** - Full CRUD for songs with all musical metadata fields
 - [ ] **Phase 3: Discovery** - Filter and sort engine — find songs by shared musical properties
 - [ ] **Phase 4: Playlist Builder** - Save, view, reorder, and use playlists from filtered results
@@ -94,7 +94,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 1/2 | In Progress|  |
+| 1. Foundation | 2/2 | Complete   | 2026-03-09 |
 | 2. Song Catalog | 0/3 | Not started | - |
 | 3. Discovery | 0/2 | Not started | - |
 | 4. Playlist Builder | 0/4 | Not started | - |

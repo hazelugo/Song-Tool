@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Phase 1 context gathered
-last_updated: "2026-03-09T15:18:01.456Z"
+stopped_at: "Checkpoint: Vercel deploy verification for 01-01-PLAN.md"
+last_updated: "2026-03-09T20:50:43.123Z"
 last_activity: 2026-03-09 — Roadmap created, phases derived from requirements
 progress:
   total_phases: 4
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 2
+  completed_plans: 1
   percent: 0
 ---
 
@@ -50,6 +50,7 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: —
 
 *Updated after each plan completion*
+| Phase 01-foundation P01 | 18 | 2 tasks | 22 files |
 
 ## Accumulated Context
 
@@ -63,6 +64,9 @@ Recent decisions affecting current work:
 - [Init]: Musical key stored as normalized enum (not free text) — prevents filter failures
 - [Init]: BPM filter is always a range (min/max), never exact match
 - [Init]: Playlist ordering uses fractional indexing (not integer position) — single-row UPDATE per reorder
+- [Phase 01-foundation]: shadcn v4 SidebarMenuButton uses render prop (not asChild) — pattern: render={<Link href=... />}
+- [Phase 01-foundation]: ThemeProvider wraps SidebarProvider in root layout — permanent nesting order for all layouts
+- [Phase 01-foundation]: suppressHydrationWarning required on html element when using next-themes
 
 ### Pending Todos
 
@@ -74,6 +78,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-09T15:18:01.429Z
-Stopped at: Phase 1 context gathered
-Resume file: .planning/phases/01-foundation/01-CONTEXT.md
+Last session: 2026-03-09T20:50:43.117Z
+Stopped at: Checkpoint: Vercel deploy verification for 01-01-PLAN.md
+Resume file: None

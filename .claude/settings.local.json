@@ -1,7 +1,16 @@
 {
   "permissions": {
     "allow": [
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(echo \"SUMMARY missing\" git log --oneline --all --grep=\"01-01\")",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx drizzle-kit generate:*)",
+      "Bash(ls:*)",
+      "Bash(DATABASE_URL=\"\" npx drizzle-kit migrate:*)",
+      "Bash(npm run build:*)"
     ]
   }
 }

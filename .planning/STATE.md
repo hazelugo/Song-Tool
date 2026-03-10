@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: "Checkpoint: 01-02 awaiting human verification of Supabase migration and /api/health"
-last_updated: "2026-03-09T22:15:24.232Z"
+stopped_at: Completed 01-foundation-02-PLAN.md — schema, migrations, and health endpoint fully verified live
+last_updated: "2026-03-10T00:36:27.934Z"
 last_activity: 2026-03-09 — Roadmap created, phases derived from requirements
 progress:
   total_phases: 4
@@ -53,6 +53,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01-foundation P01 | 18 | 2 tasks | 22 files |
 | Phase 01-foundation P01 | 18 | 3 tasks | 22 files |
 | Phase 01-foundation P02 | 2327 | 2 tasks | 8 files |
+| Phase 01-foundation P02 | 15 | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -73,6 +74,7 @@ Recent decisions affecting current work:
 - [Phase 01-foundation]: postgres({ prepare: false }) required for Supabase Transaction pool (port 6543) — without this, prepared statement errors occur in production
 - [Phase 01-foundation]: tsvector is a Drizzle customType — generatedAlwaysAs() produces correct STORED generated column syntax; no manual SQL correction needed
 - [Phase 01-foundation]: playlist_songs.song_id FK has no cascade — soft-deleted songs stay accessible in playlists
+- [Phase 01-foundation]: Live Vercel deployment confirmed returning {status:ok,db:ok} after DATABASE_URL added to Vercel env vars and migration applied to Supabase — all four tables and GIN index verified 2026-03-10
 
 ### Pending Todos
 
@@ -84,6 +86,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-09T22:15:24.228Z
-Stopped at: Checkpoint: 01-02 awaiting human verification of Supabase migration and /api/health
+Last session: 2026-03-10T00:36:27.930Z
+Stopped at: Completed 01-foundation-02-PLAN.md — schema, migrations, and health endpoint fully verified live
 Resume file: None

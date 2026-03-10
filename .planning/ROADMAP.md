@@ -44,12 +44,12 @@ Plans:
   3. User can open an existing song, change any field, save, and see the updated values reflected immediately in the song list
   4. User can delete a song and it no longer appears in the song list (soft delete — does not break existing playlists)
   5. User can see all songs in a paginated table with name, BPM, key, key signature, and tags visible as columns
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: Song data layer (Drizzle schema wired to API routes — song CRUD endpoints with Zod validation)
-- [ ] 02-02: Song form UI (add/edit form with react-hook-form + Zod, all fields including tags)
-- [ ] 02-03: Song list UI (paginated table with TanStack Table, column visibility, delete action)
+- [ ] 02-01-PLAN.md — Package installs, Drizzle relations, Zod validation schema, song CRUD API routes, e2e test stubs
+- [ ] 02-02-PLAN.md — Song form components (TagInput, SongForm, DeleteConfirm, SongSheet slide-out)
+- [ ] 02-03-PLAN.md — SongTable with TanStack pagination, songs page wired end-to-end, e2e tests passing
 
 ### Phase 3: Discovery
 **Goal**: Users can find songs that share musical DNA by filtering on BPM range, key, key signature, chord progression text, lyric keywords, and tags — with results sortable by any column. This is the product's core value proposition.

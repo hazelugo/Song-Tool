@@ -10,7 +10,9 @@
       "Bash(npx drizzle-kit generate:*)",
       "Bash(ls:*)",
       "Bash(DATABASE_URL=\"\" npx drizzle-kit migrate:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Skill(gsd:discuss-phase)",
+      "Skill(gsd:discuss-phase:*)"
     ]
   }
 }

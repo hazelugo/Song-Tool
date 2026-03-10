@@ -11,6 +11,9 @@
       "Bash(ls:*)",
       "Bash(DATABASE_URL=\"\" npx drizzle-kit migrate:*)",
       "Bash(npm run build:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm run lint:*)",
+      "Bash(npm run test:e2e:*)",
       "Skill(gsd:discuss-phase)",
       "Skill(gsd:discuss-phase:*)"
     ]

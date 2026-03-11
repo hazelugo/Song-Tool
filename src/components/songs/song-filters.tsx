@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
 import { Input } from "@/components/ui/input";
@@ -13,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { MUSICAL_KEYS } from "@/lib/validations/song";
 
-export function SongFilters() {
+function SongFiltersContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -125,5 +126,13 @@ export function SongFilters() {
         />
       </div>
     </div>
+  );
+}
+
+export function SongFilters() {
+  return (
+    <Suspense>
+      <SongFiltersContent />
+    </Suspense>
   );
 }

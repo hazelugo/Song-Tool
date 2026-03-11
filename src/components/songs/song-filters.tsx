@@ -82,7 +82,7 @@ export function SongFilters() {
         <Select
           value={searchParams.get("keySig") ?? "all"}
           onValueChange={(val) =>
-            updateFilter("keySig", val === "all" ? "" : val)
+            updateFilter("keySig", val === "all" ? "" : (val ?? undefined))
           }
         >
           <SelectTrigger id="keySig">

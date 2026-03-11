@@ -81,6 +81,7 @@ export const tags = pgTable("tags", {
 
 export const playlists = pgTable("playlists", {
   id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull(),
   name: text("name").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")

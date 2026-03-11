@@ -60,7 +60,9 @@ export function SongFilters() {
         <Label htmlFor="key">Key</Label>
         <Select
           value={searchParams.get("key") ?? "all"}
-          onValueChange={(val) => updateFilter("key", val === "all" ? "" : val)}
+          onValueChange={(val) =>
+            updateFilter("key", val === "all" ? "" : (val ?? undefined))
+          }
         >
           <SelectTrigger id="key">
             <SelectValue placeholder="All" />

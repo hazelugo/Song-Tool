@@ -6,9 +6,10 @@ import { Badge } from "@/components/ui/badge";
 interface TagInputProps {
   value: string[];
   onChange: (tags: string[]) => void;
+  id?: string;
 }
 
-export function TagInput({ value, onChange }: TagInputProps) {
+export function TagInput({ value, onChange, id }: TagInputProps) {
   const [inputValue, setInputValue] = useState("");
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -44,6 +45,7 @@ export function TagInput({ value, onChange }: TagInputProps) {
         </Badge>
       ))}
       <input
+        id={id}
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={handleKeyDown}

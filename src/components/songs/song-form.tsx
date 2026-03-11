@@ -160,8 +160,8 @@ export function SongForm({
 
       {/* Tags */}
       <div className="space-y-1.5">
-        <Label>Tags</Label>
-        <TagInput value={tags} onChange={setTags} />
+        <Label htmlFor="tags">Tags</Label>
+        <TagInput id="tags" value={tags} onChange={setTags} />
         <p className="text-xs text-muted-foreground">
           Type a tag and press Enter
         </p>

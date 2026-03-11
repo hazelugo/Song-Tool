@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { SongTable } from "@/components/songs/song-table";
@@ -9,7 +9,7 @@ import { SongFilters } from "@/components/songs/song-filters";
 
 export const dynamic = "force-dynamic";
 
-export default function SongsPage() {
+function SongsPageContent() {
   const [songs, setSongs] = useState<SongWithTags[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -80,5 +80,13 @@ export default function SongsPage() {
         onSuccess={loadSongs}
       />
     </div>
+  );
+}
+
+export default function SongsPage() {
+  return (
+    <Suspense fallback={<div>Loading songs...</div>}>
+      <SongsPageContent />
+    </Suspense>
   );
 }

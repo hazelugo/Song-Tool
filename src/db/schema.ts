@@ -121,4 +121,16 @@ export const tagsRelations = relations(tags, ({ one }) => ({
   song: one(songs, { fields: [tags.songId], references: [songs.id] }),
 }));
 
+export const playlistsRelations = relations(playlists, ({ many }) => ({
+  songs: many(playlistSongs),
+}));
+
+export const playlistSongsRelations = relations(playlistSongs, ({ one }) => ({
+  playlist: one(playlists, {
+    fields: [playlistSongs.playlistId],
+    references: [playlists.id],
+  }),
+  song: one(songs, { fields: [playlistSongs.songId], references: [songs.id] }),
+}));
+
 export type SongWithTags = Song & { tags: Tag[] };

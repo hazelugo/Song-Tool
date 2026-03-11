@@ -7,6 +7,8 @@ import { SongSheet } from "@/components/songs/song-sheet";
 import type { SongWithTags } from "@/db/schema";
 import { SongFilters } from "@/components/songs/song-filters";
 
+export const dynamic = "force-dynamic";
+
 export default function SongsPage() {
   const [songs, setSongs] = useState<SongWithTags[]>([]);
   const [isLoading, setIsLoading] = useState(true);

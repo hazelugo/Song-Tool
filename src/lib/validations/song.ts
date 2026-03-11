@@ -24,7 +24,7 @@ export const MUSICAL_KEYS = [
 // Form schema: chordProgressions is raw textarea string; tags managed separately
 export const songSchema = z.object({
   name: z.string().min(1, "Song name is required").max(255),
-  bpm: z.coerce.number({ error: "BPM must be a number" }).int().min(1).max(500),
+  bpm: z.number({ error: "BPM must be a number" }).int().min(1).max(500),
   musicalKey: z.enum(MUSICAL_KEYS, { error: "Select a key" }),
   keySignature: z.enum(["major", "minor"] as const, {
     error: "Select major or minor",
@@ -44,3 +44,4 @@ export const songSchema = z.object({
 export const songApiSchema = songSchema;
 
 export type SongFormValues = z.infer<typeof songSchema>;
+export type SongFormInput = z.input<typeof songSchema>;

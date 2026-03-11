@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   songSchema,
   type SongFormValues,
+  type SongFormInput,
   MUSICAL_KEYS,
 } from "@/lib/validations/song";
 import { Label } from "@/components/ui/label";
@@ -34,7 +35,7 @@ export function SongForm({
   const [tags, setTags] = useState<string[]>(defaultValues?.tags ?? []);
   const [showLyrics, setShowLyrics] = useState(!!defaultValues?.lyrics);
 
-  const form = useForm<SongFormValues>({
+  const form = useForm<SongFormInput, unknown, SongFormValues>({
     resolver: zodResolver(songSchema),
     defaultValues: {
       name: "",

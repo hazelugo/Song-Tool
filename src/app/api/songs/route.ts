@@ -2,7 +2,10 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { songs, tags } from "@/db/schema";
 import { isNull } from "drizzle-orm";
-import { songApiSchema } from "@/lib/validations/song";
+import { and, gte, lte, eq, ilike, exists, sql } from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
+import { filterSchema } from "@/lib/validations/filter";
+import { songApiSchema } from "@/lib/validations/song"; // Keep for POST
 
 function parseChordProgressions(raw: string): string[] {
   if (!raw.trim()) return [];
@@ -12,10 +15,50 @@ function parseChordProgressions(raw: string): string[] {
     .filter(Boolean);
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+
+    // Validate and coerce filter params — invalid values are ignored (safeParse)
+    const parsed = filterSchema.safeParse(Object.fromEntries(searchParams));
+    const f = parsed.success ? parsed.data : {};
+
+    const conditions: SQL[] = [isNull(songs.deletedAt)];
+
+    if (f.bpmMin !== undefined) conditions.push(gte(songs.bpm, f.bpmMin));
+    if (f.bpmMax !== undefined) conditions.push(lte(songs.bpm, f.bpmMax));
+    if (f.key) conditions.push(eq(songs.musicalKey, f.key as any));
+    if (f.keySig) conditions.push(eq(songs.keySignature, f.keySig as any));
+
+    if (f.chord) {
+      conditions.push(
+        sql`${songs.chordProgressions}::text ILIKE ${"%" + f.chord + "%"}`,
+      );
+    }
+
+    if (f.lyric) {
+      // Use websearch_to_tsquery — NOT to_tsquery. to_tsquery fails on raw user input
+      // e.g. "love song" would throw: syntax error in tsquery: "love song"
+      conditions.push(
+        sql`${songs.lyricsSearch} @@ websearch_to_tsquery('english', ${f.lyric})`,
+      );
+    }
+
+    if (f.tag) {
+      // Use EXISTS subquery — NOT INNER JOIN. JOIN would duplicate rows when
+      // a song has multiple tags that both match (e.g. tag="a" matches "ballad" AND "anthem")
+      const tagSq = db
+        .select({ id: sql<number>`1` })
+        .from(tags)
+        .where(and(eq(tags.songId, songs.id), ilike(tags.name, f.tag)));
+      conditions.push(exists(tagSq));
+    }
+
     const result = await db.query.songs.findMany({
-      where: isNull(songs.deletedAt),
+      // Combine all conditions with AND
+      // Drizzle's `and()` operator safely ignores `undefined` values,
+      // so conditions that aren't pushed (because filter param was missing) are skipped.
+      where: and(...conditions),
       with: { tags: true },
       orderBy: (songs, { desc }) => [desc(songs.createdAt)],
     });

@@ -1,9 +1,11 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { SongTable } from "@/components/songs/song-table";
 import { SongSheet } from "@/components/songs/song-sheet";
 import type { SongWithTags } from "@/db/schema";
+import { SongFilters } from "@/components/songs/song-filters";
 
 export default function SongsPage() {
   const [songs, setSongs] = useState<SongWithTags[]>([]);
@@ -12,10 +14,12 @@ export default function SongsPage() {
   const [selectedSong, setSelectedSong] = useState<SongWithTags | undefined>(
     undefined,
   );
+  const searchParams = useSearchParams();
 
   const loadSongs = useCallback(async () => {
+    setIsLoading(true);
     try {
-      const res = await fetch("/api/songs");
+      const res = await fetch(`/api/songs?${searchParams.toString()}`);
       if (res.ok) {
         const data = await res.json();
         setSongs(data);
@@ -25,7 +29,7 @@ export default function SongsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [searchParams]);
 
   useEffect(() => {
     loadSongs();
@@ -49,8 +53,11 @@ export default function SongsPage() {
         <Button onClick={openAddSheet}>Add Song</Button>
       </div>
 
+      {/* Filters */}
+      <SongFilters />
+
       {/* Empty state */}
-      {!isLoading && songs.length === 0 ? (
+      {!isLoading && songs.length === 0 && searchParams.toString() === "" ? (
         <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
           <p className="text-muted-foreground">No songs yet</p>
           <Button onClick={openAddSheet}>Add your first song</Button>

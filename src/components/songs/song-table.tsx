@@ -3,8 +3,10 @@ import {
   useReactTable,
   getCoreRowModel,
   getPaginationRowModel,
+  getSortedRowModel,
   flexRender,
   type ColumnDef,
+  type SortingState,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -14,6 +16,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useState } from "react";
+import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -25,22 +29,36 @@ interface SongTableProps {
   isLoading: boolean;
 }
 
+function SortableHeader({ column, label }: { column: any; label: string }) {
+  return (
+    <button
+      className="flex items-center gap-1 hover:text-foreground transition-colors"
+      onClick={column.getToggleSortingHandler()}
+    >
+      {label}
+      {column.getIsSorted() === "asc" && <ArrowUp className="h-3 w-3" />}
+      {column.getIsSorted() === "desc" && <ArrowDown className="h-3 w-3" />}
+      {!column.getIsSorted() && <ArrowUpDown className="h-3 w-3 opacity-40" />}
+    </button>
+  );
+}
+
 const columns: ColumnDef<SongWithTags>[] = [
   {
     accessorKey: "name",
-    header: "Name",
+    header: ({ column }) => <SortableHeader column={column} label="Name" />,
   },
   {
     accessorKey: "bpm",
-    header: "BPM",
+    header: ({ column }) => <SortableHeader column={column} label="BPM" />,
   },
   {
     accessorKey: "musicalKey",
-    header: "Key",
+    header: ({ column }) => <SortableHeader column={column} label="Key" />,
   },
   {
     accessorKey: "keySignature",
-    header: "Key Sig.",
+    header: ({ column }) => <SortableHeader column={column} label="Key Sig." />,
     cell: ({ row }) => (
       <span className="capitalize">{row.getValue<string>("keySignature")}</span>
     ),
@@ -48,6 +66,7 @@ const columns: ColumnDef<SongWithTags>[] = [
   {
     accessorKey: "tags",
     header: "Tags",
+    enableSorting: false,
     cell: ({ row }) => {
       const tags = row.getValue<Tag[]>("tags");
       if (!tags || tags.length === 0) return null;
@@ -65,11 +84,16 @@ const columns: ColumnDef<SongWithTags>[] = [
 ];
 
 export function SongTable({ data, onRowClick, isLoading }: SongTableProps) {
+  const [sorting, setSorting] = useState<SortingState>([]);
+
   const table = useReactTable({
     data,
     columns,
+    state: { sorting },
+    onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     initialState: {
       pagination: { pageSize: 25 },
     },

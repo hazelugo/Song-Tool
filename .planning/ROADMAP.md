@@ -62,11 +62,11 @@ Plans:
   4. User can filter by tag and see only songs with that tag
   5. User can apply multiple filters simultaneously and see the AND-combined results (e.g. BPM 80-100 AND key of G AND tag "ballad")
   6. User can sort any filtered result set by any column (name, BPM, key, key signature) in ascending or descending order
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 03-01: Filter query layer (server-side parameterized SQL — BPM range, key enum, key sig, chord keyword, tsvector FTS, tag, AND-combined)
-- [ ] 03-02: Filter panel UI (filter controls wired to query layer, combined filter + sort, results update on change)
+- [ ] 03-01-PLAN.md — Zod filter schema + extended GET /api/songs with dynamic AND filter conditions (BPM range, key, key sig, chord ILIKE, lyric FTS, tag EXISTS) + e2e test stubs
+- [ ] 03-02-PLAN.md — FilterPanel + DiscoveryTable (TanStack sort) + /discovery page wired end-to-end
 
 ### Phase 4: Playlist Builder
 **Goal**: Users can save any filtered and ordered song list as a named playlist, open saved playlists, reorder songs within them via drag-and-drop, open streaming links, and remove or delete playlists. This completes the filter-sort-drag-save workflow.

@@ -131,7 +131,7 @@ function SongFiltersContent() {
 
 export function SongFilters() {
   return (
-    <Suspense>
+    <Suspense fallback={<div>Loading filters...</div>}>
       <SongFiltersContent />
     </Suspense>
   );

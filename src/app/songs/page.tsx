@@ -1,11 +1,15 @@
 "use client";
 import { useState, useEffect, useCallback, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { SongTable } from "@/components/songs/song-table";
 import { SongSheet } from "@/components/songs/song-sheet";
 import type { SongWithTags } from "@/db/schema";
 import { SongFilters } from "@/components/songs/song-filters";
+import {
+  PlaylistBuilder,
+  PlaylistItem,
+} from "@/components/playlist-builder";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +21,27 @@ function SongsPageContent() {
     undefined,
   );
   const searchParams = useSearchParams();
+  const [showPlaylistBuilder, setShowPlaylistBuilder] = useState(false);
+  const router = useRouter();
+  const playlistId = searchParams.get("id");
+
+  async function savePlaylist(name: string, items: PlaylistItem[]) {
+    try {
+      const response = await fetch("/api/playlists", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, items, id: playlistId }),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to save");
+      }
+      router.push("/playlists");
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 
   const loadSongs = useCallback(async () => {
     setIsLoading(true);
@@ -47,12 +72,30 @@ function SongsPageContent() {
     setSheetOpen(true);
   };
 
+  if (showPlaylistBuilder) {
+    return (
+      <PlaylistBuilder
+        availableSongs={songs}
+        onSave={savePlaylist}
+        onClose={() => setShowPlaylistBuilder(false)}
+      />
+    );
+  }
+
   return (
     <div className="flex flex-col gap-6 p-6">
       {/* Header row */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Songs</h1>
-        <Button onClick={openAddSheet}>Add Song</Button>
+        <div className="flex items-center gap-4">
+          <Button
+            onClick={() => setShowPlaylistBuilder(true)}
+            disabled={songs.length === 0}
+          >
+            Save results as Playlist
+          </Button>
+          <Button onClick={openAddSheet}>Add Song</Button>
+        </div>
       </div>
 
       {/* Filters */}

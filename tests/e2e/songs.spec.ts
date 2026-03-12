@@ -97,7 +97,9 @@ test.describe("Songs — CRUD", () => {
     await page.getByRole("button", { name: "Save Song" }).click();
 
     // Tags visible as pills in the table row
-    await expect(page.getByRole("cell", { name: "opener" })).toBeVisible();
+    const row = page.getByRole("row").filter({ hasText: "Mr. Jones" });
+    await expect(row.getByText("opener")).toBeVisible();
+    await expect(row.getByText("crowd-pleaser")).toBeVisible();
   });
 
   test("SONG-04: edit a song field; updated values appear in the list", async ({

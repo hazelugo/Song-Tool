@@ -220,10 +220,14 @@ test.describe("Discovery — Filters", () => {
     await page.goto("/songs");
 
     await page.getByLabel("Min BPM").fill("80");
+    await expect(page).toHaveURL(/bpmMin=80/);
     await page.getByLabel("Max BPM").fill("100");
+    await expect(page).toHaveURL(/bpmMax=100/);
     await page.getByLabel("Key", { exact: true }).click();
     await page.getByRole("option", { name: "G", exact: true }).click();
+    await expect(page).toHaveURL(/key=G/);
     await page.getByLabel("Tag").fill("ballad");
+    await expect(page).toHaveURL(/tag=ballad/);
 
     await expect(
       page.getByRole("cell", { name: "Full Match" }).first(),

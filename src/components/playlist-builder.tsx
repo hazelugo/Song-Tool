@@ -23,7 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { GripVertical, X, Plus, ChevronLeft } from "lucide-react";
+import { GripVertical, X, Plus, ChevronLeft, Trash2 } from "lucide-react";
 import type { Song } from "@/db/schema";
 
 export interface PlaylistItem {
@@ -35,6 +35,7 @@ export interface PlaylistItem {
 export interface PlaylistBuilderProps {
   availableSongs: Song[];
   onSave: (name: string, items: PlaylistItem[]) => Promise<void>;
+  onDelete?: () => Promise<void>;
   initialName?: string;
   initialItems?: PlaylistItem[];
   onClose: () => void;
@@ -226,7 +227,14 @@ export function PlaylistBuilder({
                 className="text-lg font-semibold"
               />
             </div>
-            <Button onClick={() => onSave(name, items)}>Save Playlist</Button>
+            <div className="flex items-center gap-2">
+              {onDelete && (
+                <Button variant="destructive" onClick={onDelete}>
+                  <Trash2 className="h-4 w-4 mr-2" /> Delete
+                </Button>
+              )}
+              <Button onClick={() => onSave(name, items)}>Save Playlist</Button>
+            </div>
           </div>
 
           <div className="flex-1 overflow-y-auto p-4">

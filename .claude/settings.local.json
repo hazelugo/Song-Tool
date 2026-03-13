@@ -15,7 +15,8 @@
       "Bash(npm run lint:*)",
       "Bash(npm run test:e2e:*)",
       "Skill(gsd:discuss-phase)",
-      "Skill(gsd:discuss-phase:*)"
+      "Skill(gsd:discuss-phase:*)",
+      "Bash(git pull:*)"
     ]
   }
 }

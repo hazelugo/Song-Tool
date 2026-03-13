@@ -140,7 +140,7 @@ export default function DiscoveryPage() {
         />
       ) : (
         !isLoading && (
-          <div className="text-center py-12 text-gray-500 bg-white rounded border border-dashed">
+          <div className="text-center py-12 text-muted-foreground bg-muted/30 rounded border border-dashed">
             <p>
               No results. Try a new search to discover songs from your library.
             </p>

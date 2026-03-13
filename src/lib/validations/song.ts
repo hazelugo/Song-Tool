@@ -24,18 +24,12 @@ export const MUSICAL_KEYS = [
 // Form schema: chordProgressions is raw textarea string; tags managed separately
 export const songSchema = z.object({
   name: z.string().min(1, "Song name is required").max(255),
-  bpm: z.coerce
-    .number({ invalid_type_error: "BPM must be a number" })
-    .int()
-    .min(1)
-    .max(500),
+  bpm: z.coerce.number().int().min(1).max(500),
   musicalKey: z.enum(MUSICAL_KEYS, {
-    required_error: "Select a key",
-    invalid_type_error: "Select a key",
+    message: "Select a key",
   }),
   keySignature: z.enum(["major", "minor"] as const, {
-    required_error: "Select major or minor",
-    invalid_type_error: "Select major or minor",
+    message: "Select major or minor",
   }),
   chordProgressions: z.string().default(""),
   lyrics: z.string().optional(),

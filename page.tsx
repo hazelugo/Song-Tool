@@ -42,13 +42,8 @@ export default async function PlaylistPage({ params }: PlaylistPageProps) {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-muted-foreground mb-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="-ml-3 h-8 px-2"
-              asChild
-            >
-              <Link href="/playlists">
+            <Button variant="ghost" size="sm" className="-ml-3 h-8 px-2">
+              <Link href="/playlists" className="flex items-center">
                 <ChevronLeft className="mr-1 h-4 w-4" />
                 Playlists
               </Link>
@@ -75,7 +70,7 @@ export default async function PlaylistPage({ params }: PlaylistPageProps) {
             <p className="text-sm mt-1 mb-4">
               Add songs from the Discovery page
             </p>
-            <Button variant="outline" asChild>
+            <Button variant="outline">
               <Link href="/discovery">Go to Discovery</Link>
             </Button>
           </div>
@@ -99,7 +94,7 @@ export default async function PlaylistPage({ params }: PlaylistPageProps) {
 
                 {/* Debug info for Phase 4 development - helpful for verifying sorting */}
                 <div className="text-xs font-mono text-muted-foreground/30 select-none">
-                  {position.toFixed(4)}
+                  {position?.toFixed(4)}
                 </div>
               </div>
             ))}

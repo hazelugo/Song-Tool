@@ -35,7 +35,7 @@ export interface PlaylistItem {
 export interface PlaylistBuilderProps {
   availableSongs: Song[];
   onSave: (name: string, items: PlaylistItem[]) => Promise<void>;
-  onDelete?: () => Promise<void>;
+  onDelete?: () => void;
   initialName?: string;
   initialItems?: PlaylistItem[];
   onClose: () => void;
@@ -104,6 +104,7 @@ export function PlaylistBuilder({
   initialName = "My New Playlist",
   initialItems = [],
   onClose,
+  onDelete,
 }: PlaylistBuilderProps) {
   const [name, setName] = useState(initialName);
   const [items, setItems] = useState<PlaylistItem[]>(initialItems);

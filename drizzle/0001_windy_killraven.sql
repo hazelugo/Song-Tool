@@ -1,0 +1,1 @@
+ALTER TABLE "playlists" ADD COLUMN "user_id" uuid NOT NULL;

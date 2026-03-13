@@ -4,7 +4,8 @@ import { eq, asc } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, Music } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface PlaylistPageProps {
   params: Promise<{ id: string }>;
@@ -42,12 +43,16 @@ export default async function PlaylistPage({ params }: PlaylistPageProps) {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-muted-foreground mb-2">
-            <Button variant="ghost" size="sm" className="-ml-3 h-8 px-2">
-              <Link href="/playlists" className="flex items-center">
-                <ChevronLeft className="mr-1 h-4 w-4" />
-                Playlists
-              </Link>
-            </Button>
+            <Link
+              href="/playlists"
+              className={cn(
+                buttonVariants({ variant: "ghost", size: "sm" }),
+                "flex items-center -ml-3 h-8 px-2",
+              )}
+            >
+              <ChevronLeft className="mr-1 h-4 w-4" />
+              Playlists
+            </Link>
           </div>
           <h1 className="text-3xl font-bold tracking-tight">{playlist.name}</h1>
           <p className="text-muted-foreground">
@@ -70,9 +75,12 @@ export default async function PlaylistPage({ params }: PlaylistPageProps) {
             <p className="text-sm mt-1 mb-4">
               Add songs from the Discovery page
             </p>
-            <Button variant="outline">
-              <Link href="/discovery">Go to Discovery</Link>
-            </Button>
+            <Link
+              href="/discovery"
+              className={buttonVariants({ variant: "outline" })}
+            >
+              Go to Discovery
+            </Link>
           </div>
         ) : (
           <div className="divide-y">

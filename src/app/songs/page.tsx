@@ -6,6 +6,7 @@ import { SongTable } from "@/components/songs/song-table";
 import { SongSheet } from "@/components/songs/song-sheet";
 import type { SongWithTags } from "@/db/schema";
 import { SongFilters } from "@/components/songs/song-filters";
+import { CsvImportDialog } from "@/components/songs/csv-import-dialog";
 import {
   PlaylistBuilder,
   PlaylistItem,
@@ -110,6 +111,7 @@ function SongsPageContent() {
           >
             Save results as Playlist
           </Button>
+          <CsvImportDialog onSuccess={loadSongs} />
           <Button onClick={openAddSheet}>Add Song</Button>
         </div>
       </div>

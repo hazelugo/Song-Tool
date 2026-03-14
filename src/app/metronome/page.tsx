@@ -77,6 +77,7 @@ function MetronomeContent() {
     setCurrentBeat(0);
     setIsPlaying(true);
 
+    schedulerLoop(); // schedule beat 1 immediately, before the interval fires
     schedulerRef.current = setInterval(schedulerLoop, LOOKAHEAD_MS);
   }, [schedulerLoop]);
 

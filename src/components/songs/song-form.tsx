@@ -21,17 +21,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TagInput } from "./tag-input";
+import Link from "next/link";
+import { Timer } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface SongFormProps {
   defaultValues?: Partial<SongFormValues>;
   onSubmit: (values: SongFormValues) => Promise<void>;
   isSubmitting: boolean;
+  metronomeHref?: string;
 }
 
 export function SongForm({
   defaultValues,
   onSubmit,
   isSubmitting,
+  metronomeHref,
 }: SongFormProps) {
   const [tags, setTags] = useState<string[]>(defaultValues?.tags ?? []);
   const [showLyrics, setShowLyrics] = useState(!!defaultValues?.lyrics);
@@ -78,14 +83,27 @@ export function SongForm({
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
           <Label htmlFor="bpm">BPM *</Label>
-          <Input
-            id="bpm"
-            type="number"
-            min={1}
-            max={500}
-            {...form.register("bpm", { valueAsNumber: true })}
-            placeholder="e.g. 120"
-          />
+          <div className="flex gap-2">
+            <Input
+              id="bpm"
+              type="number"
+              min={1}
+              max={500}
+              {...form.register("bpm", { valueAsNumber: true })}
+              placeholder="e.g. 120"
+            />
+            {metronomeHref && (
+              <Link
+                href={metronomeHref}
+                className={cn(
+                  "inline-flex items-center justify-center rounded-md border border-input bg-background px-3 text-sm hover:bg-accent hover:text-accent-foreground transition-colors shrink-0",
+                )}
+                title="Open in Metronome"
+              >
+                <Timer className="h-4 w-4" />
+              </Link>
+            )}
+          </div>
           {form.formState.errors.bpm && (
             <p className="text-sm text-destructive">
               {form.formState.errors.bpm.message}

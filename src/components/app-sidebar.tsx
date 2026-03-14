@@ -6,13 +6,15 @@ import {
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { Music, Search, ListMusic, Moon, Sun } from "lucide-react"
+import { Music, Search, ListMusic, Moon, Sun, Timer, Piano } from "lucide-react"
 import { useTheme } from "next-themes"
 
 const navItems = [
-  { title: "Songs",     url: "/songs",     icon: Music },
-  { title: "Discovery", url: "/discovery", icon: Search },
-  { title: "Playlists", url: "/playlists", icon: ListMusic },
+  { title: "Songs",      url: "/songs",     icon: Music },
+  { title: "Discovery",  url: "/discovery", icon: Search },
+  { title: "Playlists",  url: "/playlists", icon: ListMusic },
+  { title: "Metronome",  url: "/metronome", icon: Timer },
+  { title: "Chord Pads", url: "/chords",    icon: Piano },
 ]
 
 export function AppSidebar() {

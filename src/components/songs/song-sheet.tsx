@@ -1,15 +1,19 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { buttonVariants } from "@/components/ui/button";
 import { SongForm } from "./song-form";
 import { DeleteConfirm } from "./delete-confirm";
 import type { SongWithTags } from "@/db/schema";
 import type { SongFormValues } from "@/lib/validations/song";
+import { Timer } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface SongSheetProps {
   open: boolean;
@@ -115,9 +119,15 @@ export function SongSheet({
 
           {error && <p className="text-sm text-destructive">{error}</p>}
 
-          {/* Delete only shown in edit mode */}
+          {/* Delete + tools only shown in edit mode */}
           {isEditMode && (
-            <div className="pt-4 border-t">
+            <div className="pt-4 border-t space-y-3">
+              <Link
+                href={`/metronome?bpm=${song.bpm}&timeSig=${encodeURIComponent(song.timeSignature)}`}
+                className={cn(buttonVariants({ variant: "outline" }), "w-full")}
+              >
+                <Timer className="mr-2 h-4 w-4" /> Open in Metronome
+              </Link>
               <DeleteConfirm onConfirm={handleDelete} isDeleting={isDeleting} />
             </div>
           )}

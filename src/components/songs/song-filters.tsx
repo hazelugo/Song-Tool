@@ -122,10 +122,10 @@ function SongFiltersContent() {
 
       {/* Text Filters */}
       <div className="space-y-2 col-span-2 md:col-span-2">
-        <Label htmlFor="lyric">Lyric search</Label>
+        <Label htmlFor="lyric">Search title / lyrics</Label>
         <Input
           id="lyric"
-          placeholder="Search lyrics..."
+          placeholder="Search by title or lyrics..."
           defaultValue={searchParams.get("lyric") ?? ""}
           onChange={(e) => debouncedUpdate("lyric", e.target.value)}
         />

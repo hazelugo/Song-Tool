@@ -40,10 +40,10 @@ export async function GET(request: Request) {
     }
 
     if (f.lyric) {
-      // Use websearch_to_tsquery — NOT to_tsquery. to_tsquery fails on raw user input
-      // e.g. "love song" would throw: syntax error in tsquery: "love song"
+      // Search both song title (ILIKE) and lyrics (FTS). OR so either match returns the song.
+      // Use websearch_to_tsquery for lyrics — NOT to_tsquery, which fails on raw user input.
       conditions.push(
-        sql`${songs.lyricsSearch} @@ websearch_to_tsquery('english', ${f.lyric})`,
+        sql`(${songs.name} ILIKE ${"%" + f.lyric + "%"} OR ${songs.lyricsSearch} @@ websearch_to_tsquery('english', ${f.lyric}))`,
       );
     }
 

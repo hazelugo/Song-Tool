@@ -7,6 +7,7 @@ import {
   flexRender,
   type ColumnDef,
   type SortingState,
+  type OnChangeFn,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -124,7 +125,15 @@ export function SongTable({
   const isManualSort = sortingProp !== undefined && onSortingChange !== undefined;
 
   const sorting = isManualSort ? sortingProp : localSorting;
-  const setSorting = isManualSort ? onSortingChange : setLocalSorting;
+  const setSorting: OnChangeFn<SortingState> = isManualSort
+    ? (updaterOrValue) => {
+        const next =
+          typeof updaterOrValue === "function"
+            ? updaterOrValue(sorting!)
+            : updaterOrValue;
+        onSortingChange!(next);
+      }
+    : setLocalSorting;
 
   const table = useReactTable({
     data,

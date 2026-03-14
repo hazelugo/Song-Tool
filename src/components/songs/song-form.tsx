@@ -125,7 +125,7 @@ export function SongForm({
       {/* Key Signature + Time Signature */}
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
-          <Label>Mode *</Label>
+          <Label>Key Sig *</Label>
           <Select
             value={form.watch("keySignature")}
             onValueChange={(v) =>

@@ -100,7 +100,7 @@ function SongsPageContent() {
   }
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="flex flex-col gap-6 p-6 max-w-6xl mx-auto w-full">
       {/* Header row */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Songs</h1>

@@ -129,17 +129,23 @@ export async function POST(request: Request) {
 
     if (filters.searchTerm) {
       const term = filters.searchTerm;
-      // Search across name (ILIKE), lyrics (FTS), and tags (EXISTS)
-      const tagSubquery = db
-        .select({ id: sql<number>`1` })
-        .from(tags)
-        .where(and(eq(tags.songId, songs.id), ilike(tags.name, `%${term}%`)));
+      // Split into individual words so "acoustic ballad" matches songs tagged
+      // "acoustic" OR "ballad" rather than requiring the exact phrase as a tag name.
+      const words = term.split(/\s+/).filter((w) => w.length > 1);
+      const tagExistsConditions = words.map((word) =>
+        exists(
+          db
+            .select({ id: sql<number>`1` })
+            .from(tags)
+            .where(and(eq(tags.songId, songs.id), ilike(tags.name, `%${word}%`))),
+        ),
+      );
 
       conditions.push(
         or(
           ilike(songs.name, `%${term}%`),
           sql`${songs.lyricsSearch} @@ websearch_to_tsquery('english', ${term})`,
-          exists(tagSubquery),
+          ...tagExistsConditions,
         )!,
       );
     }

@@ -150,13 +150,13 @@ export async function POST(request: Request) {
       );
     }
 
-    const result = await db.query.songs.findMany({
+    const results = await db.query.songs.findMany({
       where: and(...conditions),
       with: { tags: true },
       orderBy: (songs, { desc }) => [desc(songs.createdAt)],
     });
 
-    return NextResponse.json(result);
+    return NextResponse.json({ results, parsedFilters: filters });
   } catch (err) {
     console.error("POST /api/discovery error:", err);
     return NextResponse.json(

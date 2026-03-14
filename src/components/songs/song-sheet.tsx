@@ -16,6 +16,7 @@ interface SongSheetProps {
   onOpenChange: (open: boolean) => void;
   song?: SongWithTags; // undefined = add mode; SongWithTags = edit mode
   onSuccess: () => void; // called after successful save or delete — triggers list refresh
+  onFindSimilar?: () => void; // optional — shows "Find similar" button in edit mode
 }
 
 function toFormValues(song: SongWithTags): Partial<SongFormValues> {
@@ -39,6 +40,7 @@ export function SongSheet({
   onOpenChange,
   song,
   onSuccess,
+  onFindSimilar,
 }: SongSheetProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -102,6 +104,15 @@ export function SongSheet({
       <SheetContent className="overflow-y-auto sm:max-w-md">
         <SheetHeader>
           <SheetTitle>{isEditMode ? "Edit Song" : "Add Song"}</SheetTitle>
+          {isEditMode && onFindSimilar && (
+            <button
+              type="button"
+              onClick={onFindSimilar}
+              className="text-xs text-primary hover:underline text-left w-fit"
+            >
+              Find similar songs →
+            </button>
+          )}
         </SheetHeader>
 
         <div className="px-4 pb-4 space-y-6 pt-6">

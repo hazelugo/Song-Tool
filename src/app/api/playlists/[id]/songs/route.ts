@@ -3,12 +3,11 @@ import { db } from "@/db";
 import { playlists, playlistSongs } from "@/db/schema";
 import { and, eq, max } from "drizzle-orm";
 import { z } from "zod";
+import { requireUser } from "@/lib/auth";
 
-const USER_ID = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
-
-async function verifyPlaylistOwner(id: string) {
+async function verifyPlaylistOwner(id: string, userId: string) {
   return db.query.playlists.findFirst({
-    where: and(eq(playlists.id, id), eq(playlists.userId, USER_ID)),
+    where: and(eq(playlists.id, id), eq(playlists.userId, userId)),
   });
 }
 
@@ -17,6 +16,9 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const { userId, error: authError } = await requireUser();
+  if (authError) return authError;
+
   const { id } = await params;
   const body = await request.json();
   const schema = z.object({ songIds: z.array(z.string().uuid()).min(1) });
@@ -25,7 +27,7 @@ export async function POST(
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
-  const playlist = await verifyPlaylistOwner(id);
+  const playlist = await verifyPlaylistOwner(id, userId);
   if (!playlist) {
     return NextResponse.json({ error: "Playlist not found" }, { status: 404 });
   }
@@ -68,6 +70,9 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const { userId, error: authError } = await requireUser();
+  if (authError) return authError;
+
   const { id } = await params;
   const body = await request.json();
   const schema = z.object({ songIds: z.array(z.string().uuid()).min(1) });
@@ -76,7 +81,7 @@ export async function PUT(
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
-  const playlist = await verifyPlaylistOwner(id);
+  const playlist = await verifyPlaylistOwner(id, userId);
   if (!playlist) {
     return NextResponse.json({ error: "Playlist not found" }, { status: 404 });
   }

@@ -4,9 +4,7 @@ import { playlists, playlistSongs } from "@/db/schema";
 import { eq, isNull, desc } from "drizzle-orm";
 import { z } from "zod";
 import { randomUUID } from "crypto";
-
-// Hardcoded user ID for V1 (matching [id]/route.ts)
-const USER_ID = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+import { requireUser } from "@/lib/auth";
 
 const createPlaylistSchema = z.object({
   name: z.string().min(1, "Playlist name cannot be empty"),
@@ -21,11 +19,14 @@ const createPlaylistSchema = z.object({
 });
 
 export async function GET() {
+  const { userId, error: authError } = await requireUser();
+  if (authError) return authError;
+
   try {
     const list = await db
       .select()
       .from(playlists)
-      .where(eq(playlists.userId, USER_ID))
+      .where(eq(playlists.userId, userId))
       .orderBy(desc(playlists.updatedAt));
 
     return NextResponse.json(list);
@@ -39,6 +40,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const { userId, error: authError } = await requireUser();
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const result = createPlaylistSchema.safeParse(body);
@@ -57,7 +61,7 @@ export async function POST(request: Request) {
     await db.transaction(async (tx) => {
       await tx.insert(playlists).values({
         id: playlistId,
-        userId: USER_ID,
+        userId,
         name: name,
       });
 

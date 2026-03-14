@@ -11,7 +11,8 @@ import {
   PlaylistBuilder,
   type PlaylistItem,
 } from "@/components/playlist-builder";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { buildSimilarQuery } from "@/lib/similar-query";
 
 export const dynamic = "force-dynamic";
 
@@ -71,6 +72,7 @@ function DiscoveryContent() {
   const [placeholderIdx, setPlaceholderIdx] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // Cycle placeholder text
   useEffect(() => {
@@ -102,6 +104,18 @@ function DiscoveryContent() {
     }
   }, []);
 
+  // Auto-search if ?q= param is present (e.g. navigating from /songs "Find similar")
+  const didAutoSearch = useRef(false);
+  useEffect(() => {
+    if (didAutoSearch.current) return;
+    const q = searchParams.get("q");
+    if (q) {
+      didAutoSearch.current = true;
+      setQuery(q);
+      search(q);
+    }
+  }, [search, searchParams]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     search(query);
@@ -111,6 +125,16 @@ function DiscoveryContent() {
     setQuery(prompt);
     search(prompt);
   };
+
+  const handleFindSimilar = useCallback(
+    (song: SongWithTags) => {
+      const q = buildSimilarQuery(song);
+      setQuery(q);
+      setSheetOpen(false);
+      search(q);
+    },
+    [search],
+  );
 
   const handleClear = () => {
     setQuery("");
@@ -284,7 +308,12 @@ function DiscoveryContent() {
           {results.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {results.map((song) => (
-                <SongCard key={song.id} song={song} onClick={openSheet} />
+                <SongCard
+                  key={song.id}
+                  song={song}
+                  onClick={openSheet}
+                  onFindSimilar={handleFindSimilar}
+                />
               ))}
             </div>
           ) : (
@@ -305,6 +334,7 @@ function DiscoveryContent() {
         onOpenChange={setSheetOpen}
         song={selectedSong}
         onSuccess={() => query && search(query)}
+        onFindSimilar={selectedSong ? () => handleFindSimilar(selectedSong) : undefined}
       />
     </div>
   );

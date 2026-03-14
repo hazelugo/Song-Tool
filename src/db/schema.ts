@@ -60,6 +60,7 @@ export const songs = pgTable(
   "songs",
   {
     id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id").notNull().default("f47ac10b-58cc-4372-a567-0e02b2c3d479"),
     name: text("name").notNull(),
     bpm: integer("bpm").notNull(),
     musicalKey: musicalKeyEnum("musical_key").notNull(),
@@ -82,7 +83,10 @@ export const songs = pgTable(
       .$onUpdate(() => new Date()),
     deletedAt: timestamp("deleted_at"), // soft delete
   },
-  (t) => [index("idx_songs_lyrics_search").using("gin", t.lyricsSearch)],
+  (t) => [
+    index("idx_songs_lyrics_search").using("gin", t.lyricsSearch),
+    index("idx_songs_user_id").on(t.userId),
+  ],
 );
 
 export const tags = pgTable(

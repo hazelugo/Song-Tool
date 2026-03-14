@@ -3,20 +3,22 @@ import { db } from "@/db";
 import { playlists, playlistSongs, songs } from "@/db/schema";
 import { and, eq, notInArray, isNull, between } from "drizzle-orm";
 import { getKeyCompatibility } from "@/lib/camelot";
-
-const USER_ID = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+import { requireUser } from "@/lib/auth";
 const BPM_RANGE = 15;
 
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const { userId, error: authError } = await requireUser();
+  if (authError) return authError;
+
   const { id } = await params;
 
   try {
     // Verify ownership and load playlist songs
     const playlist = await db.query.playlists.findFirst({
-      where: and(eq(playlists.id, id), eq(playlists.userId, USER_ID)),
+      where: and(eq(playlists.id, id), eq(playlists.userId, userId)),
       with: {
         songs: {
           with: { song: true },
@@ -46,6 +48,7 @@ export async function GET(
       .where(
         and(
           isNull(songs.deletedAt),
+          eq(songs.userId, userId),
           notInArray(songs.id, existingIds),
           between(songs.bpm, Math.floor(avgBpm - BPM_RANGE), Math.ceil(avgBpm + BPM_RANGE)),
         ),

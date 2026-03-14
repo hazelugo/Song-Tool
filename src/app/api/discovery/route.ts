@@ -5,6 +5,7 @@ import { and, isNull, gte, lte, eq, ilike, exists, or, sql } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import { z } from "zod";
 import { MUSICAL_KEYS, TIME_SIGNATURES } from "@/lib/validations/song";
+import { requireUser } from "@/lib/auth";
 
 const schema = z.object({ prompt: z.string().min(1).max(500) });
 
@@ -109,6 +110,9 @@ function parsePrompt(prompt: string): {
 }
 
 export async function POST(request: Request) {
+  const { userId, error: authError } = await requireUser();
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const parsed = schema.safeParse(body);
@@ -119,7 +123,7 @@ export async function POST(request: Request) {
     const { prompt } = parsed.data;
     const filters = parsePrompt(prompt);
 
-    const conditions: SQL[] = [isNull(songs.deletedAt)];
+    const conditions: SQL[] = [isNull(songs.deletedAt), eq(songs.userId, userId)];
 
     if (filters.bpmMin !== undefined) conditions.push(gte(songs.bpm, filters.bpmMin));
     if (filters.bpmMax !== undefined) conditions.push(lte(songs.bpm, filters.bpmMax));

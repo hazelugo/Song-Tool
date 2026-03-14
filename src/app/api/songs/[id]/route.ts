@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { songs, tags } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { songApiSchema } from "@/lib/validations/song";
+import { requireUser } from "@/lib/auth";
 
 function parseChordProgressions(raw: string): string[] {
   if (!raw.trim()) return [];
@@ -16,6 +17,9 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const { userId, error: authError } = await requireUser();
+  if (authError) return authError;
+
   try {
     const { id } = await params; // Next.js 15: params is a Promise — must await
     const body = await request.json();
@@ -38,7 +42,7 @@ export async function PUT(
       await tx
         .update(songs)
         .set({ ...songData, chordProgressions })
-        .where(eq(songs.id, id));
+        .where(and(eq(songs.id, id), eq(songs.userId, userId)));
       // Delete-all-reinsert: simpler than diffing for v1
       await tx.delete(tags).where(eq(tags.songId, id));
       const normalizedTags = [
@@ -65,13 +69,16 @@ export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const { userId, error: authError } = await requireUser();
+  if (authError) return authError;
+
   try {
     const { id } = await params; // Next.js 15: params is a Promise — must await
     // Soft delete only — playlist_songs.song_id has no cascade
     await db
       .update(songs)
       .set({ deletedAt: new Date() })
-      .where(eq(songs.id, id));
+      .where(and(eq(songs.id, id), eq(songs.userId, userId)));
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("DELETE /api/songs/[id] error:", err);

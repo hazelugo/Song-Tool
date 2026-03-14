@@ -6,6 +6,7 @@ import { and, gte, lte, eq, ilike, exists, sql, asc, desc } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import { filterSchema } from "@/lib/validations/filter";
 import { songApiSchema } from "@/lib/validations/song"; // Keep for POST
+import { requireUser } from "@/lib/auth";
 
 const PAGE_SIZE = 25;
 
@@ -18,6 +19,9 @@ function parseChordProgressions(raw: string): string[] {
 }
 
 export async function GET(request: Request) {
+  const { userId, error: authError } = await requireUser();
+  if (authError) return authError;
+
   try {
     const { searchParams } = new URL(request.url);
 
@@ -25,7 +29,7 @@ export async function GET(request: Request) {
     const parsed = filterSchema.safeParse(Object.fromEntries(searchParams));
     const f = parsed.success ? parsed.data : {};
 
-    const conditions: SQL[] = [isNull(songs.deletedAt)];
+    const conditions: SQL[] = [isNull(songs.deletedAt), eq(songs.userId, userId)];
 
     if (f.bpmMin !== undefined) conditions.push(gte(songs.bpm, f.bpmMin));
     if (f.bpmMax !== undefined) conditions.push(lte(songs.bpm, f.bpmMax));
@@ -93,6 +97,9 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const { userId, error: authError } = await requireUser();
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const parsed = songApiSchema.safeParse(body);
@@ -113,7 +120,7 @@ export async function POST(request: Request) {
     const newSong = await db.transaction(async (tx) => {
       const [song] = await tx
         .insert(songs)
-        .values({ ...songData, chordProgressions })
+        .values({ ...songData, chordProgressions, userId })
         .returning();
       const normalizedTags = [
         ...new Set(tagNames.map((t) => t.toLowerCase().trim())),

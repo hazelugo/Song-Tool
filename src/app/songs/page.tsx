@@ -12,6 +12,7 @@ import {
   PlaylistBuilder,
   PlaylistItem,
 } from "@/components/playlist-builder";
+import { buildSimilarQuery } from "@/lib/similar-query";
 
 export const dynamic = "force-dynamic";
 
@@ -155,6 +156,14 @@ function SongsPageContent() {
         onOpenChange={setSheetOpen}
         song={selectedSong}
         onSuccess={loadSongs}
+        onFindSimilar={
+          selectedSong
+            ? () =>
+                router.push(
+                  `/discovery?q=${encodeURIComponent(buildSimilarQuery(selectedSong))}`,
+                )
+            : undefined
+        }
       />
     </div>
   );

@@ -3,20 +3,21 @@ import { db } from "@/db";
 import { playlists, playlistSongs } from "@/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
-
-// Hardcoded user ID for now
-const USER_ID = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+import { requireUser } from "@/lib/auth";
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const { userId, error: authError } = await requireUser();
+  if (authError) return authError;
+
   const { id } = await params;
   try {
     const playlist = await db.query.playlists.findFirst({
       where: and(
         eq(playlists.id, id),
-        eq(playlists.userId, USER_ID),
+        eq(playlists.userId, userId),
         isNull(playlists.deletedAt),
       ),
       with: {
@@ -51,6 +52,9 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const { userId, error: authError } = await requireUser();
+  if (authError) return authError;
+
   const { id } = await params;
   const body = await request.json();
   const schema = z.object({ name: z.string().min(1) });
@@ -63,7 +67,7 @@ export async function PATCH(
     const [updated] = await db
       .update(playlists)
       .set({ name: result.data.name })
-      .where(and(eq(playlists.id, id), eq(playlists.userId, USER_ID)))
+      .where(and(eq(playlists.id, id), eq(playlists.userId, userId)))
       .returning();
 
     if (!updated) {
@@ -81,12 +85,15 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const { userId, error: authError } = await requireUser();
+  if (authError) return authError;
+
   const { id } = await params;
   try {
     const [deleted] = await db
       .update(playlists)
       .set({ deletedAt: new Date() })
-      .where(and(eq(playlists.id, id), eq(playlists.userId, USER_ID)))
+      .where(and(eq(playlists.id, id), eq(playlists.userId, userId)))
       .returning();
 
     if (!deleted) {

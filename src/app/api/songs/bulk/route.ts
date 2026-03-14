@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { songs, tags } from "@/db/schema";
 import { songApiSchema } from "@/lib/validations/song";
 import { z } from "zod";
+import { requireUser } from "@/lib/auth";
 
 function parseChordProgressions(raw: string): string[] {
   if (!raw.trim()) return [];
@@ -17,6 +18,9 @@ const bulkSchema = z.object({
 });
 
 export async function POST(request: Request) {
+  const { userId, error: authError } = await requireUser();
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const parsed = bulkSchema.safeParse(body);
@@ -33,7 +37,7 @@ export async function POST(request: Request) {
 
         const [song] = await tx
           .insert(songs)
-          .values({ ...rest, chordProgressions })
+          .values({ ...rest, chordProgressions, userId })
           .returning();
 
         const normalizedTags = [

@@ -14,9 +14,10 @@ function bpmStyle(bpm: number) {
 interface SongCardProps {
   song: SongWithTags;
   onClick: (song: SongWithTags) => void;
+  onFindSimilar?: (song: SongWithTags) => void;
 }
 
-export function SongCard({ song, onClick }: SongCardProps) {
+export function SongCard({ song, onClick, onFindSimilar }: SongCardProps) {
   const camelot = getCamelotPosition(song.musicalKey, song.keySignature);
   const camelotLabel = camelot ? formatCamelot(camelot) : null;
   const chords = (song.chordProgressions as string[]) ?? [];
@@ -112,6 +113,22 @@ export function SongCard({ song, onClick }: SongCardProps) {
               +{song.tags.length - 6}
             </span>
           )}
+        </div>
+      )}
+
+      {/* Find similar — revealed on hover */}
+      {onFindSimilar && (
+        <div className="mt-3 pt-3 border-t border-border/40 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onFindSimilar(song);
+            }}
+            className="text-xs text-primary hover:underline"
+          >
+            Find similar →
+          </button>
         </div>
       )}
     </div>

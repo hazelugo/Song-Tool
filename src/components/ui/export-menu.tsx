@@ -1,6 +1,6 @@
 "use client";
 
-import { Download } from "lucide-react";
+import { Download, Printer } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -70,6 +70,56 @@ export function ExportMenu({ playlistName, songs }: ExportMenuProps) {
     );
   };
 
+  const handlePrint = () => {
+    const rows = songs
+      .map((s, i) => {
+        const key = s.musicalKey
+          ? `${s.musicalKey} ${s.keySignature ?? ""}`.trim()
+          : "—";
+        const bpm = s.bpm ?? "—";
+        const tags = (s.tags ?? []).map((t) => t.name).join(", ") || "—";
+        return `<tr>
+          <td>${i + 1}</td>
+          <td>${s.name.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</td>
+          <td>${key}</td>
+          <td>${bpm}</td>
+          <td>${tags}</td>
+        </tr>`;
+      })
+      .join("");
+
+    const html = `<!DOCTYPE html>
+<html><head>
+  <meta charset="utf-8" />
+  <title>${playlistName.replace(/</g, "&lt;")} — Setlist</title>
+  <style>
+    body { font-family: Georgia, serif; max-width: 800px; margin: 40px auto; color: #000; }
+    h1 { font-size: 24px; margin-bottom: 4px; }
+    .meta { font-size: 13px; color: #666; margin-bottom: 24px; }
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; border-bottom: 2px solid #000; padding: 6px 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+    td { padding: 8px; border-bottom: 1px solid #ddd; font-size: 14px; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    td:first-child { color: #999; width: 28px; }
+    @media print { body { margin: 20px; } }
+  </style>
+</head><body>
+  <h1>${playlistName.replace(/</g, "&lt;")}</h1>
+  <p class="meta">${songs.length} song${songs.length !== 1 ? "s" : ""} &middot; Printed ${new Date().toLocaleDateString()}</p>
+  <table>
+    <thead><tr><th>#</th><th>Song</th><th>Key</th><th>BPM</th><th>Tags</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+</body></html>`;
+
+    const win = window.open("", "_blank");
+    if (win) {
+      win.document.write(html);
+      win.document.close();
+      win.print();
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>
@@ -79,6 +129,10 @@ export function ExportMenu({ playlistName, songs }: ExportMenuProps) {
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={handleCsv}>Export as CSV</DropdownMenuItem>
         <DropdownMenuItem onClick={handleJson}>Export as JSON</DropdownMenuItem>
+        <DropdownMenuItem onClick={handlePrint}>
+          <Printer className="h-4 w-4 mr-2" />
+          Print Setlist
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

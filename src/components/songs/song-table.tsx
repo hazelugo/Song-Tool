@@ -51,7 +51,7 @@ const columns: ColumnDef<SongWithTags>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => <SortableHeader column={column} label="Name" />,
-    meta: { className: "w-40" },
+    // No fixed width — expands to fill available space alongside Tags
     cell: ({ getValue }) => (
       <span className="block whitespace-normal break-words">
         {getValue<string>()}
@@ -71,7 +71,8 @@ const columns: ColumnDef<SongWithTags>[] = [
   {
     accessorKey: "keySignature",
     header: ({ column }) => <SortableHeader column={column} label="Key Sig." />,
-    meta: { className: "w-20" },
+    // Hidden on mobile to keep table within screen width
+    meta: { className: "w-24 hidden md:table-cell" },
     cell: ({ row }) => (
       <span className="capitalize">{row.getValue<string>("keySignature")}</span>
     ),
@@ -81,12 +82,14 @@ const columns: ColumnDef<SongWithTags>[] = [
     header: ({ column }) => (
       <SortableHeader column={column} label="Time Sig." />
     ),
-    meta: { className: "w-20" },
+    // Hidden on mobile to keep table within screen width
+    meta: { className: "w-24 hidden md:table-cell" },
   },
   {
     accessorKey: "tags",
     header: "Tags",
     enableSorting: false,
+    // No fixed width — expands to fill available space alongside Name
     cell: ({ row }) => {
       const tags = row.getValue<Tag[]>("tags");
       if (!tags || tags.length === 0) return null;
@@ -144,7 +147,7 @@ export function SongTable({
 
   return (
     <div className="space-y-4">
-      <Table>
+      <Table className="table-fixed">
         <TableHeader>
           {table.getHeaderGroups().map((hg) => (
             <TableRow key={hg.id}>

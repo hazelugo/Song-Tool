@@ -20,6 +20,7 @@ type SongItem = {
   name: string;
   musicalKey: string;
   keySignature: string;
+  timeSignature: string;
   bpm: number;
 };
 
@@ -136,7 +137,7 @@ export function AddSongsDialog({
                     <div className="flex-1 min-w-0 mr-4">
                       <div className="font-medium truncate">{song.name}</div>
                       <div className="text-xs text-muted-foreground">
-                        {song.musicalKey} {song.keySignature} • {song.bpm} BPM
+                        {song.musicalKey} {song.keySignature} • {song.timeSignature} • {song.bpm} BPM
                       </div>
                     </div>
                     {isSelected && <Check className="h-4 w-4 text-primary" />}

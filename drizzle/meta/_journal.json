@@ -15,6 +15,13 @@
       "when": 1773259895708,
       "tag": "0001_windy_killraven",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1773433961452,
+      "tag": "0002_panoramic_quicksilver",
+      "breakpoints": true
     }
   ]
 }

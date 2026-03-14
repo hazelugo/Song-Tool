@@ -7,6 +7,7 @@ import {
   type SongFormValues,
   type SongFormInput,
   MUSICAL_KEYS,
+  TIME_SIGNATURES,
 } from "@/lib/validations/song";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -42,6 +43,7 @@ export function SongForm({
       bpm: undefined,
       musicalKey: undefined,
       keySignature: undefined,
+      timeSignature: "4/4",
       chordProgressions: "",
       lyrics: "",
       youtubeUrl: "",
@@ -141,6 +143,35 @@ export function SongForm({
         {form.formState.errors.keySignature && (
           <p className="text-sm text-destructive">
             {form.formState.errors.keySignature.message}
+          </p>
+        )}
+      </div>
+
+      {/* Time Signature */}
+      <div className="space-y-1.5">
+        <Label>Time Signature *</Label>
+        <Select
+          value={form.watch("timeSignature")}
+          onValueChange={(v) =>
+            form.setValue("timeSignature", v as SongFormValues["timeSignature"], {
+              shouldValidate: true,
+            })
+          }
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select time signature" />
+          </SelectTrigger>
+          <SelectContent>
+            {TIME_SIGNATURES.map((ts) => (
+              <SelectItem key={ts} value={ts}>
+                {ts}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {form.formState.errors.timeSignature && (
+          <p className="text-sm text-destructive">
+            {form.formState.errors.timeSignature.message}
           </p>
         )}
       </div>

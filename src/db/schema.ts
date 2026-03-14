@@ -42,6 +42,22 @@ export const musicalKeyEnum = pgEnum("musical_key", [
 ]);
 export const keySignatureEnum = pgEnum("key_signature", ["major", "minor"]);
 
+// Common time signatures in x/y notation
+export const timeSignatureEnum = pgEnum("time_signature", [
+  "4/4",
+  "3/4",
+  "2/4",
+  "2/2",
+  "6/8",
+  "9/8",
+  "12/8",
+  "5/4",
+  "7/8",
+  "7/4",
+  "3/8",
+  "6/4",
+]);
+
 export const songs = pgTable(
   "songs",
   {
@@ -50,6 +66,7 @@ export const songs = pgTable(
     bpm: integer("bpm").notNull(),
     musicalKey: musicalKeyEnum("musical_key").notNull(),
     keySignature: keySignatureEnum("key_signature").notNull(),
+    timeSignature: timeSignatureEnum("time_signature").notNull().default("4/4"),
     chordProgressions: jsonb("chord_progressions")
       .$type<string[]>()
       .notNull()

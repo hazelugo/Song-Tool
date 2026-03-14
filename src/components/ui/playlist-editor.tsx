@@ -31,6 +31,7 @@ interface Song {
   name: string;
   musicalKey: string | null;
   keySignature: string | null;
+  timeSignature: string | null;
   bpm: number | null;
 }
 
@@ -78,6 +79,11 @@ function ItemRow({ song, index, onRemove, isRemoving, isDragOverlay }: ItemRowPr
           <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded text-muted-foreground">
             {song.musicalKey} {song.keySignature}
           </span>
+          {song.timeSignature && (
+            <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded text-muted-foreground">
+              {song.timeSignature}
+            </span>
+          )}
           {song.bpm && (
             <>
               <span className="text-muted-foreground/40 text-xs">•</span>

@@ -64,6 +64,10 @@ const columns: ColumnDef<SongWithTags>[] = [
     ),
   },
   {
+    accessorKey: "timeSignature",
+    header: ({ column }) => <SortableHeader column={column} label="Time Sig." />,
+  },
+  {
     accessorKey: "tags",
     header: "Tags",
     enableSorting: false,

@@ -29,6 +29,7 @@ export async function GET(request: Request) {
     if (f.bpmMax !== undefined) conditions.push(lte(songs.bpm, f.bpmMax));
     if (f.key) conditions.push(eq(songs.musicalKey, f.key as any));
     if (f.keySig) conditions.push(eq(songs.keySignature, f.keySig as any));
+    if (f.timeSig) conditions.push(eq(songs.timeSignature, f.timeSig as any));
 
     if (f.chord) {
       conditions.push(

@@ -31,6 +31,9 @@ interface SongTableProps {
   pageCount?: number;
   pageIndex?: number;
   onPageChange?: (page: number) => void;
+  // Server-side sorting — omit to use client-side sorting
+  sorting?: SortingState;
+  onSortingChange?: (s: SortingState) => void;
 }
 
 function SortableHeader({ column, label }: { column: any; label: string }) {
@@ -113,9 +116,15 @@ export function SongTable({
   pageCount,
   pageIndex,
   onPageChange,
+  sorting: sortingProp,
+  onSortingChange,
 }: SongTableProps) {
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [localSorting, setLocalSorting] = useState<SortingState>([]);
   const isManual = pageCount !== undefined && pageIndex !== undefined && onPageChange !== undefined;
+  const isManualSort = sortingProp !== undefined && onSortingChange !== undefined;
+
+  const sorting = isManualSort ? sortingProp : localSorting;
+  const setSorting = isManualSort ? onSortingChange : setLocalSorting;
 
   const table = useReactTable({
     data,
@@ -126,7 +135,7 @@ export function SongTable({
     },
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
+    ...(isManualSort ? { manualSorting: true } : { getSortedRowModel: getSortedRowModel() }),
     ...(isManual
       ? { manualPagination: true, pageCount, onPaginationChange: (updater) => {
           const next = typeof updater === "function" ? updater({ pageIndex, pageSize: 25 }) : updater;

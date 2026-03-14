@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback, useRef, Suspense } from "react";
+import type { SortingState } from "@tanstack/react-table";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { SongTable } from "@/components/songs/song-table";
@@ -27,6 +28,7 @@ function SongsPageContent() {
   const playlistId = searchParams.get("id");
   const [pageIndex, setPageIndex] = useState(0);
   const [total, setTotal] = useState(0);
+  const [sorting, setSorting] = useState<SortingState>([]);
   const PAGE_SIZE = 25;
   const prevFiltersRef = useRef(searchParams.toString());
 
@@ -62,6 +64,10 @@ function SongsPageContent() {
     try {
       const params = new URLSearchParams(searchParams.toString());
       params.set("page", String(pageIndex + 1));
+      if (sorting.length > 0) {
+        params.set("sort", sorting[0].id);
+        params.set("sortDir", sorting[0].desc ? "desc" : "asc");
+      }
       const res = await fetch(`/api/songs?${params.toString()}`);
       if (res.ok) {
         const { data, total } = await res.json();
@@ -73,11 +79,16 @@ function SongsPageContent() {
     } finally {
       setIsLoading(false);
     }
-  }, [searchParams, pageIndex]);
+  }, [searchParams, pageIndex, sorting]);
 
   useEffect(() => {
     loadSongs();
   }, [loadSongs]);
+
+  const handleSortingChange = (s: SortingState) => {
+    setSorting(s);
+    setPageIndex(0);
+  };
 
   const openAddSheet = () => {
     setSelectedSong(undefined);
@@ -133,6 +144,8 @@ function SongsPageContent() {
           pageCount={Math.ceil(total / PAGE_SIZE)}
           pageIndex={pageIndex}
           onPageChange={setPageIndex}
+          sorting={sorting}
+          onSortingChange={handleSortingChange}
         />
       )}
 

@@ -10,6 +10,8 @@ export const filterSchema = z.object({
   chord: z.string().max(100).optional(),
   lyric: z.string().max(500).optional(),
   tag: z.string().max(100).optional(),
+  sort: z.enum(["name", "bpm", "musicalKey", "keySignature", "timeSignature", "createdAt"]).optional(),
+  sortDir: z.enum(["asc", "desc"]).optional(),
 });
 
 export type FilterParams = z.infer<typeof filterSchema>;

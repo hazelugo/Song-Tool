@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { songs, tags } from "@/db/schema";
 import { isNull, count } from "drizzle-orm";
-import { and, gte, lte, eq, ilike, exists, sql } from "drizzle-orm";
+import { and, gte, lte, eq, ilike, exists, sql, asc, desc } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import { filterSchema } from "@/lib/validations/filter";
 import { songApiSchema } from "@/lib/validations/song"; // Keep for POST
@@ -60,12 +60,23 @@ export async function GET(request: Request) {
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
     const whereClause = and(...conditions);
 
+    const sortColMap = {
+      name: songs.name,
+      bpm: songs.bpm,
+      musicalKey: songs.musicalKey,
+      keySignature: songs.keySignature,
+      timeSignature: songs.timeSignature,
+      createdAt: songs.createdAt,
+    } as const;
+    const sortCol = sortColMap[f.sort ?? "createdAt"] ?? songs.createdAt;
+    const orderByClause = (f.sortDir ?? "desc") === "asc" ? asc(sortCol) : desc(sortCol);
+
     const [[{ total }], data] = await Promise.all([
       db.select({ total: count() }).from(songs).where(whereClause),
       db.query.songs.findMany({
         where: whereClause,
         with: { tags: true },
-        orderBy: (songs, { desc }) => [desc(songs.createdAt)],
+        orderBy: orderByClause,
         limit: PAGE_SIZE,
         offset: (page - 1) * PAGE_SIZE,
       }),

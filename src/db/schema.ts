@@ -52,20 +52,6 @@ export const timeSignatureEnum = pgEnum("time_signature", [
   "5/4",
   "7/8",
   "7/4",
-]);
-
-// Common time signatures in x/y notation
-export const timeSignatureEnum = pgEnum("time_signature", [
-  "4/4",
-  "3/4",
-  "2/4",
-  "2/2",
-  "6/8",
-  "9/8",
-  "12/8",
-  "5/4",
-  "7/8",
-  "7/4",
   "3/8",
   "6/4",
 ]);
@@ -99,26 +85,34 @@ export const songs = pgTable(
   (t) => [index("idx_songs_lyrics_search").using("gin", t.lyricsSearch)],
 );
 
-export const tags = pgTable("tags", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  songId: uuid("song_id")
-    .notNull()
-    .references(() => songs.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const tags = pgTable(
+  "tags",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    songId: uuid("song_id")
+      .notNull()
+      .references(() => songs.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => [index("idx_tags_song_id").on(t.songId)],
+);
 
-export const playlists = pgTable("playlists", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  userId: uuid("user_id").notNull(),
-  name: text("name").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .notNull()
-    .$onUpdate(() => new Date()),
-  deletedAt: timestamp("deleted_at"),
-});
+export const playlists = pgTable(
+  "playlists",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id").notNull(),
+    name: text("name").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .notNull()
+      .$onUpdate(() => new Date()),
+    deletedAt: timestamp("deleted_at"),
+  },
+  (t) => [index("idx_playlists_user_id").on(t.userId)],
+);
 
 export const playlistSongs = pgTable(
   "playlist_songs",
@@ -131,7 +125,10 @@ export const playlistSongs = pgTable(
       .references(() => songs.id), // no cascade: soft-deleted songs stay in playlists
     position: real("position").notNull(), // fractional indexing — single-row UPDATE per drag reorder
   },
-  (t) => [primaryKey({ columns: [t.playlistId, t.songId] })],
+  (t) => [
+    primaryKey({ columns: [t.playlistId, t.songId] }),
+    index("idx_playlist_songs_playlist_id").on(t.playlistId),
+  ],
 );
 
 // TypeScript type exports — used by all feature phases

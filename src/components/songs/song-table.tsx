@@ -27,6 +27,10 @@ interface SongTableProps {
   data: SongWithTags[];
   onRowClick: (song: SongWithTags) => void;
   isLoading: boolean;
+  // Server-side pagination — omit to use client-side pagination
+  pageCount?: number;
+  pageIndex?: number;
+  onPageChange?: (page: number) => void;
 }
 
 function SortableHeader({ column, label }: { column: any; label: string }) {
@@ -99,20 +103,33 @@ const columns: ColumnDef<SongWithTags>[] = [
   },
 ];
 
-export function SongTable({ data, onRowClick, isLoading }: SongTableProps) {
+export function SongTable({
+  data,
+  onRowClick,
+  isLoading,
+  pageCount,
+  pageIndex,
+  onPageChange,
+}: SongTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
+  const isManual = pageCount !== undefined && pageIndex !== undefined && onPageChange !== undefined;
 
   const table = useReactTable({
     data,
     columns,
-    state: { sorting },
+    state: {
+      sorting,
+      ...(isManual ? { pagination: { pageIndex, pageSize: 25 } } : {}),
+    },
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    initialState: {
-      pagination: { pageSize: 25 },
-    },
+    ...(isManual
+      ? { manualPagination: true, pageCount, onPaginationChange: (updater) => {
+          const next = typeof updater === "function" ? updater({ pageIndex, pageSize: 25 }) : updater;
+          onPageChange(next.pageIndex);
+        }}
+      : { getPaginationRowModel: getPaginationRowModel(), initialState: { pagination: { pageSize: 25 } } }),
   });
 
   if (isLoading) {
@@ -165,12 +182,12 @@ export function SongTable({ data, onRowClick, isLoading }: SongTableProps) {
         </TableBody>
       </Table>
 
-      {/* Pagination controls — only shown when there are rows */}
-      {data.length > 0 && (
+      {/* Pagination controls — only shown when there are multiple pages */}
+      {table.getPageCount() > 1 && (
         <div className="flex items-center justify-between">
           <span className="text-sm text-muted-foreground">
             Page {table.getState().pagination.pageIndex + 1} of{" "}
-            {table.getPageCount()} ({data.length} songs)
+            {table.getPageCount()}
           </span>
           <div className="flex gap-2">
             <Button

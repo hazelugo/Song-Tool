@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   DndContext,
   closestCenter,
@@ -172,6 +173,14 @@ export function PlaylistBuilder({
     );
   });
 
+  const libraryScrollRef = useRef<HTMLDivElement>(null);
+  const rowVirtualizer = useVirtualizer({
+    count: filteredSongs.length,
+    getScrollElement: () => libraryScrollRef.current,
+    estimateSize: () => 60,
+    overscan: 5,
+  });
+
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-4 p-4 border-b">
@@ -191,28 +200,45 @@ export function PlaylistBuilder({
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <div className="flex-1 overflow-y-auto p-2 space-y-2">
-            {filteredSongs.map((song) => (
-              <div
-                key={song.id}
-                className="flex items-center justify-between p-2 rounded-md border bg-card hover:bg-accent/50 transition-colors group"
-              >
-                <div className="overflow-hidden">
-                  <div className="font-medium truncate">{song.name}</div>
-                  <div className="text-xs text-muted-foreground truncate">
-                    {song.bpm} BPM • {song.musicalKey}
+          <div ref={libraryScrollRef} className="flex-1 overflow-y-auto p-2">
+            <div
+              style={{ height: `${rowVirtualizer.getTotalSize()}px`, position: "relative" }}
+            >
+              {rowVirtualizer.getVirtualItems().map((virtualItem) => {
+                const song = filteredSongs[virtualItem.index];
+                return (
+                  <div
+                    key={song.id}
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: `${virtualItem.size}px`,
+                      transform: `translateY(${virtualItem.start}px)`,
+                      paddingBottom: "8px",
+                    }}
+                  >
+                    <div className="flex items-center justify-between p-2 rounded-md border bg-card hover:bg-accent/50 transition-colors group h-full">
+                      <div className="overflow-hidden">
+                        <div className="font-medium truncate">{song.name}</div>
+                        <div className="text-xs text-muted-foreground truncate">
+                          {song.bpm} BPM • {song.musicalKey}
+                        </div>
+                      </div>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => addItem(song)}
+                        className="opacity-0 group-hover:opacity-100"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
-                </div>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => addItem(song)}
-                  className="opacity-0 group-hover:opacity-100"
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
+                );
+              })}
+            </div>
           </div>
         </div>
 

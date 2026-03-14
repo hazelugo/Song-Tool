@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { songs, tags } from "@/db/schema";
-import { isNull } from "drizzle-orm";
+import { isNull, count } from "drizzle-orm";
 import { and, gte, lte, eq, ilike, exists, sql } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import { filterSchema } from "@/lib/validations/filter";
 import { songApiSchema } from "@/lib/validations/song"; // Keep for POST
+
+const PAGE_SIZE = 25;
 
 function parseChordProgressions(raw: string): string[] {
   if (!raw.trim()) return [];
@@ -55,15 +57,21 @@ export async function GET(request: Request) {
       conditions.push(exists(tagSq));
     }
 
-    const result = await db.query.songs.findMany({
-      // Combine all conditions with AND
-      // Drizzle's `and()` operator safely ignores `undefined` values,
-      // so conditions that aren't pushed (because filter param was missing) are skipped.
-      where: and(...conditions),
-      with: { tags: true },
-      orderBy: (songs, { desc }) => [desc(songs.createdAt)],
-    });
-    return NextResponse.json(result);
+    const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
+    const whereClause = and(...conditions);
+
+    const [[{ total }], data] = await Promise.all([
+      db.select({ total: count() }).from(songs).where(whereClause),
+      db.query.songs.findMany({
+        where: whereClause,
+        with: { tags: true },
+        orderBy: (songs, { desc }) => [desc(songs.createdAt)],
+        limit: PAGE_SIZE,
+        offset: (page - 1) * PAGE_SIZE,
+      }),
+    ]);
+
+    return NextResponse.json({ data, total, page, pageSize: PAGE_SIZE });
   } catch (err) {
     console.error("GET /api/songs error:", err);
     return NextResponse.json(

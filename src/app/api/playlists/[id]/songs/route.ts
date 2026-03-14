@@ -40,13 +40,16 @@ export async function POST(
     let pos = (maxPos ?? 0) + 1;
 
     await db.transaction(async (tx) => {
-      for (const songId of result.data.songIds) {
-        await tx
-          .insert(playlistSongs)
-          .values({ playlistId: id, songId, position: pos })
-          .onConflictDoNothing();
-        pos += 1;
-      }
+      await tx
+        .insert(playlistSongs)
+        .values(
+          result.data.songIds.map((songId, i) => ({
+            playlistId: id,
+            songId,
+            position: pos + i,
+          })),
+        )
+        .onConflictDoNothing();
       await tx
         .update(playlists)
         .set({ updatedAt: new Date() })
@@ -80,17 +83,17 @@ export async function PUT(
 
   try {
     await db.transaction(async (tx) => {
-      for (let i = 0; i < result.data.songIds.length; i++) {
-        await tx
-          .update(playlistSongs)
-          .set({ position: i + 1 })
-          .where(
-            and(
-              eq(playlistSongs.playlistId, id),
-              eq(playlistSongs.songId, result.data.songIds[i]),
-            ),
-          );
-      }
+      // Delete and bulk-reinsert: 2 queries instead of N
+      await tx
+        .delete(playlistSongs)
+        .where(eq(playlistSongs.playlistId, id));
+      await tx.insert(playlistSongs).values(
+        result.data.songIds.map((songId, i) => ({
+          playlistId: id,
+          songId,
+          position: i + 1,
+        })),
+      );
       await tx
         .update(playlists)
         .set({ updatedAt: new Date() })

@@ -16,7 +16,10 @@
       "Bash(npm run test:e2e:*)",
       "Skill(gsd:discuss-phase)",
       "Skill(gsd:discuss-phase:*)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "mcp__gemini-cli__ask-gemini",
+      "Bash(gemini:*)",
+      "Bash(cd:*)"
     ]
   }
 }

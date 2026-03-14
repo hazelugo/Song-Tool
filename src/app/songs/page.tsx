@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback, Suspense } from "react";
+import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { SongTable } from "@/components/songs/song-table";
@@ -24,6 +24,10 @@ function SongsPageContent() {
   const [showPlaylistBuilder, setShowPlaylistBuilder] = useState(false);
   const router = useRouter();
   const playlistId = searchParams.get("id");
+  const [pageIndex, setPageIndex] = useState(0);
+  const [total, setTotal] = useState(0);
+  const PAGE_SIZE = 25;
+  const prevFiltersRef = useRef(searchParams.toString());
 
   async function savePlaylist(name: string, items: PlaylistItem[]) {
     try {
@@ -43,20 +47,32 @@ function SongsPageContent() {
     }
   }
 
+  // Reset to page 0 when filters change
+  useEffect(() => {
+    const filtersStr = searchParams.toString();
+    if (filtersStr !== prevFiltersRef.current) {
+      prevFiltersRef.current = filtersStr;
+      setPageIndex(0);
+    }
+  }, [searchParams]);
+
   const loadSongs = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`/api/songs?${searchParams.toString()}`);
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("page", String(pageIndex + 1));
+      const res = await fetch(`/api/songs?${params.toString()}`);
       if (res.ok) {
-        const data = await res.json();
+        const { data, total } = await res.json();
         setSongs(data);
+        setTotal(total);
       }
     } catch {
       // Silent fail — table stays empty
     } finally {
       setIsLoading(false);
     }
-  }, [searchParams]);
+  }, [searchParams, pageIndex]);
 
   useEffect(() => {
     loadSongs();
@@ -112,6 +128,9 @@ function SongsPageContent() {
           data={songs}
           onRowClick={openEditSheet}
           isLoading={isLoading}
+          pageCount={Math.ceil(total / PAGE_SIZE)}
+          pageIndex={pageIndex}
+          onPageChange={setPageIndex}
         />
       )}
 

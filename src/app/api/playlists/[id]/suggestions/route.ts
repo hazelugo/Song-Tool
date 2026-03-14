@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { playlists, playlistSongs, songs } from "@/db/schema";
-import { and, eq, notInArray, isNull } from "drizzle-orm";
+import { and, eq, notInArray, isNull, between } from "drizzle-orm";
 import { getKeyCompatibility } from "@/lib/camelot";
 
 const USER_ID = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
@@ -47,10 +47,9 @@ export async function GET(
         and(
           isNull(songs.deletedAt),
           notInArray(songs.id, existingIds),
-          // BPM range filter handled in JS to avoid complex SQL; candidate pool is bounded
+          between(songs.bpm, Math.floor(avgBpm - BPM_RANGE), Math.ceil(avgBpm + BPM_RANGE)),
         ),
-      )
-      .limit(200);
+      );
 
     // Score each candidate
     type Suggestion = {
@@ -69,16 +68,11 @@ export async function GET(
       const reasons: string[] = [];
       let score = 0;
 
-      // BPM compatibility
+      // BPM compatibility (range already enforced in SQL)
       if (candidate.bpm !== null) {
         const bpmDiff = Math.abs(candidate.bpm - avgBpm);
-        if (bpmDiff <= BPM_RANGE) {
-          score += 1;
-          reasons.push(`${candidate.bpm} BPM (±${Math.round(bpmDiff)} from avg)`);
-        } else {
-          // Skip songs too far out of BPM range
-          continue;
-        }
+        score += 1;
+        reasons.push(`${candidate.bpm} BPM (±${Math.round(bpmDiff)} from avg)`);
       }
 
       // Key compatibility — check against the most common key in playlist

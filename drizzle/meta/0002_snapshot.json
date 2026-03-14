@@ -1,5 +1,5 @@
 {
-  "id": "d10c511c-0e07-4470-adcc-8324c541164b",
+  "id": "df261a17-49db-4ee9-81cf-56ccedcec428",
   "prevId": "ea9c76b9-050d-48da-a5ef-67413d83ef85",
   "version": "7",
   "dialect": "postgresql",
@@ -33,12 +33,8 @@
           "name": "playlist_songs_playlist_id_playlists_id_fk",
           "tableFrom": "playlist_songs",
           "tableTo": "playlists",
-          "columnsFrom": [
-            "playlist_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["playlist_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -46,12 +42,8 @@
           "name": "playlist_songs_song_id_songs_id_fk",
           "tableFrom": "playlist_songs",
           "tableTo": "songs",
-          "columnsFrom": [
-            "song_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["song_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -59,10 +51,7 @@
       "compositePrimaryKeys": {
         "playlist_songs_playlist_id_song_id_pk": {
           "name": "playlist_songs_playlist_id_song_id_pk",
-          "columns": [
-            "playlist_id",
-            "song_id"
-          ]
+          "columns": ["playlist_id", "song_id"]
         }
       },
       "uniqueConstraints": {},
@@ -284,12 +273,8 @@
           "name": "tags_song_id_songs_id_fk",
           "tableFrom": "tags",
           "tableTo": "songs",
-          "columnsFrom": [
-            "song_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["song_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -305,10 +290,7 @@
     "public.key_signature": {
       "name": "key_signature",
       "schema": "public",
-      "values": [
-        "major",
-        "minor"
-      ]
+      "values": ["major", "minor"]
     },
     "public.musical_key": {
       "name": "musical_key",
@@ -346,9 +328,7 @@
         "12/8",
         "5/4",
         "7/8",
-        "7/4",
-        "3/8",
-        "6/4"
+        "7/4"
       ]
     }
   },

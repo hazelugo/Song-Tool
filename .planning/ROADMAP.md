@@ -14,9 +14,9 @@ Four phases from empty repo to a working music database and playlist builder. Ph
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Project scaffolding, database schema, and Vercel deployment (completed 2026-03-09)
-- [x] **Phase 2: Song Catalog** - Full CRUD for songs with all musical metadata fields
-- [x] **Phase 3: Discovery** - Filter and sort engine — find songs by shared musical properties
-- [ ] **Phase 4: Playlist Builder** - Save, view, reorder, and use playlists from filtered results (IN PROGRESS)
+- [x] **Phase 2: Song Catalog** - Full CRUD for songs with all musical metadata fields (completed 2026-03-10)
+- [x] **Phase 3: Discovery** - Filter and sort engine — find songs by shared musical properties (completed 2026-03-10)
+- [x] **Phase 4: Playlist Builder** - Save, view, reorder, and use playlists from filtered results (completed 2026-03-11)
 
 ## Phase Details
 
@@ -95,10 +95,10 @@ Plans:
 
 Plans:
 
-- [ ] 04-01: Playlist data layer (playlist CRUD, playlist_songs join table with fractional position, ownership-safe queries)
-- [ ] 04-02: Save playlist flow (save button on filter results, name prompt, confirmation)
-- [ ] 04-03: Playlist view UI (playlist list, open playlist, song rows with streaming links, remove-from-playlist action, delete playlist)
-- [ ] 04-04: Drag-and-drop reorder (dnd-kit sortable, fractional indexing on drop, UI rollback on persist failure)
+- [x] 04-01: Playlist data layer (playlist CRUD, playlist_songs join table with fractional position, ownership-safe queries, Camelot suggestions API)
+- [x] 04-02: Save playlist flow (PlaylistBuilder component, "Save results as Playlist" on Songs and Discovery pages, Playlists list page)
+- [x] 04-03: Playlist view UI (playlist detail page, PlaylistEditor with streaming links, AddSongsDialog, SuggestionsPanel, ExportMenu, PlaylistNameEditor)
+- [x] 04-04: Drag-and-drop reorder (dnd-kit sortable, DragOverlay, optimistic update, PUT /api/playlists/[id]/songs, UI rollback on persist failure)
 
 ## Progress
 
@@ -107,7 +107,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase               | Plans Complete | Status      | Completed  |
 | ------------------- | -------------- | ----------- | ---------- |
-| 1. Foundation       | 2/2            | Complete    | 2026-03-10 |
-| 2. Song Catalog     | 3/3            | Complete    | -          |
-| 3. Discovery        | 2/2            | Complete    | -          |
-| 4. Playlist Builder | 1/4            | In Progress | -          |
+| 1. Foundation       | 2/2            | Complete    | 2026-03-09 |
+| 2. Song Catalog     | 3/3            | Complete    | 2026-03-10 |
+| 3. Discovery        | 2/2            | Complete    | 2026-03-10 |
+| 4. Playlist Builder | 4/4            | Complete    | 2026-03-11 |

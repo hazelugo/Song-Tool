@@ -33,7 +33,7 @@ function SongFiltersContent() {
   const debouncedUpdate = useDebouncedCallback(updateFilter, 300);
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 p-4 border rounded-lg bg-muted/20">
+    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 p-4 border rounded-lg bg-muted/20 max-w-4xl">
       {/* BPM Range */}
       <div className="space-y-2">
         <Label htmlFor="bpmMin">Min BPM</Label>

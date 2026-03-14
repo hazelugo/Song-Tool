@@ -41,6 +41,18 @@ export const musicalKeyEnum = pgEnum("musical_key", [
   "B",
 ]);
 export const keySignatureEnum = pgEnum("key_signature", ["major", "minor"]);
+export const timeSignatureEnum = pgEnum("time_signature", [
+  "4/4",
+  "3/4",
+  "2/4",
+  "2/2",
+  "6/8",
+  "9/8",
+  "12/8",
+  "5/4",
+  "7/8",
+  "7/4",
+]);
 
 // Common time signatures in x/y notation
 export const timeSignatureEnum = pgEnum("time_signature", [

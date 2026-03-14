@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Check, Plus, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -95,7 +95,7 @@ export function AddSongsDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className={cn(buttonVariants())}>
+      <DialogTrigger render={<Button />}>
         <Plus className="mr-2 h-4 w-4" />
         Add Songs
       </DialogTrigger>

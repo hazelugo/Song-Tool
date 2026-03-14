@@ -170,6 +170,8 @@ export function PlaylistEditor({
   const [activeId, setActiveId] = React.useState<string | null>(null);
   const router = useRouter();
 
+  const dndId = React.useId();
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 8 }, // prevents accidental drag on button clicks
@@ -238,6 +240,7 @@ export function PlaylistEditor({
 
   return (
     <DndContext
+      id={dndId}
       sensors={sensors}
       collisionDetection={closestCenter}
       onDragStart={handleDragStart}

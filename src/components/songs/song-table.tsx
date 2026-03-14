@@ -47,25 +47,37 @@ const columns: ColumnDef<SongWithTags>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => <SortableHeader column={column} label="Name" />,
+    meta: { className: "w-40" },
+    cell: ({ getValue }) => (
+      <span className="block whitespace-normal break-words">
+        {getValue<string>()}
+      </span>
+    ),
   },
   {
     accessorKey: "bpm",
     header: ({ column }) => <SortableHeader column={column} label="BPM" />,
+    meta: { className: "w-16" },
   },
   {
     accessorKey: "musicalKey",
     header: ({ column }) => <SortableHeader column={column} label="Key" />,
+    meta: { className: "w-14" },
   },
   {
     accessorKey: "keySignature",
     header: ({ column }) => <SortableHeader column={column} label="Key Sig." />,
+    meta: { className: "w-20" },
     cell: ({ row }) => (
       <span className="capitalize">{row.getValue<string>("keySignature")}</span>
     ),
   },
   {
     accessorKey: "timeSignature",
-    header: ({ column }) => <SortableHeader column={column} label="Time Sig." />,
+    header: ({ column }) => (
+      <SortableHeader column={column} label="Time Sig." />
+    ),
+    meta: { className: "w-20" },
   },
   {
     accessorKey: "tags",
@@ -120,7 +132,10 @@ export function SongTable({ data, onRowClick, isLoading }: SongTableProps) {
           {table.getHeaderGroups().map((hg) => (
             <TableRow key={hg.id}>
               {hg.headers.map((header) => (
-                <TableHead key={header.id}>
+                <TableHead
+                  key={header.id}
+                  className={(header.column.columnDef.meta as any)?.className}
+                >
                   {flexRender(
                     header.column.columnDef.header,
                     header.getContext(),
@@ -138,7 +153,10 @@ export function SongTable({ data, onRowClick, isLoading }: SongTableProps) {
               className="cursor-pointer hover:bg-muted/50 transition-colors"
             >
               {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
+                <TableCell
+                  key={cell.id}
+                  className={(cell.column.columnDef.meta as any)?.className}
+                >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>
               ))}

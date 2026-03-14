@@ -12,8 +12,6 @@ export const TIME_SIGNATURES = [
   "5/4",
   "7/8",
   "7/4",
-  "3/8",
-  "6/4",
 ] as const;
 
 // Must match musicalKeyEnum in schema.ts exactly (17 values)
@@ -49,7 +47,7 @@ export const songSchema = z.object({
   }),
   timeSignature: z.enum(TIME_SIGNATURES, {
     message: "Select a time signature",
-  }).default("4/4"),
+  }),
   chordProgressions: z.string().default(""),
   lyrics: z.string().optional(),
   youtubeUrl: z

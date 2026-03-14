@@ -3,20 +3,24 @@ import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup,
   SidebarGroupContent, SidebarHeader,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { Music, Search, ListMusic, Moon, Sun } from "lucide-react"
+import { Music, Search, ListMusic, Moon, Sun, Timer, Piano } from "lucide-react"
 import { useTheme } from "next-themes"
 
 const navItems = [
-  { title: "Songs",     url: "/songs",     icon: Music },
-  { title: "Discovery", url: "/discovery", icon: Search },
-  { title: "Playlists", url: "/playlists", icon: ListMusic },
+  { title: "Songs",      url: "/songs",     icon: Music },
+  { title: "Discovery",  url: "/discovery", icon: Search },
+  { title: "Playlists",  url: "/playlists", icon: ListMusic },
+  { title: "Metronome",  url: "/metronome", icon: Timer },
+  { title: "Chord Pads", url: "/chords",    icon: Piano },
 ]
 
 export function AppSidebar() {
   const { theme, setTheme } = useTheme()
+  const { setOpenMobile } = useSidebar()
   return (
     <Sidebar>
       <SidebarHeader>
@@ -28,7 +32,7 @@ export function AppSidebar() {
             <SidebarMenu>
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton render={<Link href={item.url} />}>
+                  <SidebarMenuButton render={<Link href={item.url} onClick={() => setOpenMobile(false)} />}>
                     <item.icon className="h-4 w-4" />
                     <span>{item.title}</span>
                   </SidebarMenuButton>

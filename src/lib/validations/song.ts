@@ -1,5 +1,19 @@
 import { z } from "zod";
 
+// Must match timeSignatureEnum in schema.ts exactly
+export const TIME_SIGNATURES = [
+  "4/4",
+  "3/4",
+  "2/4",
+  "2/2",
+  "6/8",
+  "9/8",
+  "12/8",
+  "5/4",
+  "7/8",
+  "7/4",
+] as const;
+
 // Must match musicalKeyEnum in schema.ts exactly (17 values)
 export const MUSICAL_KEYS = [
   "C",
@@ -30,6 +44,9 @@ export const songSchema = z.object({
   }),
   keySignature: z.enum(["major", "minor"] as const, {
     message: "Select major or minor",
+  }),
+  timeSignature: z.enum(TIME_SIGNATURES, {
+    message: "Select a time signature",
   }),
   chordProgressions: z.string().default(""),
   lyrics: z.string().optional(),

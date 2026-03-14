@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MUSICAL_KEYS } from "@/lib/validations/song";
+import { MUSICAL_KEYS, TIME_SIGNATURES } from "@/lib/validations/song";
 
 function SongFiltersContent() {
   const router = useRouter();
@@ -93,6 +93,29 @@ function SongFiltersContent() {
             <SelectItem value="all">All</SelectItem>
             <SelectItem value="major">Major</SelectItem>
             <SelectItem value="minor">Minor</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Time Signature */}
+      <div className="space-y-2">
+        <Label htmlFor="timeSig">Time Sig</Label>
+        <Select
+          value={searchParams.get("timeSig") ?? "all"}
+          onValueChange={(val) =>
+            updateFilter("timeSig", val === "all" ? "" : (val ?? undefined))
+          }
+        >
+          <SelectTrigger id="timeSig">
+            <SelectValue placeholder="All" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All</SelectItem>
+            {TIME_SIGNATURES.map((ts) => (
+              <SelectItem key={ts} value={ts}>
+                {ts}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>

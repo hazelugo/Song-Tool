@@ -22,7 +22,11 @@ export const NOTE_SEMITONES: Record<MusicalKey, number> = {
   B: 11,
 };
 
-const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+const NOTE_NAMES_SHARP = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+const NOTE_NAMES_FLAT  = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
+
+// Keys traditionally spelled with flats: those whose name ends in 'b', plus F (has Bb in scale)
+const FLAT_KEYS = new Set<string>(["F", "Bb", "Eb", "Ab", "Db", "Gb"]);
 
 export function noteToFrequency(semitone: number, octave = 4): number {
   return 440 * Math.pow(2, (semitone + octave * 12 - 57) / 12);
@@ -70,10 +74,11 @@ export function getDiatonicChords(key: MusicalKey, keySig: "major" | "minor"): C
   const rootSemitone = NOTE_SEMITONES[key];
   const scale = keySig === "major" ? MAJOR_SCALE : MINOR_SCALE;
   const romans = keySig === "major" ? MAJOR_ROMAN_NUMERALS : MINOR_ROMAN_NUMERALS;
+  const noteNames = FLAT_KEYS.has(key) ? NOTE_NAMES_FLAT : NOTE_NAMES_SHARP;
 
   return scale.map((degree, i) => {
     const noteSemitone = (rootSemitone + degree.interval) % 12;
-    const noteName = NOTE_NAMES[noteSemitone];
+    const noteName = noteNames[noteSemitone];
     const qualitySuffix =
       degree.quality === "minor" ? "m" : degree.quality === "dim" ? "°" : "";
     const label = noteName + qualitySuffix;

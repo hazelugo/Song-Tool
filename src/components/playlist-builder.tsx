@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   DndContext,
@@ -117,14 +117,6 @@ export function PlaylistBuilder({
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
-
-  useEffect(() => {
-    if (initialName) setName(initialName);
-  }, [initialName]);
-
-  useEffect(() => {
-    if (initialItems) setItems(initialItems);
-  }, [initialItems]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;

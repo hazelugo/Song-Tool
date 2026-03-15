@@ -45,7 +45,7 @@ export function AddSongsDialog({
     if (open) {
       setLoading(true);
       // Fetch all songs to populate the list
-      fetch("/api/songs")
+      fetch("/api/songs?limit=1000")
         .then((res) => res.json())
         .then((data) => {
           setSongs(Array.isArray(data.data) ? data.data : []);

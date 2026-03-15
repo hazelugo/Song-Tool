@@ -62,6 +62,8 @@ export async function GET(request: Request) {
     }
 
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
+    const limitParam = searchParams.get("limit");
+    const pageSize = limitParam ? Math.min(1000, Math.max(1, parseInt(limitParam, 10))) : PAGE_SIZE;
     const whereClause = and(...conditions);
 
     const sortColMap = {
@@ -81,12 +83,12 @@ export async function GET(request: Request) {
         where: whereClause,
         with: { tags: true },
         orderBy: orderByClause,
-        limit: PAGE_SIZE,
-        offset: (page - 1) * PAGE_SIZE,
+        limit: pageSize,
+        offset: (page - 1) * pageSize,
       }),
     ]);
 
-    return NextResponse.json({ data, total, page, pageSize: PAGE_SIZE });
+    return NextResponse.json({ data, total, page, pageSize });
   } catch (err) {
     console.error("GET /api/songs error:", err);
     return NextResponse.json(

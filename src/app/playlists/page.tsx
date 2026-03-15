@@ -32,7 +32,7 @@ export default function ViewPlaylistsPage() {
 
   const handleNewPlaylist = async () => {
     setLoadingSongs(true);
-    const res = await fetch("/api/songs");
+    const res = await fetch("/api/songs?limit=1000");
     const data = await res.json();
     setAvailableSongs(Array.isArray(data.data) ? data.data : []);
     setLoadingSongs(false);

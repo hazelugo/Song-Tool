@@ -48,7 +48,7 @@ export function AddSongsDialog({
       fetch("/api/songs")
         .then((res) => res.json())
         .then((data) => {
-          setSongs(Array.isArray(data) ? data : []);
+          setSongs(Array.isArray(data.data) ? data.data : []);
           setLoading(false);
         })
         .catch((err) => {

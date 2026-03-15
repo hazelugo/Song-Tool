@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { playlists, playlistSongs } from "@/db/schema";
-import { eq, isNull, desc } from "drizzle-orm";
+import { and, eq, isNull, desc } from "drizzle-orm";
 import { z } from "zod";
 import { randomUUID } from "crypto";
 import { requireUser } from "@/lib/auth";
@@ -26,7 +26,7 @@ export async function GET() {
     const list = await db
       .select()
       .from(playlists)
-      .where(eq(playlists.userId, userId))
+      .where(and(eq(playlists.userId, userId), isNull(playlists.deletedAt)))
       .orderBy(desc(playlists.updatedAt));
 
     return NextResponse.json(list);

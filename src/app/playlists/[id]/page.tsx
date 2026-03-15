@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { db } from "@/db";
@@ -9,8 +9,7 @@ import { AddSongsDialog } from "@/components/ui/add-songs-dialog";
 import { SuggestionsPanel } from "@/components/ui/suggestions-panel";
 import { ExportMenu } from "@/components/ui/export-menu";
 import { PlaylistNameEditor } from "@/components/ui/playlist-name-editor";
-
-const USER_ID = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function PlaylistDetailPage({
   params,
@@ -19,8 +18,12 @@ export default async function PlaylistDetailPage({
 }) {
   const { id } = await params;
 
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
   const playlist = await db.query.playlists.findFirst({
-    where: and(eq(playlists.id, id), eq(playlists.userId, USER_ID)),
+    where: and(eq(playlists.id, id), eq(playlists.userId, user.id)),
     with: {
       songs: {
         with: { song: { with: { tags: true } } },

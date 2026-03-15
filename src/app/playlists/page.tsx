@@ -34,7 +34,7 @@ export default function ViewPlaylistsPage() {
     setLoadingSongs(true);
     const res = await fetch("/api/songs");
     const data = await res.json();
-    setAvailableSongs(Array.isArray(data) ? data : []);
+    setAvailableSongs(Array.isArray(data.data) ? data.data : []);
     setLoadingSongs(false);
     setShowBuilder(true);
   };

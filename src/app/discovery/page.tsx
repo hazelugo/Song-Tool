@@ -66,6 +66,7 @@ function DiscoveryContent() {
   const [parsedFilters, setParsedFilters] = useState<ParsedFilters | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const [selectedSong, setSelectedSong] = useState<SongWithTags | undefined>();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [showPlaylistBuilder, setShowPlaylistBuilder] = useState(false);
@@ -86,19 +87,24 @@ function DiscoveryContent() {
     if (!prompt.trim()) return;
     setIsLoading(true);
     setHasSearched(true);
+    setSearchError(null);
     try {
       const res = await fetch("/api/discovery", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: prompt.trim() }),
       });
+      const json = await res.json();
       if (res.ok) {
-        const { results: data, parsedFilters: pf } = await res.json();
-        setResults(data);
-        setParsedFilters(pf);
+        setResults(json.results);
+        setParsedFilters(json.parsedFilters);
+      } else {
+        setResults(null);
+        setSearchError(json.error ?? "Search failed");
       }
     } catch {
-      // silent fail
+      setResults(null);
+      setSearchError("Could not reach the server");
     } finally {
       setIsLoading(false);
     }
@@ -141,6 +147,7 @@ function DiscoveryContent() {
     setResults(null);
     setParsedFilters(null);
     setHasSearched(false);
+    setSearchError(null);
     inputRef.current?.focus();
   };
 
@@ -263,6 +270,14 @@ function DiscoveryContent() {
           </div>
         </div>
       </div>
+
+      {/* Error state */}
+      {!isLoading && searchError && (
+        <div className="text-center py-20">
+          <p className="text-destructive text-lg mb-2">Search failed</p>
+          <p className="text-sm text-muted-foreground">{searchError}</p>
+        </div>
+      )}
 
       {/* Loading skeletons */}
       {isLoading && (

@@ -6,7 +6,7 @@ import type { SQL } from "drizzle-orm";
 import { z } from "zod";
 import { MUSICAL_KEYS, TIME_SIGNATURES } from "@/lib/validations/song";
 import { requireUser } from "@/lib/auth";
-import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
+import { GoogleGenerativeAI, SchemaType, FunctionCallingMode } from "@google/generative-ai";
 
 const requestSchema = z.object({ prompt: z.string().min(1).max(500) });
 
@@ -76,7 +76,7 @@ async function extractFiltersWithGemini(prompt: string): Promise<Filters> {
     ],
     toolConfig: {
       functionCallingConfig: {
-        mode: "ANY" as any,
+        mode: FunctionCallingMode.ANY,
         allowedFunctionNames: ["extract_filters"],
       },
     },

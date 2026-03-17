@@ -20,6 +20,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { TagInput } from "./tag-input";
 import Link from "next/link";
 import { Timer } from "lucide-react";
@@ -39,7 +46,8 @@ export function SongForm({
   metronomeHref,
 }: SongFormProps) {
   const [tags, setTags] = useState<string[]>(defaultValues?.tags ?? []);
-  const [showLyrics, setShowLyrics] = useState(!!defaultValues?.lyrics);
+  const [lyricsOpen, setLyricsOpen] = useState(false);
+  const [draftLyrics, setDraftLyrics] = useState("");
 
   const form = useForm<SongFormInput, unknown, SongFormValues>({
     resolver: zodResolver(songSchema),
@@ -253,28 +261,40 @@ export function SongForm({
         )}
       </div>
 
-      {/* Lyrics — collapsed by default */}
+      {/* Lyrics */}
       <div className="space-y-1.5">
-        {!showLyrics && !form.getValues("lyrics") ? (
+        {form.watch("lyrics") ? (
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <Label>Lyrics</Label>
+              <button
+                type="button"
+                onClick={() => {
+                  setDraftLyrics(form.getValues("lyrics") ?? "");
+                  setLyricsOpen(true);
+                }}
+                className="text-xs text-primary hover:underline"
+              >
+                Edit lyrics
+              </button>
+            </div>
+            <p className="text-xs text-muted-foreground line-clamp-2 font-mono whitespace-pre-wrap">
+              {form.watch("lyrics")}
+            </p>
+          </div>
+        ) : (
           <Button
             type="button"
             variant="ghost"
             size="sm"
-            onClick={() => setShowLyrics(true)}
+            onClick={() => {
+              setDraftLyrics("");
+              setLyricsOpen(true);
+            }}
             className="text-muted-foreground"
           >
             + Add lyrics
           </Button>
-        ) : (
-          <>
-            <Label htmlFor="lyrics">Lyrics</Label>
-            <Textarea
-              id="lyrics"
-              {...form.register("lyrics")}
-              placeholder="Enter lyrics..."
-              rows={6}
-            />
-          </>
         )}
       </div>
 
@@ -282,6 +302,39 @@ export function SongForm({
       <Button type="submit" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? "Saving..." : "Save Song"}
       </Button>
+
+      {/* Lyrics editor dialog */}
+      <Dialog open={lyricsOpen} onOpenChange={setLyricsOpen}>
+        <DialogContent className="max-w-2xl h-[80vh] flex flex-col gap-0 p-0">
+          <DialogHeader className="px-6 pt-6 pb-4 border-b">
+            <DialogTitle>Lyrics</DialogTitle>
+          </DialogHeader>
+          <Textarea
+            value={draftLyrics}
+            onChange={(e) => setDraftLyrics(e.target.value)}
+            placeholder="Enter lyrics..."
+            className="flex-1 resize-none rounded-none border-0 focus-visible:ring-0 font-mono text-sm leading-relaxed px-6 py-4"
+          />
+          <DialogFooter className="px-6 py-4 border-t">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setLyricsOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={() => {
+                form.setValue("lyrics", draftLyrics, { shouldDirty: true });
+                setLyricsOpen(false);
+              }}
+            >
+              Save lyrics
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </form>
   );
 }

@@ -40,7 +40,7 @@ interface SongTableProps {
 function SortableHeader({ column, label }: { column: any; label: string }) {
   return (
     <button
-      className="flex items-center gap-1 hover:text-foreground transition-colors"
+      className="flex items-center gap-1 hover:text-foreground transition-colors text-xs uppercase tracking-widest font-medium text-muted-foreground"
       onClick={column.getToggleSortingHandler()}
     >
       {label}
@@ -57,7 +57,7 @@ const columns: ColumnDef<SongWithTags>[] = [
     header: ({ column }) => <SortableHeader column={column} label="Name" />,
     // No fixed width — expands to fill available space alongside Tags
     cell: ({ getValue }) => (
-      <span className="block whitespace-normal break-words">
+      <span className="block whitespace-normal break-words text-sm font-medium">
         {getValue<string>()}
       </span>
     ),
@@ -66,11 +66,23 @@ const columns: ColumnDef<SongWithTags>[] = [
     accessorKey: "bpm",
     header: ({ column }) => <SortableHeader column={column} label="BPM" />,
     meta: { className: "w-16" },
+    cell: ({ getValue }) => {
+      const v = getValue<number | null>();
+      return v != null ? (
+        <span className="font-mono tabular-nums text-sm font-semibold">{v}</span>
+      ) : null;
+    },
   },
   {
     accessorKey: "musicalKey",
     header: ({ column }) => <SortableHeader column={column} label="Key" />,
     meta: { className: "w-14" },
+    cell: ({ getValue }) => {
+      const v = getValue<string | null>();
+      return v ? (
+        <span className="font-mono tabular-nums text-sm font-semibold">{v}</span>
+      ) : null;
+    },
   },
   {
     accessorKey: "keySignature",
@@ -78,7 +90,7 @@ const columns: ColumnDef<SongWithTags>[] = [
     // Hidden on mobile to keep table within screen width
     meta: { className: "w-24 hidden md:table-cell" },
     cell: ({ row }) => (
-      <span className="capitalize">{row.getValue<string>("keySignature")}</span>
+      <span className="font-mono text-sm capitalize">{row.getValue<string>("keySignature")}</span>
     ),
   },
   {
@@ -88,10 +100,18 @@ const columns: ColumnDef<SongWithTags>[] = [
     ),
     // Hidden on mobile to keep table within screen width
     meta: { className: "w-24 hidden md:table-cell" },
+    cell: ({ getValue }) => {
+      const v = getValue<string | null>();
+      return v ? (
+        <span className="font-mono tabular-nums text-sm font-semibold">{v}</span>
+      ) : null;
+    },
   },
   {
     accessorKey: "tags",
-    header: "Tags",
+    header: () => (
+      <span className="text-xs uppercase tracking-widest font-medium text-muted-foreground">Tags</span>
+    ),
     enableSorting: false,
     // No fixed width — expands to fill available space alongside Name
     cell: ({ row }) => {
@@ -100,7 +120,7 @@ const columns: ColumnDef<SongWithTags>[] = [
       return (
         <div className="flex gap-1 flex-wrap">
           {tags.map((t) => (
-            <Badge key={t.id} variant="secondary">
+            <Badge key={t.id} variant="secondary" className="text-xs rounded-sm px-1.5 py-0 h-5">
               {t.name}
             </Badge>
           ))}
@@ -164,15 +184,15 @@ export function SongTable({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <Table className="table-fixed">
         <TableHeader>
           {table.getHeaderGroups().map((hg) => (
-            <TableRow key={hg.id}>
+            <TableRow key={hg.id} className="border-b border-border/60 hover:bg-transparent">
               {hg.headers.map((header) => (
                 <TableHead
                   key={header.id}
-                  className={(header.column.columnDef.meta as any)?.className}
+                  className={`py-2 h-8 ${(header.column.columnDef.meta as any)?.className ?? ""}`}
                 >
                   {flexRender(
                     header.column.columnDef.header,
@@ -188,12 +208,12 @@ export function SongTable({
             <TableRow
               key={row.id}
               onClick={() => onRowClick(row.original)}
-              className="cursor-pointer hover:bg-muted/50 transition-colors"
+              className="cursor-pointer border-b border-border/40 hover:bg-muted/40 hover:border-l-2 hover:border-l-[color:var(--color-chart-4)] transition-colors h-9 group"
             >
               {row.getVisibleCells().map((cell) => (
                 <TableCell
                   key={cell.id}
-                  className={(cell.column.columnDef.meta as any)?.className}
+                  className={`py-1.5 ${(cell.column.columnDef.meta as any)?.className ?? ""}`}
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>
@@ -205,8 +225,8 @@ export function SongTable({
 
       {/* Pagination controls — only shown when there are multiple pages */}
       {table.getPageCount() > 1 && (
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">
+        <div className="flex items-center justify-between pt-1">
+          <span className="text-xs text-muted-foreground font-mono tabular-nums">
             Page {table.getState().pagination.pageIndex + 1} of{" "}
             {table.getPageCount()}
           </span>
@@ -216,6 +236,7 @@ export function SongTable({
               size="sm"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
+              className="h-7 text-xs rounded-sm"
             >
               Previous
             </Button>
@@ -224,6 +245,7 @@ export function SongTable({
               size="sm"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
+              className="h-7 text-xs rounded-sm"
             >
               Next
             </Button>

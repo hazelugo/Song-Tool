@@ -177,9 +177,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ results, parsedFilters: filters });
   } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
     console.error("POST /api/discovery error:", err);
     return NextResponse.json(
-      { error: "Failed to process search" },
+      { error: message },
       { status: 500 },
     );
   }

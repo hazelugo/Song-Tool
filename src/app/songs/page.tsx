@@ -112,19 +112,24 @@ function SongsPageContent() {
   }
 
   return (
-    <div className="flex flex-col gap-6 p-6 max-w-6xl mx-auto w-full">
-      {/* Header row */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Songs</h1>
-        <div className="flex items-center gap-4">
+    <div className="flex flex-col gap-4 p-6 max-w-6xl mx-auto w-full">
+      {/* Header row — DAW toolbar style */}
+      <div className="flex items-center justify-between border-b border-border/60 pb-3">
+        <h1 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Songs</h1>
+        <div className="flex items-center gap-2">
           <Button
+            variant="outline"
+            size="sm"
             onClick={() => setShowPlaylistBuilder(true)}
             disabled={songs.length === 0}
+            className="h-7 text-xs rounded-sm"
           >
-            Save results as Playlist
+            Save as Playlist
           </Button>
           <CsvImportDialog onSuccess={loadSongs} />
-          <Button onClick={openAddSheet}>Add Song</Button>
+          <Button onClick={openAddSheet} size="sm" className="h-7 text-xs rounded-sm">
+            Add Song
+          </Button>
         </div>
       </div>
 
@@ -134,8 +139,8 @@ function SongsPageContent() {
       {/* Empty state */}
       {!isLoading && songs.length === 0 && searchParams.toString() === "" ? (
         <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
-          <p className="text-muted-foreground">No songs yet</p>
-          <Button onClick={openAddSheet}>Add your first song</Button>
+          <p className="text-muted-foreground text-sm">No songs yet</p>
+          <Button onClick={openAddSheet} size="sm" className="rounded-sm">Add your first song</Button>
         </div>
       ) : (
         <SongTable

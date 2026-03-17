@@ -195,27 +195,32 @@ function DiscoveryContent() {
         <div className={`w-full ${isIdle ? "max-w-2xl mx-auto" : "max-w-3xl"}`}>
           {isIdle && (
             <div className="text-center mb-8">
-              <div className="flex items-center justify-center gap-2.5 mb-3">
-                <Sparkles className="size-7 text-primary" />
-                <h1 className="text-4xl font-bold tracking-tight">Discovery</h1>
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <Sparkles className="size-5 text-muted-foreground" />
+                <h1 className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                  Discovery
+                </h1>
               </div>
-              <p className="text-muted-foreground text-lg">
-                Describe what you&apos;re looking for in plain language
+              <p className="text-2xl font-semibold tracking-tight text-foreground mb-1">
+                Find songs by feel
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Describe tempo, key, mood — in plain language
               </p>
             </div>
           )}
 
           {!isIdle && (
             <div className="flex items-center gap-2 mb-3">
-              <Sparkles className="size-4 text-primary" />
-              <h1 className="text-lg font-semibold">Discovery</h1>
+              <Sparkles className="size-3.5 text-muted-foreground" />
+              <h1 className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Discovery</h1>
             </div>
           )}
 
-          {/* Search bar */}
+          {/* Search bar — command palette style */}
           <form onSubmit={handleSubmit}>
             <div className="relative flex items-center">
-              <Search className="absolute left-4 size-5 text-muted-foreground pointer-events-none z-10" />
+              <Search className="absolute left-3 size-4 text-muted-foreground pointer-events-none z-10" />
               <input
                 ref={inputRef}
                 type="text"
@@ -223,29 +228,29 @@ function DiscoveryContent() {
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={PLACEHOLDER_PROMPTS[placeholderIdx]}
                 autoFocus={isIdle}
-                className="w-full h-14 pl-12 pr-28 text-base rounded-2xl border border-border bg-card shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all placeholder:text-muted-foreground/50"
+                className="w-full h-10 pl-9 pr-28 text-sm rounded-sm border border-border bg-card font-mono focus:outline-none focus:ring-1 focus:ring-[color:var(--color-chart-4)] focus:border-[color:var(--color-chart-4)] transition-all placeholder:text-muted-foreground/40 placeholder:font-sans"
               />
-              <div className="absolute right-2 flex items-center gap-1">
+              <div className="absolute right-1.5 flex items-center gap-1">
                 {query && (
                   <button
                     type="button"
                     onClick={handleClear}
-                    className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground transition-colors"
+                    className="p-1 rounded-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    <X className="size-4" />
+                    <X className="size-3.5" />
                   </button>
                 )}
                 <Button
                   type="submit"
                   size="sm"
                   disabled={!query.trim() || isLoading}
-                  className="rounded-xl h-10 px-5"
+                  className="rounded-sm h-7 px-4 text-xs"
                 >
                   {isLoading ? (
                     <span className="flex gap-0.5 items-center">
-                      <span className="size-1.5 rounded-full bg-current animate-bounce [animation-delay:0ms]" />
-                      <span className="size-1.5 rounded-full bg-current animate-bounce [animation-delay:150ms]" />
-                      <span className="size-1.5 rounded-full bg-current animate-bounce [animation-delay:300ms]" />
+                      <span className="size-1 rounded-none bg-current animate-bounce [animation-delay:0ms]" />
+                      <span className="size-1 rounded-none bg-current animate-bounce [animation-delay:150ms]" />
+                      <span className="size-1 rounded-none bg-current animate-bounce [animation-delay:300ms]" />
                     </span>
                   ) : (
                     "Search"
@@ -255,14 +260,14 @@ function DiscoveryContent() {
             </div>
           </form>
 
-          {/* Suggestion chips */}
-          <div className={`flex flex-wrap gap-2 mt-4 ${isIdle ? "justify-center" : ""}`}>
+          {/* Suggestion chips — tight, rectangular */}
+          <div className={`flex flex-wrap gap-1.5 mt-3 ${isIdle ? "justify-center" : ""}`}>
             {SUGGESTIONS.map(({ label, prompt }) => (
               <button
                 key={label}
                 type="button"
                 onClick={() => handleSuggestion(prompt)}
-                className="text-sm px-3 py-1.5 rounded-full border border-border bg-muted/40 hover:bg-muted hover:border-primary/40 text-muted-foreground hover:text-foreground transition-all"
+                className="text-xs px-2.5 py-1 rounded-sm border border-border/60 bg-muted/30 hover:bg-muted hover:border-[color:var(--color-chart-4)]/50 text-muted-foreground hover:text-foreground transition-all uppercase tracking-wide font-medium"
               >
                 {label}
               </button>
@@ -281,9 +286,9 @@ function DiscoveryContent() {
 
       {/* Loading skeletons */}
       {isLoading && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-44 rounded-xl bg-muted animate-pulse" />
+            <div key={i} className="h-40 rounded-sm bg-muted/60 animate-pulse" />
           ))}
         </div>
       )}
@@ -292,20 +297,20 @@ function DiscoveryContent() {
       {!isLoading && results !== null && (
         <div>
           {/* Status bar */}
-          <div className="flex items-center justify-between gap-4 mb-5 flex-wrap">
+          <div className="flex items-center justify-between gap-4 mb-4 flex-wrap border-b border-border/40 pb-3">
             <div className="flex items-center gap-2 flex-wrap">
               {interpreted && (
                 <>
-                  <span className="text-xs text-muted-foreground">Interpreted as:</span>
-                  <Badge variant="secondary" className="text-xs">
+                  <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">Parsed:</span>
+                  <Badge variant="secondary" className="text-xs rounded-sm font-mono px-1.5 py-0">
                     {interpreted}
                   </Badge>
                 </>
               )}
-              <span className="text-sm text-muted-foreground">
+              <span className="text-xs text-muted-foreground font-mono tabular-nums">
                 {results.length === 0
                   ? "No songs found"
-                  : `${results.length} song${results.length !== 1 ? "s" : ""} found`}
+                  : `${results.length} result${results.length !== 1 ? "s" : ""}`}
               </span>
             </div>
             {results.length > 0 && (
@@ -313,6 +318,7 @@ function DiscoveryContent() {
                 size="sm"
                 variant="outline"
                 onClick={() => setShowPlaylistBuilder(true)}
+                className="h-7 text-xs rounded-sm"
               >
                 Save as Playlist
               </Button>
@@ -321,7 +327,7 @@ function DiscoveryContent() {
 
           {/* Card grid */}
           {results.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {results.map((song) => (
                 <SongCard
                   key={song.id}
@@ -333,10 +339,10 @@ function DiscoveryContent() {
             </div>
           ) : (
             <div className="text-center py-20">
-              <p className="text-muted-foreground text-lg mb-2">
+              <p className="text-muted-foreground text-sm mb-1">
                 No songs matched your search
               </p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 Try different words, adjust the BPM, or use one of the suggestions above
               </p>
             </div>

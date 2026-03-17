@@ -33,86 +33,99 @@ function SongFiltersContent() {
   const debouncedUpdate = useDebouncedCallback(updateFilter, 300);
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 p-4 border rounded-lg bg-muted/20 max-w-4xl">
+    /* DAW toolbar: compact, flat, horizontal strip */
+    <div className="flex flex-wrap gap-x-4 gap-y-3 p-3 border border-border/60 rounded-sm bg-muted/10">
       {/* BPM Range */}
-      <div className="space-y-2">
-        <Label htmlFor="bpmMin">Min BPM</Label>
+      <div className="flex flex-col gap-1 min-w-[60px]">
+        <Label htmlFor="bpmMin" className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
+          BPM Min
+        </Label>
         <Input
           id="bpmMin"
           type="number"
           placeholder="0"
           defaultValue={searchParams.get("bpmMin") ?? ""}
           onChange={(e) => debouncedUpdate("bpmMin", e.target.value)}
+          className="h-7 text-xs rounded-sm font-mono w-20 px-2"
         />
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="bpmMax">Max BPM</Label>
+      <div className="flex flex-col gap-1 min-w-[60px]">
+        <Label htmlFor="bpmMax" className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
+          BPM Max
+        </Label>
         <Input
           id="bpmMax"
           type="number"
           placeholder="500"
           defaultValue={searchParams.get("bpmMax") ?? ""}
           onChange={(e) => debouncedUpdate("bpmMax", e.target.value)}
+          className="h-7 text-xs rounded-sm font-mono w-20 px-2"
         />
       </div>
 
       {/* Key & Signature */}
-      <div className="space-y-2">
-        <Label htmlFor="key">Key</Label>
+      <div className="flex flex-col gap-1">
+        <Label htmlFor="key" className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
+          Key
+        </Label>
         <Select
           value={searchParams.get("key") ?? "all"}
           onValueChange={(val) =>
             updateFilter("key", val === "all" ? "" : (val ?? undefined))
           }
         >
-          <SelectTrigger id="key">
+          <SelectTrigger id="key" className="h-7 text-xs rounded-sm w-24 font-mono">
             <SelectValue placeholder="All" />
           </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All</SelectItem>
+          <SelectContent className="rounded-sm">
+            <SelectItem value="all" className="text-xs">All</SelectItem>
             {MUSICAL_KEYS.map((k) => (
-              <SelectItem key={k} value={k}>
+              <SelectItem key={k} value={k} className="text-xs font-mono">
                 {k}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="keySig">Key Sig</Label>
+      <div className="flex flex-col gap-1">
+        <Label htmlFor="keySig" className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
+          Mode
+        </Label>
         <Select
           value={searchParams.get("keySig") ?? "all"}
           onValueChange={(val) =>
             updateFilter("keySig", val === "all" ? "" : (val ?? undefined))
           }
         >
-          <SelectTrigger id="keySig">
+          <SelectTrigger id="keySig" className="h-7 text-xs rounded-sm w-24">
             <SelectValue placeholder="All" />
           </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            <SelectItem value="major">Major</SelectItem>
-            <SelectItem value="minor">Minor</SelectItem>
+          <SelectContent className="rounded-sm">
+            <SelectItem value="all" className="text-xs">All</SelectItem>
+            <SelectItem value="major" className="text-xs">Major</SelectItem>
+            <SelectItem value="minor" className="text-xs">Minor</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       {/* Time Signature */}
-      <div className="space-y-2">
-        <Label htmlFor="timeSig">Time Sig</Label>
+      <div className="flex flex-col gap-1">
+        <Label htmlFor="timeSig" className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
+          Time Sig
+        </Label>
         <Select
           value={searchParams.get("timeSig") ?? "all"}
           onValueChange={(val) =>
             updateFilter("timeSig", val === "all" ? "" : (val ?? undefined))
           }
         >
-          <SelectTrigger id="timeSig">
+          <SelectTrigger id="timeSig" className="h-7 text-xs rounded-sm w-20 font-mono">
             <SelectValue placeholder="All" />
           </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All</SelectItem>
+          <SelectContent className="rounded-sm">
+            <SelectItem value="all" className="text-xs">All</SelectItem>
             {TIME_SIGNATURES.map((ts) => (
-              <SelectItem key={ts} value={ts}>
+              <SelectItem key={ts} value={ts} className="text-xs font-mono">
                 {ts}
               </SelectItem>
             ))}
@@ -121,31 +134,40 @@ function SongFiltersContent() {
       </div>
 
       {/* Text Filters */}
-      <div className="space-y-2 col-span-2 md:col-span-2">
-        <Label htmlFor="lyric">Search title / lyrics</Label>
+      <div className="flex flex-col gap-1 flex-1 min-w-[140px]">
+        <Label htmlFor="lyric" className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
+          Title / Lyrics
+        </Label>
         <Input
           id="lyric"
-          placeholder="Search by title or lyrics..."
+          placeholder="Search..."
           defaultValue={searchParams.get("lyric") ?? ""}
           onChange={(e) => debouncedUpdate("lyric", e.target.value)}
+          className="h-7 text-xs rounded-sm"
         />
       </div>
-      <div className="space-y-2 col-span-2 md:col-span-2">
-        <Label htmlFor="tag">Tag</Label>
+      <div className="flex flex-col gap-1 flex-1 min-w-[120px]">
+        <Label htmlFor="tag" className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
+          Tag
+        </Label>
         <Input
           id="tag"
-          placeholder="Filter by tag..."
+          placeholder="Filter tag..."
           defaultValue={searchParams.get("tag") ?? ""}
           onChange={(e) => debouncedUpdate("tag", e.target.value)}
+          className="h-7 text-xs rounded-sm"
         />
       </div>
-      <div className="space-y-2 col-span-2 md:col-span-2">
-        <Label htmlFor="chord">Chord keyword</Label>
+      <div className="flex flex-col gap-1 flex-1 min-w-[120px]">
+        <Label htmlFor="chord" className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
+          Chord
+        </Label>
         <Input
           id="chord"
-          placeholder="e.g. Em or G, D"
+          placeholder="Em, G, D..."
           defaultValue={searchParams.get("chord") ?? ""}
           onChange={(e) => debouncedUpdate("chord", e.target.value)}
+          className="h-7 text-xs rounded-sm font-mono"
         />
       </div>
     </div>

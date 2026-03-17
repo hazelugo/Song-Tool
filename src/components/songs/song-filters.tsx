@@ -134,16 +134,16 @@ function SongFiltersContent() {
       </div>
 
       {/* Text Filters */}
-      <div className="flex flex-col gap-1 flex-1 min-w-[140px]">
-        <Label htmlFor="lyric" className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
-          Title / Lyrics
+      <div className="flex flex-col gap-1 flex-1 min-w-[120px]">
+        <Label htmlFor="chord" className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
+          Chord
         </Label>
         <Input
-          id="lyric"
-          placeholder="Search..."
-          defaultValue={searchParams.get("lyric") ?? ""}
-          onChange={(e) => debouncedUpdate("lyric", e.target.value)}
-          className="h-7 text-xs rounded-sm"
+          id="chord"
+          placeholder="Em, G, D..."
+          defaultValue={searchParams.get("chord") ?? ""}
+          onChange={(e) => debouncedUpdate("chord", e.target.value)}
+          className="h-7 text-xs rounded-sm font-mono"
         />
       </div>
       <div className="flex flex-col gap-1 flex-1 min-w-[120px]">
@@ -158,16 +158,16 @@ function SongFiltersContent() {
           className="h-7 text-xs rounded-sm"
         />
       </div>
-      <div className="flex flex-col gap-1 flex-1 min-w-[120px]">
-        <Label htmlFor="chord" className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
-          Chord
+      <div className="flex flex-col gap-1 flex-1 min-w-[140px]">
+        <Label htmlFor="lyric" className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
+          Title / Lyrics
         </Label>
         <Input
-          id="chord"
-          placeholder="Em, G, D..."
-          defaultValue={searchParams.get("chord") ?? ""}
-          onChange={(e) => debouncedUpdate("chord", e.target.value)}
-          className="h-7 text-xs rounded-sm font-mono"
+          id="lyric"
+          placeholder="Search..."
+          defaultValue={searchParams.get("lyric") ?? ""}
+          onChange={(e) => debouncedUpdate("lyric", e.target.value)}
+          className="h-7 text-xs rounded-sm"
         />
       </div>
     </div>

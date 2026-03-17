@@ -15,6 +15,7 @@ interface ExportSong {
   bpm: number | null;
   musicalKey: string | null;
   keySignature: string | null;
+  lyrics?: string | null;
   tags?: { name: string }[];
 }
 
@@ -68,6 +69,74 @@ export function ExportMenu({ playlistName, songs }: ExportMenuProps) {
       `${toSafeFilename(playlistName)}.json`,
       "application/json",
     );
+  };
+
+  const handlePrintWithLyrics = () => {
+    const pages = songs
+      .map((s, i) => {
+        const key = s.musicalKey
+          ? `${s.musicalKey} ${s.keySignature ?? ""}`.trim()
+          : "—";
+        const bpm = s.bpm ?? "—";
+        const tags = (s.tags ?? []).map((t) => t.name).join(", ") || "—";
+        const lyricsHtml = s.lyrics
+          ? s.lyrics
+              .replace(/&/g, "&amp;")
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;")
+              .replace(/\n/g, "<br />")
+          : '<span class="no-lyrics">No lyrics saved</span>';
+        return `<div class="page">
+          <div class="song-header">
+            <span class="song-number">${i + 1}</span>
+            <h2 class="song-title">${s.name.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</h2>
+          </div>
+          <div class="song-meta">
+            <span>Key: <strong>${key}</strong></span>
+            <span>BPM: <strong>${bpm}</strong></span>
+            <span>Tags: ${tags}</span>
+          </div>
+          <div class="lyrics">${lyricsHtml}</div>
+        </div>`;
+      })
+      .join("");
+
+    const html = `<!DOCTYPE html>
+<html><head>
+  <meta charset="utf-8" />
+  <title>${playlistName.replace(/</g, "&lt;")} — Lyrics Sheets</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; color: #000; }
+    .page {
+      width: 100%;
+      min-height: 100vh;
+      padding: 48px 56px;
+      page-break-after: always;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .page:last-child { page-break-after: avoid; }
+    .song-header { display: flex; align-items: baseline; gap: 12px; border-bottom: 2px solid #000; padding-bottom: 10px; }
+    .song-number { font-size: 13px; color: #999; width: 20px; flex-shrink: 0; }
+    .song-title { font-size: 26px; font-weight: bold; }
+    .song-meta { display: flex; gap: 24px; font-size: 12px; color: #555; text-transform: uppercase; letter-spacing: 0.05em; }
+    .song-meta strong { color: #000; }
+    .lyrics { font-size: 15px; line-height: 1.8; white-space: pre-wrap; margin-top: 8px; flex: 1; }
+    .no-lyrics { color: #aaa; font-style: italic; }
+    @media print {
+      .page { padding: 32px 40px; }
+    }
+  </style>
+</head><body>${pages}</body></html>`;
+
+    const win = window.open("", "_blank");
+    if (win) {
+      win.document.write(html);
+      win.document.close();
+      win.print();
+    }
   };
 
   const handlePrint = () => {
@@ -132,6 +201,10 @@ export function ExportMenu({ playlistName, songs }: ExportMenuProps) {
         <DropdownMenuItem onClick={handlePrint}>
           <Printer className="h-4 w-4 mr-2" />
           Print Setlist
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handlePrintWithLyrics}>
+          <Printer className="h-4 w-4 mr-2" />
+          Print with Lyrics
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

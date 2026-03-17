@@ -63,6 +63,7 @@ export default async function PlaylistDetailPage({
                 bpm: ps.song.bpm,
                 musicalKey: ps.song.musicalKey,
                 keySignature: ps.song.keySignature,
+                lyrics: ps.song.lyrics,
                 tags: ps.song.tags,
               }))}
             />

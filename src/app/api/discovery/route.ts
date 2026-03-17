@@ -6,122 +6,139 @@ import type { SQL } from "drizzle-orm";
 import { z } from "zod";
 import { MUSICAL_KEYS, TIME_SIGNATURES } from "@/lib/validations/song";
 import { requireUser } from "@/lib/auth";
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 
-const schema = z.object({ prompt: z.string().min(1).max(500) });
+const requestSchema = z.object({ prompt: z.string().min(1).max(500) });
 
-// Mood keywords → BPM range hints
-const MOOD_BPM = [
-  {
-    keywords: ["upbeat", "fast", "energetic", "dance", "workout", "hype", "pump", "high energy"],
-    bpmMin: 120,
-  },
-  {
-    keywords: ["slow", "ballad", "chill", "relaxed", "mellow", "calm", "soft", "peaceful"],
-    bpmMax: 90,
-  },
-  {
-    keywords: ["medium", "moderate", "mid-tempo", "midtempo"],
-    bpmMin: 90,
-    bpmMax: 130,
-  },
-] as const;
-
-// Words to strip from the remaining search term
-const STOP_WORDS =
-  /\b(songs?|tracks?|music|in|the|of|with|for|a|an|and|or|that|are|is|key|my|i|want|find|show|me|some|give|feel|have|which|like|similar|about|by)\b/gi;
-
-function parsePrompt(prompt: string): {
+interface Filters {
   key?: string;
   keySig?: "major" | "minor";
   timeSig?: string;
   bpmMin?: number;
   bpmMax?: number;
   searchTerm?: string;
-} {
-  const lower = prompt.toLowerCase();
-  let remaining = prompt;
-  const result: ReturnType<typeof parsePrompt> = {};
+}
 
-  // 1. Time signature — match fraction-style strings first
-  const timeSigMatch = remaining.match(
-    /\b(12\/8|9\/8|6\/8|7\/4|7\/8|5\/4|4\/4|3\/4|2\/4|2\/2)\b/,
-  );
-  if (timeSigMatch && TIME_SIGNATURES.includes(timeSigMatch[1] as (typeof TIME_SIGNATURES)[number])) {
-    result.timeSig = timeSigMatch[1];
-    remaining = remaining.replace(timeSigMatch[0], " ");
+async function extractFiltersWithGemini(prompt: string): Promise<Filters> {
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-pro",
+    tools: [
+      {
+        functionDeclarations: [
+          {
+            name: "extract_filters",
+            description:
+              "Extract structured search filters from a natural-language song-search prompt. " +
+              "Return only the fields clearly implied by the prompt — omit anything not mentioned.",
+            parameters: {
+              type: SchemaType.OBJECT,
+              properties: {
+                key: {
+                  type: SchemaType.STRING,
+                  format: "enum",
+                  enum: [...MUSICAL_KEYS],
+                  description: "Musical key (e.g. 'C', 'F#', 'Bb'). Omit if not specified.",
+                },
+                keySig: {
+                  type: SchemaType.STRING,
+                  format: "enum",
+                  enum: ["major", "minor"],
+                  description: "Major or minor mode. Omit if not specified.",
+                },
+                timeSig: {
+                  type: SchemaType.STRING,
+                  format: "enum",
+                  enum: [...TIME_SIGNATURES],
+                  description: "Time signature (e.g. '4/4', '3/4'). Omit if not specified.",
+                },
+                bpmMin: {
+                  type: SchemaType.NUMBER,
+                  description:
+                    "Minimum BPM. Use when an explicit BPM or mood word implies a lower bound (e.g. 'upbeat' → 120). Omit if not applicable.",
+                },
+                bpmMax: {
+                  type: SchemaType.NUMBER,
+                  description:
+                    "Maximum BPM. Use when an explicit BPM or mood word implies an upper bound (e.g. 'slow' → 90). Omit if not applicable.",
+                },
+                searchTerm: {
+                  type: SchemaType.STRING,
+                  description:
+                    "Free-text remainder to search song names, lyrics, and tags. Strip filter-related words already captured in other fields. Omit if nothing meaningful remains.",
+                },
+              },
+            },
+          },
+        ],
+      },
+    ],
+    toolConfig: {
+      functionCallingConfig: {
+        mode: "ANY" as any,
+        allowedFunctionNames: ["extract_filters"],
+      },
+    },
+    systemInstruction:
+      "You are a filter extraction assistant for a musician's song library. " +
+      "The library stores songs with: BPM (tempo), musical key (e.g. C, F#, Bb), " +
+      "key signature (major/minor), time signature (e.g. 4/4, 3/4), lyrics, and tags. " +
+      "Your job is to call extract_filters with the structured search parameters " +
+      "implied by the user's natural-language prompt. Be conservative — only set fields " +
+      "the prompt clearly implies.",
+  });
+
+  const result = await model.generateContent(prompt);
+  const call = result.response.functionCalls()?.[0];
+  if (!call) return {};
+
+  const input = call.args as Filters;
+
+  // Validate against known enum values before returning
+  const filters: Filters = {};
+  if (input.key && (MUSICAL_KEYS as readonly string[]).includes(input.key)) {
+    filters.key = input.key;
+  }
+  if (input.keySig === "major" || input.keySig === "minor") {
+    filters.keySig = input.keySig;
+  }
+  if (input.timeSig && (TIME_SIGNATURES as readonly string[]).includes(input.timeSig)) {
+    filters.timeSig = input.timeSig;
+  }
+  if (typeof input.bpmMin === "number" && input.bpmMin >= 1) {
+    filters.bpmMin = Math.round(input.bpmMin);
+  }
+  if (typeof input.bpmMax === "number" && input.bpmMax <= 500) {
+    filters.bpmMax = Math.round(input.bpmMax);
+  }
+  if (typeof input.searchTerm === "string" && input.searchTerm.trim().length > 1) {
+    filters.searchTerm = input.searchTerm.trim();
   }
 
-  // 2. Key signature
-  if (/\bminor\b/i.test(remaining)) {
-    result.keySig = "minor";
-    remaining = remaining.replace(/\bminor\b/gi, " ");
-  } else if (/\bmajor\b/i.test(remaining)) {
-    result.keySig = "major";
-    remaining = remaining.replace(/\bmajor\b/gi, " ");
-  }
-
-  // 3. Musical key — multi-char keys first to avoid consuming part of "C#" as "C"
-  const sortedKeys = [...MUSICAL_KEYS].sort((a, b) => b.length - a.length);
-  for (const k of sortedKeys) {
-    // Escape # for use in regex
-    const escaped = k.replace("#", "\\#");
-    // Single-char keys (C D E F G A B) need case-sensitive boundary match to avoid
-    // false positives from words like "for" containing "f", "and" containing "a", etc.
-    // We look for them only when surrounded by non-word chars or at string boundaries.
-    const pattern =
-      k.length === 1
-        ? new RegExp(`(?<![A-Za-z])${escaped}(?![a-z])`) // uppercase only, not inside a word
-        : new RegExp(`\\b${escaped}\\b`, "i");
-
-    if (pattern.test(remaining)) {
-      result.key = k;
-      remaining = remaining.replace(pattern, " ");
-      break;
-    }
-  }
-
-  // 4. Explicit BPM number ("120 bpm", "90bpm")
-  const bpmMatch = remaining.match(/\b(\d{2,3})\s*bpm\b/i);
-  if (bpmMatch) {
-    const bpm = parseInt(bpmMatch[1], 10);
-    if (bpm >= 1 && bpm <= 500) {
-      result.bpmMin = Math.max(1, bpm - 5);
-      result.bpmMax = Math.min(500, bpm + 5);
-    }
-    remaining = remaining.replace(bpmMatch[0], " ");
-  } else {
-    // 5. Mood keywords → BPM range
-    for (const { keywords, ...bpms } of MOOD_BPM) {
-      if (keywords.some((kw) => lower.includes(kw))) {
-        if ("bpmMin" in bpms) result.bpmMin = bpms.bpmMin;
-        if ("bpmMax" in bpms) result.bpmMax = bpms.bpmMax;
-        break;
-      }
-    }
-  }
-
-  // 6. Whatever remains (after stripping stop words) becomes the text search term
-  const cleaned = remaining.replace(STOP_WORDS, " ").replace(/\s+/g, " ").trim();
-  if (cleaned.length > 1) {
-    result.searchTerm = cleaned;
-  }
-
-  return result;
+  return filters;
 }
 
 export async function POST(request: Request) {
   const { userId, error: authError } = await requireUser();
   if (authError) return authError;
 
+  if (!process.env.GEMINI_API_KEY) {
+    return NextResponse.json(
+      { error: "GEMINI_API_KEY is not configured" },
+      { status: 503 },
+    );
+  }
+
   try {
     const body = await request.json();
-    const parsed = schema.safeParse(body);
+    const parsed = requestSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json({ error: "Invalid request" }, { status: 400 });
     }
 
     const { prompt } = parsed.data;
-    const filters = parsePrompt(prompt);
+    const filters = await extractFiltersWithGemini(prompt);
 
     const conditions: SQL[] = [isNull(songs.deletedAt), eq(songs.userId, userId)];
 
@@ -133,8 +150,6 @@ export async function POST(request: Request) {
 
     if (filters.searchTerm) {
       const term = filters.searchTerm;
-      // Split into individual words so "acoustic ballad" matches songs tagged
-      // "acoustic" OR "ballad" rather than requiring the exact phrase as a tag name.
       const words = term.split(/\s+/).filter((w) => w.length > 1);
       const tagExistsConditions = words.map((word) =>
         exists(

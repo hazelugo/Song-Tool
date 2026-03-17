@@ -25,6 +25,7 @@ function toFormValues(song: SongWithTags): Partial<SongFormValues> {
     bpm: song.bpm,
     musicalKey: song.musicalKey,
     keySignature: song.keySignature,
+    timeSignature: song.timeSignature,
     chordProgressions: Array.isArray(song.chordProgressions)
       ? song.chordProgressions.join(", ")
       : "",

@@ -55,10 +55,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <div
+      className="min-h-screen flex items-center justify-center bg-background px-4"
+      style={{
+        backgroundImage:
+          "repeating-linear-gradient(0deg, transparent, transparent 39px, oklch(1 0 0 / 0.025) 39px, oklch(1 0 0 / 0.025) 40px), repeating-linear-gradient(90deg, transparent, transparent 39px, oklch(1 0 0 / 0.025) 39px, oklch(1 0 0 / 0.025) 40px)",
+      }}
+    >
       <div className="w-full max-w-sm">
         {/* Header */}
-        <div className="mb-8 border-b border-border/60 pb-4">
+        <div className="mb-8 border-b border-border/60 pb-4 text-center">
           <span className="text-[10px] font-mono font-semibold uppercase tracking-[0.3em] text-muted-foreground border border-border/60 rounded-sm px-3 py-1">
             Repertoire v1.0
           </span>

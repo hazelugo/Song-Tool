@@ -60,11 +60,11 @@ export default function LoginPage() {
 
         {/* Header */}
         <div className="mb-8 border-b border-border/60 pb-4">
-          <p className="text-[10px] font-mono font-semibold tracking-[0.25em] uppercase text-muted-foreground mb-1">
+          <h1 className="text-4xl font-bold tracking-tight leading-none mb-2">
             Repertoire
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Your repertoire. Built for flow.
+          </h1>
+          <p className="text-base text-muted-foreground tracking-wide">
+            Built for flow.
           </p>
         </div>
 

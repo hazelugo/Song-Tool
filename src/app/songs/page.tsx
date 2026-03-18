@@ -127,7 +127,7 @@ function SongsPageContent() {
             Save as Playlist
           </Button>
           <CsvImportDialog onSuccess={loadSongs} />
-          <Button onClick={openAddSheet} size="sm" className="h-7 text-xs rounded-sm">
+          <Button variant="outline" onClick={openAddSheet} size="sm" className="h-7 text-xs rounded-sm">
             Add Song
           </Button>
         </div>

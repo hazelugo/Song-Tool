@@ -197,8 +197,8 @@ export function CsvImportDialog({ onSuccess }: { onSuccess: () => void }) {
 
   return (
     <>
-      <Button onClick={() => setOpen(true)}>
-        <Upload className="h-4 w-4 mr-2" /> Import CSV
+      <Button variant="outline" size="sm" onClick={() => setOpen(true)} className="h-7 text-xs rounded-sm">
+        <Upload className="h-3.5 w-3.5 mr-1.5" /> Import CSV
       </Button>
 
       <Dialog open={open} onOpenChange={handleClose}>

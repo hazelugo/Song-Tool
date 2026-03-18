@@ -13,6 +13,7 @@ import {
 } from "@/components/playlist-builder";
 import { useRouter, useSearchParams } from "next/navigation";
 import { buildSimilarQuery } from "@/lib/similar-query";
+import { toast } from "sonner";
 
 export const dynamic = "force-dynamic";
 
@@ -159,8 +160,12 @@ function DiscoveryContent() {
     });
     if (!response.ok) {
       const error = await response.json();
+      toast.error(error.message || "Failed to save playlist");
       throw new Error(error.message || "Failed to save");
     }
+    toast.success(`"${name}" saved`, {
+      description: `${items.length} song${items.length !== 1 ? "s" : ""} added to playlist`,
+    });
     router.push("/playlists");
   }
 

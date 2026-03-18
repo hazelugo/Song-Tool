@@ -86,6 +86,9 @@ export const songs = pgTable(
   (t) => [
     index("idx_songs_lyrics_search").using("gin", t.lyricsSearch),
     index("idx_songs_user_id").on(t.userId),
+    index("idx_songs_musical_key").on(t.musicalKey),
+    index("idx_songs_key_signature").on(t.keySignature),
+    index("idx_songs_time_signature").on(t.timeSignature),
   ],
 );
 

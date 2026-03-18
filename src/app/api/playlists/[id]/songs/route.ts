@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { playlists, playlistSongs } from "@/db/schema";
-import { and, eq, max } from "drizzle-orm";
+import { and, eq, max, sql } from "drizzle-orm";
 import { z } from "zod";
 import { requireUser } from "@/lib/auth";
 
@@ -65,7 +65,7 @@ export async function POST(
   }
 }
 
-// PUT /api/playlists/[id]/songs — reorder songs
+// PUT /api/playlists/[id]/songs — reorder songs using fractional positions
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -75,7 +75,11 @@ export async function PUT(
 
   const { id } = await params;
   const body = await request.json();
-  const schema = z.object({ songIds: z.array(z.string().uuid()).min(1) });
+  const schema = z.object({
+    items: z.array(
+      z.object({ songId: z.string().uuid(), position: z.number() }),
+    ).min(1),
+  });
   const result = schema.safeParse(body);
   if (!result.success) {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
@@ -88,17 +92,19 @@ export async function PUT(
 
   try {
     await db.transaction(async (tx) => {
-      // Delete and bulk-reinsert: 2 queries instead of N
-      await tx
-        .delete(playlistSongs)
-        .where(eq(playlistSongs.playlistId, id));
-      await tx.insert(playlistSongs).values(
-        result.data.songIds.map((songId, i) => ({
-          playlistId: id,
-          songId,
-          position: i + 1,
-        })),
-      );
+      // Bulk UPDATE positions using a VALUES list — single round-trip
+      await tx.execute(sql`
+        UPDATE playlist_songs AS ps
+        SET position = v.position
+        FROM (VALUES ${sql.join(
+          result.data.items.map(
+            (item) => sql`(${item.songId}::uuid, ${item.position}::real)`,
+          ),
+          sql`, `,
+        )}) AS v(song_id, position)
+        WHERE ps.playlist_id = ${id}::uuid
+          AND ps.song_id = v.song_id
+      `);
       await tx
         .update(playlists)
         .set({ updatedAt: new Date() })

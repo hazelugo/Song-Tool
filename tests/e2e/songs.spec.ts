@@ -210,3 +210,379 @@ test.describe("Songs — CRUD", () => {
     await expect(page.getByText(/Page 1 of \d+/)).toBeVisible();
   });
 });
+
+// Helper: create a song via API for test isolation
+async function createSong(
+  request: any,
+  overrides: Record<string, unknown> = {},
+) {
+  const base = {
+    name: "Test Song",
+    bpm: 120,
+    musicalKey: "C",
+    keySignature: "major",
+    chordProgressions: "",
+    tags: [],
+  };
+  const res = await request.post("/api/songs", {
+    data: { ...base, ...overrides },
+  });
+  expect(res.ok()).toBeTruthy();
+  return res.json();
+}
+
+test.describe("Songs — Filters", () => {
+  test("FILTER-01: BPM range filter; only songs in range appear", async ({
+    page,
+    request,
+  }) => {
+    await createSong(request, { name: "Slow Song", bpm: 70 });
+    await createSong(request, { name: "Mid Song", bpm: 90 });
+    await createSong(request, { name: "Fast Song", bpm: 150 });
+
+    await page.goto("/songs");
+
+    await page.getByLabel("Min BPM").fill("80");
+    await expect(page).toHaveURL(/bpmMin=80/);
+
+    await page.getByLabel("Max BPM").fill("100");
+    await expect(page).toHaveURL(/bpmMax=100/);
+    await expect(page).toHaveURL(/bpmMin=80/);
+
+    await expect(
+      page.getByRole("cell", { name: "Mid Song" }).first(),
+    ).toBeVisible();
+
+    await expect(
+      page.getByRole("cell", { name: "Slow Song" }).first(),
+    ).not.toBeVisible();
+    await expect(
+      page.getByRole("cell", { name: "Fast Song" }).first(),
+    ).not.toBeVisible();
+  });
+
+  test("FILTER-02: musical key filter; only songs with that key appear", async ({
+    page,
+    request,
+  }) => {
+    await createSong(request, { name: "G Song", musicalKey: "G" });
+    await createSong(request, { name: "D Song", musicalKey: "D" });
+
+    await page.goto("/songs");
+
+    await page.getByLabel("Key", { exact: true }).click();
+    await page.getByRole("option", { name: "G", exact: true }).click();
+
+    await expect(
+      page.getByRole("cell", { name: "G Song" }).first(),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("cell", { name: "D Song" }).first(),
+    ).not.toBeVisible();
+  });
+
+  test("FILTER-03: key signature filter; only major or minor songs appear", async ({
+    page,
+    request,
+  }) => {
+    await createSong(request, {
+      name: "Major Song",
+      keySignature: "major",
+      musicalKey: "C",
+    });
+    await createSong(request, {
+      name: "Minor Song",
+      keySignature: "minor",
+      musicalKey: "C",
+    });
+
+    await page.goto("/songs");
+
+    await page.getByLabel("Key Sig").click();
+    await page.getByRole("option", { name: "Major" }).click();
+
+    await expect(
+      page.getByRole("cell", { name: "Major Song" }).first(),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("cell", { name: "Minor Song" }).first(),
+    ).not.toBeVisible();
+  });
+
+  test("FILTER-04: chord progression keyword filter; only matching songs appear", async ({
+    page,
+    request,
+  }) => {
+    await createSong(request, {
+      name: "Em Song",
+      chordProgressions: "Em,G,D",
+      musicalKey: "G",
+      keySignature: "major",
+    });
+    await createSong(request, {
+      name: "No Em Song",
+      chordProgressions: "C,F,Am",
+      musicalKey: "C",
+      keySignature: "major",
+    });
+
+    await page.goto("/songs");
+
+    await page.getByLabel("Chord keyword").fill("Em");
+
+    await expect(
+      page.getByRole("cell", { name: "Em Song", exact: true }).first(),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("cell", { name: "No Em Song" }).first(),
+    ).not.toBeVisible();
+  });
+
+  test("FILTER-05: lyric full-text search; only matching songs appear", async ({
+    page,
+    request,
+  }) => {
+    await createSong(request, {
+      name: "Love Song",
+      lyrics: "I will always love you forever",
+      musicalKey: "F",
+      keySignature: "major",
+    });
+    await createSong(request, {
+      name: "Rock Song",
+      lyrics: "We will rock you tonight",
+      musicalKey: "A",
+      keySignature: "minor",
+    });
+
+    await page.goto("/songs");
+
+    await page.getByLabel("Lyric search").fill("love");
+
+    await expect(
+      page.getByRole("cell", { name: "Love Song" }).first(),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("cell", { name: "Rock Song" }).first(),
+    ).not.toBeVisible();
+  });
+
+  test("FILTER-06: tag filter; only songs with that tag appear", async ({
+    page,
+    request,
+  }) => {
+    await createSong(request, {
+      name: "Ballad Song",
+      tags: ["ballad"],
+      musicalKey: "C",
+      keySignature: "major",
+    });
+    await createSong(request, {
+      name: "Opener Song",
+      tags: ["opener"],
+      musicalKey: "G",
+      keySignature: "major",
+    });
+
+    await page.goto("/songs");
+
+    await page.getByLabel("Tag").fill("ballad");
+
+    await expect(
+      page.getByRole("cell", { name: "Ballad Song" }).first(),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("cell", { name: "Opener Song" }).first(),
+    ).not.toBeVisible();
+  });
+
+  test("FILTER-07: multiple filters combined (AND); only songs matching all conditions appear", async ({
+    page,
+    request,
+  }) => {
+    await createSong(request, {
+      name: "Full Match",
+      bpm: 90,
+      musicalKey: "G",
+      tags: ["ballad"],
+      keySignature: "major",
+    });
+    await createSong(request, {
+      name: "Wrong BPM",
+      bpm: 140,
+      musicalKey: "G",
+      tags: ["ballad"],
+      keySignature: "major",
+    });
+    await createSong(request, {
+      name: "Wrong Key",
+      bpm: 90,
+      musicalKey: "D",
+      tags: ["ballad"],
+      keySignature: "major",
+    });
+
+    await page.goto("/songs");
+
+    await page.getByLabel("Min BPM").fill("80");
+    await expect(page).toHaveURL(/bpmMin=80/);
+    await page.getByLabel("Max BPM").fill("100");
+    await expect(page).toHaveURL(/bpmMax=100/);
+    await page.getByLabel("Key", { exact: true }).click();
+    await page.getByRole("option", { name: "G", exact: true }).click();
+    await expect(page).toHaveURL(/key=G/);
+    await page.getByLabel("Tag").fill("ballad");
+    await expect(page).toHaveURL(/tag=ballad/);
+
+    await expect(
+      page.getByRole("cell", { name: "Full Match" }).first(),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("cell", { name: "Wrong BPM" }).first(),
+    ).not.toBeVisible();
+    await expect(
+      page.getByRole("cell", { name: "Wrong Key" }).first(),
+    ).not.toBeVisible();
+  });
+
+  test("FILTER-08: sort by column; rows reorder on header click", async ({
+    page,
+    request,
+  }) => {
+    await createSong(request, {
+      name: "Zzz Song",
+      bpm: 200,
+      musicalKey: "C",
+      keySignature: "major",
+    });
+    await createSong(request, {
+      name: "Aaa Song",
+      bpm: 60,
+      musicalKey: "C",
+      keySignature: "major",
+    });
+
+    await page.goto("/songs");
+
+    await expect(
+      page.getByRole("cell", { name: "Zzz Song" }).first(),
+    ).toBeVisible();
+
+    await page.getByRole("button", { name: /BPM/i }).click();
+
+    await expect(
+      page.locator("tbody tr:first-child > td:first-child"),
+    ).toHaveText("Zzz Song");
+
+    await page.getByRole("button", { name: /BPM/i }).click();
+    await expect(
+      page.locator("tbody tr:first-child > td:first-child"),
+    ).toHaveText("Aaa Song");
+  });
+});
+
+test.describe("Songs — CSV Import", () => {
+  test("CSV-01: valid CSV; all rows imported and appear in table", async ({
+    page,
+  }) => {
+    const csv = [
+      "name,bpm,key,keySig",
+      "CSV Song Alpha,120,C,major",
+      "CSV Song Beta,95,G,minor",
+    ].join("\n");
+
+    await page.goto("/songs");
+    await page.getByRole("button", { name: /Import CSV/i }).click();
+
+    await expect(
+      page.getByRole("heading", { name: "Import songs from CSV" }),
+    ).toBeVisible();
+
+    await page.locator('input[type="file"]').setInputFiles({
+      name: "songs.csv",
+      mimeType: "text/csv",
+      buffer: Buffer.from(csv),
+    });
+
+    // Preview step — 2 valid rows
+    await expect(page.getByText(/2 rows found/i)).toBeVisible();
+    await expect(page.getByText("2 valid")).toBeVisible();
+
+    await page.getByRole("button", { name: /Import 2 songs/i }).click();
+
+    // Done step
+    await expect(page.getByText("2 songs imported")).toBeVisible();
+    await page.getByRole("button", { name: "Done" }).click();
+
+    // Songs appear in table
+    await expect(
+      page.getByRole("cell", { name: "CSV Song Alpha" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("cell", { name: "CSV Song Beta" }),
+    ).toBeVisible();
+  });
+
+  test("CSV-02: invalid rows shown in preview and skipped on import", async ({
+    page,
+  }) => {
+    const csv = [
+      "name,bpm,key,keySig",
+      "Valid Song,110,A,major",
+      "Bad Song,notabpm,Z,major", // invalid bpm + invalid key
+    ].join("\n");
+
+    await page.goto("/songs");
+    await page.getByRole("button", { name: /Import CSV/i }).click();
+
+    await page.locator('input[type="file"]').setInputFiles({
+      name: "songs.csv",
+      mimeType: "text/csv",
+      buffer: Buffer.from(csv),
+    });
+
+    await expect(page.getByText(/2 rows found/i)).toBeVisible();
+    await expect(page.getByText("1 valid")).toBeVisible();
+    await expect(page.getByText(/1 invalid/i)).toBeVisible();
+
+    // Import button shows only the valid count
+    await page.getByRole("button", { name: /Import 1 song/i }).click();
+
+    await expect(page.getByText("1 songs imported")).toBeVisible();
+    await expect(page.getByText(/1 row.*skipped/i)).toBeVisible();
+
+    await page.getByRole("button", { name: "Done" }).click();
+
+    await expect(
+      page.getByRole("cell", { name: "Valid Song" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("cell", { name: "Bad Song" }),
+    ).not.toBeVisible();
+  });
+
+  test("CSV-03: back button returns to upload step", async ({ page }) => {
+    const csv = ["name,bpm,key,keySig", "Any Song,100,D,minor"].join("\n");
+
+    await page.goto("/songs");
+    await page.getByRole("button", { name: /Import CSV/i }).click();
+
+    await page.locator('input[type="file"]').setInputFiles({
+      name: "songs.csv",
+      mimeType: "text/csv",
+      buffer: Buffer.from(csv),
+    });
+
+    await expect(page.getByText(/1 rows found/i)).toBeVisible();
+
+    await page.getByRole("button", { name: "Back" }).click();
+
+    await expect(
+      page.getByRole("heading", { name: "Import songs from CSV" }),
+    ).toBeVisible();
+    // Back at upload step — drop zone is visible again
+    await expect(
+      page.getByText("Drop your CSV here or click to browse"),
+    ).toBeVisible();
+  });
+});

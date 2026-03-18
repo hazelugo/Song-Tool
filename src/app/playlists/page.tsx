@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { PlaylistBuilder, type PlaylistItem } from "@/components/playlist-builder";
+import { Button } from "@/components/ui/button";
 import type { Song } from "@/db/schema";
 
 interface PlaylistSummary {
@@ -12,23 +14,38 @@ interface PlaylistSummary {
   updatedAt: string;
 }
 
+const PAGE_SIZE = 25;
+
 export default function ViewPlaylistsPage() {
   const [playlists, setPlaylists] = useState<PlaylistSummary[]>([]);
+  const [total, setTotal] = useState(0);
+  const [pageIndex, setPageIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showBuilder, setShowBuilder] = useState(false);
   const [availableSongs, setAvailableSongs] = useState<Song[]>([]);
   const [loadingSongs, setLoadingSongs] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    fetch("/api/playlists")
-      .then((res) => res.json())
-      .then((data) => {
-        setPlaylists(data);
-        setLoading(false);
-      })
-      .catch((err) => console.error("Failed to load playlists", err));
+  const pageCount = Math.ceil(total / PAGE_SIZE);
+
+  const loadPlaylists = useCallback(async (page: number) => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/playlists?page=${page + 1}&limit=${PAGE_SIZE}`);
+      const data = await res.json();
+      setPlaylists(data.data);
+      setTotal(data.total);
+    } catch {
+      toast.error("Failed to load playlists");
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    loadPlaylists(pageIndex);
+  }, [loadPlaylists, pageIndex]);
 
   const handleNewPlaylist = async () => {
     setLoadingSongs(true);
@@ -50,25 +67,22 @@ export default function ViewPlaylistsPage() {
     });
     if (!res.ok) throw new Error("Failed to save playlist");
     const data = await res.json();
+    toast.success(`"${name}" saved`);
     router.push(`/playlists/${data.id}`);
   };
 
-  const handleDelete = async (id: string) => {
-    if (
-      !window.confirm(
-        "Are you sure you want to delete this playlist? This action cannot be undone.",
-      )
-    ) {
-      return;
-    }
-
+  const handleDelete = async (id: string, name: string) => {
+    setDeletingId(id);
     try {
       const res = await fetch(`/api/playlists/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Failed to delete");
       setPlaylists((prev) => prev.filter((p) => p.id !== id));
-    } catch (err) {
-      console.error("Failed to delete playlist", err);
-      alert("Failed to delete playlist");
+      setTotal((prev) => prev - 1);
+      toast.success(`"${name}" deleted`);
+    } catch {
+      toast.error("Failed to delete playlist");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -85,51 +99,92 @@ export default function ViewPlaylistsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Your Playlists</h1>
-          <button
-            onClick={handleNewPlaylist}
-            disabled={loadingSongs}
-            className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 disabled:opacity-50 transition-colors"
-          >
-            {loadingSongs ? "Loading..." : "+ New Playlist"}
-          </button>
-        </div>
+    <div className="flex flex-col gap-4 p-6 max-w-6xl mx-auto w-full">
+      {/* Header row */}
+      <div className="flex items-center justify-between border-b border-border/60 pb-3">
+        <h1 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+          Playlists
+        </h1>
+        <Button
+          size="sm"
+          onClick={handleNewPlaylist}
+          disabled={loadingSongs}
+          className="h-7 text-xs rounded-sm"
+        >
+          {loadingSongs ? "Loading..." : "+ New Playlist"}
+        </Button>
+      </div>
 
-        {loading ? (
-          <div className="text-muted-foreground">Loading...</div>
-        ) : (
-          <div className="grid gap-4">
+      {loading ? (
+        <div className="text-xs text-muted-foreground font-mono py-4">Loading...</div>
+      ) : playlists.length === 0 && pageIndex === 0 ? (
+        <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
+          <p className="text-muted-foreground text-sm">No playlists yet</p>
+          <Button size="sm" className="rounded-sm" onClick={handleNewPlaylist}>
+            Create your first playlist
+          </Button>
+        </div>
+      ) : (
+        <>
+          <div className="flex flex-col gap-1.5">
             {playlists.map((playlist) => (
               <div
                 key={playlist.id}
-                className="group relative block bg-card rounded-lg border hover:border-primary/50 hover:shadow-sm transition-all"
+                className="group relative flex items-center border border-border/60 border-l-2 border-l-transparent hover:border-l-[color:var(--color-chart-4)] hover:border-[color:var(--color-chart-4)]/30 bg-card rounded-sm transition-all duration-150"
               >
-                <Link href={`/playlists/${playlist.id}`} className="block p-6">
-                  <h2 className="text-xl font-semibold mb-2">{playlist.name}</h2>
-                  <div className="text-sm text-muted-foreground">
-                    Last updated:{" "}
-                    {new Date(playlist.updatedAt).toLocaleDateString()}
-                  </div>
-                </Link>
-                <button
-                  onClick={() => handleDelete(playlist.id)}
-                  className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive/80 hover:bg-destructive/10 px-3 py-1 rounded"
+                <Link
+                  href={`/playlists/${playlist.id}`}
+                  className="flex-1 flex items-center justify-between px-4 py-3 min-w-0"
                 >
-                  Delete
-                </button>
+                  <span className="font-medium text-sm truncate">{playlist.name}</span>
+                  <span className="text-[10px] font-mono text-muted-foreground tabular-nums shrink-0 ml-4">
+                    {new Date(playlist.updatedAt).toLocaleDateString()}
+                  </span>
+                </Link>
+                <div className="pr-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    disabled={deletingId === playlist.id}
+                    onClick={() => handleDelete(playlist.id, playlist.name)}
+                    className="h-6 px-2 text-xs rounded-sm text-destructive hover:text-destructive hover:bg-destructive/10"
+                  >
+                    {deletingId === playlist.id ? "..." : "Delete"}
+                  </Button>
+                </div>
               </div>
             ))}
-            {playlists.length === 0 && (
-              <div className="text-center py-12 text-muted-foreground bg-card rounded border border-dashed">
-                No playlists yet. Create one to get started.
-              </div>
-            )}
           </div>
-        )}
-      </div>
-    </main>
+
+          {pageCount > 1 && (
+            <div className="flex items-center justify-between border-t border-border/40 pt-3">
+              <span className="text-xs font-mono text-muted-foreground tabular-nums">
+                Page {pageIndex + 1} of {pageCount}
+              </span>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs rounded-sm"
+                  disabled={pageIndex === 0}
+                  onClick={() => setPageIndex((p) => p - 1)}
+                >
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs rounded-sm"
+                  disabled={pageIndex >= pageCount - 1}
+                  onClick={() => setPageIndex((p) => p + 1)}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </div>
   );
 }

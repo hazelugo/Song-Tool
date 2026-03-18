@@ -36,6 +36,13 @@
       "when": 1773530542569,
       "tag": "0004_add_user_id_to_songs",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1773807623113,
+      "tag": "0005_add_filter_indexes",
+      "breakpoints": true
     }
   ]
 }

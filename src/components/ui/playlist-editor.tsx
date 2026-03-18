@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { getCamelotPosition, formatCamelot } from "@/lib/camelot";
+import { generateRank } from "@/lib/ranking";
 
 interface Song {
   id: string;
@@ -41,6 +42,12 @@ interface PlaylistEditorProps {
     song: Song;
     position: number | null;
   }[];
+}
+
+interface EditorItem {
+  id: string; // song id — used as dnd-kit identifier
+  song: Song;
+  position: number;
 }
 
 interface ItemRowProps {
@@ -159,13 +166,21 @@ function SortableItem({ id, song, index, onRemove, isRemoving, isActive }: Sorta
   );
 }
 
+function toEditorItems(initialSongs: PlaylistEditorProps["initialSongs"]): EditorItem[] {
+  const items = initialSongs.map((item, i) => ({
+    id: item.song.id,
+    song: item.song,
+    position: item.position ?? (i + 1) * 10000,
+  }));
+  // Sort by position so initial render matches server order
+  return items.sort((a, b) => a.position - b.position);
+}
+
 export function PlaylistEditor({
   playlistId,
   initialSongs,
 }: PlaylistEditorProps) {
-  const [items, setItems] = React.useState(
-    initialSongs.map((item) => ({ ...item.song, id: item.song.id })),
-  );
+  const [items, setItems] = React.useState<EditorItem[]>(() => toEditorItems(initialSongs));
   const [removingIds, setRemovingIds] = React.useState<Set<string>>(new Set());
   const [activeId, setActiveId] = React.useState<string | null>(null);
   const router = useRouter();
@@ -182,7 +197,7 @@ export function PlaylistEditor({
   );
 
   React.useEffect(() => {
-    setItems(initialSongs.map((item) => ({ ...item.song, id: item.song.id })));
+    setItems(toEditorItems(initialSongs));
   }, [initialSongs]);
 
   function handleDragStart(event: DragStartEvent) {
@@ -196,21 +211,36 @@ export function PlaylistEditor({
     if (over && active.id !== over.id) {
       const oldIndex = items.findIndex((item) => item.id === active.id);
       const newIndex = items.findIndex((item) => item.id === over.id);
-      const newOrder = arrayMove(items, oldIndex, newIndex);
+      const reordered = arrayMove(items, oldIndex, newIndex);
 
-      setItems(newOrder);
+      // Compute new fractional position for the moved item only
+      let newItems: EditorItem[];
+      try {
+        const prevRank = reordered[newIndex - 1]?.position;
+        const nextRank = reordered[newIndex + 1]?.position;
+        const newPosition = generateRank(prevRank, nextRank);
+        newItems = reordered.map((item, i) =>
+          i === newIndex ? { ...item, position: newPosition } : item,
+        );
+      } catch {
+        // Ranks too close — rebalance all to sequential
+        newItems = reordered.map((item, i) => ({ ...item, position: (i + 1) * 10000 }));
+      }
+
+      setItems(newItems);
 
       try {
         await fetch(`/api/playlists/${playlistId}/songs`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ songIds: newOrder.map((s) => s.id) }),
+          body: JSON.stringify({
+            items: newItems.map((item) => ({ songId: item.id, position: item.position })),
+          }),
         });
         // No router.refresh() — state is already correct, avoid flicker
       } catch (error) {
         console.error("Failed to save order", error);
-        // Revert on failure
-        setItems(items);
+        setItems(items); // revert on failure
       }
     }
   }
@@ -235,7 +265,7 @@ export function PlaylistEditor({
     }
   };
 
-  const activeSong = activeId ? items.find((i) => i.id === activeId) : null;
+  const activeItem = activeId ? items.find((i) => i.id === activeId) : null;
   const activeIndex = activeId ? items.findIndex((i) => i.id === activeId) : -1;
 
   return (
@@ -252,29 +282,29 @@ export function PlaylistEditor({
         strategy={verticalListSortingStrategy}
       >
         <div className="border rounded-xl bg-card shadow-sm overflow-hidden">
-          {items.map((song, index) => (
+          {items.map((item, index) => (
             <SortableItem
-              key={song.id}
-              id={song.id}
-              song={song}
+              key={item.id}
+              id={item.id}
+              song={item.song}
               index={index}
               onRemove={handleRemove}
-              isRemoving={removingIds.has(song.id)}
-              isActive={song.id === activeId}
+              isRemoving={removingIds.has(item.id)}
+              isActive={item.id === activeId}
             />
           ))}
         </div>
       </SortableContext>
 
       <DragOverlay dropAnimation={null}>
-        {activeSong ? (
+        {activeItem ? (
           <div className="border rounded-xl overflow-hidden w-full">
             <div className="flex items-center">
               <div className="px-2 py-3 text-muted-foreground/40 shrink-0">
                 <GripVertical className="h-5 w-5" />
               </div>
               <div className="flex-1 min-w-0">
-                <ItemRow song={activeSong} index={activeIndex} isDragOverlay />
+                <ItemRow song={activeItem.song} index={activeIndex} isDragOverlay />
               </div>
             </div>
           </div>

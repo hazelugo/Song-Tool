@@ -1,283 +1,244 @@
 import { test, expect } from "@playwright/test";
 
-// Helper: create a song via API for test isolation
-async function createSong(
-  request: any,
-  overrides: Record<string, unknown> = {},
-) {
-  const base = {
-    name: "Test Song",
-    bpm: 120,
-    musicalKey: "C",
-    keySignature: "major",
-    chordProgressions: "",
+const MOCK_SONGS = [
+  {
+    id: "song-1",
+    name: "Dark Night",
+    bpm: 78,
+    musicalKey: "A",
+    keySignature: "minor",
+    timeSignature: "4/4",
+    chordProgressions: ["Am", "F", "C", "G"],
+    tags: [{ id: "tag-1", name: "ballad", songId: "song-1" }],
+    youtubeUrl: null,
+    spotifyUrl: null,
+    lyrics: null,
+    lyricsSearch: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    userId: "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+  },
+  {
+    id: "song-2",
+    name: "Slow Burn",
+    bpm: 82,
+    musicalKey: "D",
+    keySignature: "minor",
+    timeSignature: "4/4",
+    chordProgressions: ["Dm", "Am", "Bb", "F"],
     tags: [],
-  };
-  const res = await request.post("/api/songs", {
-    data: { ...base, ...overrides },
-  });
-  expect(res.ok()).toBeTruthy();
-  return res.json();
-}
+    youtubeUrl: null,
+    spotifyUrl: null,
+    lyrics: null,
+    lyricsSearch: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    userId: "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+  },
+];
 
-test.describe("Discovery — Filters", () => {
-  test("DISC-01: BPM range filter; only songs in range appear", async ({
+const MOCK_PARSED_FILTERS = {
+  keySig: "minor",
+  bpmMin: 70,
+  bpmMax: 90,
+};
+
+test.describe("Discovery — AI Search", () => {
+  test("DISC-01: page loads with search bar and suggestion chips", async ({
     page,
-    request,
   }) => {
-    await createSong(request, { name: "Slow Song", bpm: 70 });
-    await createSong(request, { name: "Mid Song", bpm: 90 });
-    await createSong(request, { name: "Fast Song", bpm: 150 });
+    await page.goto("/discovery");
 
-    await page.goto("/songs");
+    // Search input is present and focused
+    await expect(page.locator("input[type='text']")).toBeVisible();
 
-    // Set BPM range 80-100
-    // Wait for the input to register (debounce is 300ms)
-    await page.getByLabel("Min BPM").fill("80");
-    await expect(page).toHaveURL(/bpmMin=80/); // Wait for first debounce
-
-    await page.getByLabel("Max BPM").fill("100");
-    // Now check for both params.
-    await expect(page).toHaveURL(/bpmMax=100/);
-    await expect(page).toHaveURL(/bpmMin=80/);
-
-    // Wait for the filtered result to appear BEFORE checking what is gone
+    // Suggestion chips are rendered
     await expect(
-      page.getByRole("cell", { name: "Mid Song" }).first(),
-    ).toBeVisible();
-
-    await expect(
-      page.getByRole("cell", { name: "Slow Song" }).first(),
-    ).not.toBeVisible();
-    await expect(
-      page.getByRole("cell", { name: "Fast Song" }).first(),
-    ).not.toBeVisible();
-  });
-
-  test("DISC-02: musical key filter; only songs with that key appear", async ({
-    page,
-    request,
-  }) => {
-    await createSong(request, { name: "G Song", musicalKey: "G" });
-    await createSong(request, { name: "D Song", musicalKey: "D" });
-
-    await page.goto("/songs");
-
-    // Use exact label match to avoid ambiguity with "Key Sig"
-    // Note: The filter component labels are "Key" and "Key Sig"
-    await page.getByLabel("Key", { exact: true }).click();
-    await page.getByRole("option", { name: "G", exact: true }).click();
-
-    await expect(
-      page.getByRole("cell", { name: "G Song" }).first(),
+      page.getByRole("button", { name: /Dark Minor Ballad/i }),
     ).toBeVisible();
     await expect(
-      page.getByRole("cell", { name: "D Song" }).first(),
-    ).not.toBeVisible();
+      page.getByRole("button", { name: /Upbeat.*Energetic/i }),
+    ).toBeVisible();
   });
 
-  test("DISC-03: key signature filter; only major or minor songs appear", async ({
+  test("DISC-02: submitting a query shows loading state then results", async ({
     page,
-    request,
   }) => {
-    await createSong(request, {
-      name: "Major Song",
-      keySignature: "major",
-      musicalKey: "C",
+    // Intercept API to return controlled response
+    await page.route("/api/discovery", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          results: MOCK_SONGS,
+          parsedFilters: MOCK_PARSED_FILTERS,
+        }),
+      });
     });
-    await createSong(request, {
-      name: "Minor Song",
-      keySignature: "minor",
-      musicalKey: "C",
-    });
 
-    await page.goto("/songs");
+    await page.goto("/discovery");
 
-    await page.getByLabel("Key Sig").click();
-    await page.getByRole("option", { name: "Major" }).click();
+    const input = page.locator("input[type='text']");
+    await input.fill("dark minor ballad around 80 BPM");
+    await page.getByRole("button", { name: "Search" }).click();
 
-    await expect(
-      page.getByRole("cell", { name: "Major Song" }).first(),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("cell", { name: "Minor Song" }).first(),
-    ).not.toBeVisible();
+    // Loading dots appear briefly (may be fast due to mock)
+    // Then results appear
+    await expect(page.getByText("Dark Night")).toBeVisible();
+    await expect(page.getByText("Slow Burn")).toBeVisible();
   });
 
-  test("DISC-04: chord progression keyword filter; only matching songs appear", async ({
+  test("DISC-03: parsed filter badge shows extracted parameters", async ({
     page,
-    request,
   }) => {
-    await createSong(request, {
-      name: "Em Song",
-      chordProgressions: "Em,G,D",
-      musicalKey: "G",
-      keySignature: "major",
-    });
-    await createSong(request, {
-      name: "No Em Song",
-      chordProgressions: "C,F,Am",
-      musicalKey: "C",
-      keySignature: "major",
+    await page.route("/api/discovery", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          results: MOCK_SONGS,
+          parsedFilters: MOCK_PARSED_FILTERS,
+        }),
+      });
     });
 
-    await page.goto("/songs");
+    await page.goto("/discovery");
+    await page.locator("input[type='text']").fill("dark slow minor ballad");
+    await page.getByRole("button", { name: "Search" }).click();
 
-    await page.getByLabel("Chord keyword").fill("Em");
+    await expect(page.getByText("Dark Night")).toBeVisible();
 
-    await expect(
-      page.getByRole("cell", { name: "Em Song", exact: true }).first(),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("cell", { name: "No Em Song" }).first(),
-    ).not.toBeVisible();
+    // Parsed filter badge shows extracted BPM/key info
+    await expect(page.getByText(/70.*90 BPM/)).toBeVisible();
   });
 
-  test("DISC-05: lyric full-text search; only matching songs appear", async ({
-    page,
-    request,
-  }) => {
-    await createSong(request, {
-      name: "Love Song",
-      lyrics: "I will always love you forever",
-      musicalKey: "F",
-      keySignature: "major",
-    });
-    await createSong(request, {
-      name: "Rock Song",
-      lyrics: "We will rock you tonight",
-      musicalKey: "A",
-      keySignature: "minor",
+  test("DISC-04: error state shown when API call fails", async ({ page }) => {
+    await page.route("/api/discovery", async (route) => {
+      await route.fulfill({
+        status: 500,
+        contentType: "application/json",
+        body: JSON.stringify({ error: "Gemini API unavailable" }),
+      });
     });
 
-    await page.goto("/songs");
+    await page.goto("/discovery");
+    await page.locator("input[type='text']").fill("some query");
+    await page.getByRole("button", { name: "Search" }).click();
 
-    await page.getByLabel("Lyric search").fill("love");
-
-    await expect(
-      page.getByRole("cell", { name: "Love Song" }).first(),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("cell", { name: "Rock Song" }).first(),
-    ).not.toBeVisible();
+    await expect(page.getByText("Search failed")).toBeVisible();
+    await expect(page.getByText("Gemini API unavailable")).toBeVisible();
   });
 
-  test("DISC-06: tag filter; only songs with that tag appear", async ({
+  test("DISC-05: empty results state shown when no songs match", async ({
     page,
-    request,
   }) => {
-    await createSong(request, {
-      name: "Ballad Song",
-      tags: ["ballad"],
-      musicalKey: "C",
-      keySignature: "major",
-    });
-    await createSong(request, {
-      name: "Opener Song",
-      tags: ["opener"],
-      musicalKey: "G",
-      keySignature: "major",
+    await page.route("/api/discovery", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ results: [], parsedFilters: {} }),
+      });
     });
 
-    await page.goto("/songs");
+    await page.goto("/discovery");
+    await page.locator("input[type='text']").fill("very obscure query xyz");
+    await page.getByRole("button", { name: "Search" }).click();
 
-    await page.getByLabel("Tag").fill("ballad");
-
-    await expect(
-      page.getByRole("cell", { name: "Ballad Song" }).first(),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("cell", { name: "Opener Song" }).first(),
-    ).not.toBeVisible();
+    await expect(page.getByText("No songs matched your search")).toBeVisible();
   });
 
-  test("DISC-07: multiple filters combined (AND); only songs matching all conditions appear", async ({
+  test("DISC-06: suggestion chip triggers search with preset prompt", async ({
     page,
-    request,
   }) => {
-    await createSong(request, {
-      name: "Full Match",
-      bpm: 90,
-      musicalKey: "G",
-      tags: ["ballad"],
-      keySignature: "major",
-    });
-    await createSong(request, {
-      name: "Wrong BPM",
-      bpm: 140,
-      musicalKey: "G",
-      tags: ["ballad"],
-      keySignature: "major",
-    });
-    await createSong(request, {
-      name: "Wrong Key",
-      bpm: 90,
-      musicalKey: "D",
-      tags: ["ballad"],
-      keySignature: "major",
+    let capturedBody = "";
+    await page.route("/api/discovery", async (route) => {
+      capturedBody = route.request().postData() ?? "";
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ results: [], parsedFilters: {} }),
+      });
     });
 
-    await page.goto("/songs");
+    await page.goto("/discovery");
+    await page.getByRole("button", { name: /Dark Minor Ballad/i }).click();
 
-    await page.getByLabel("Min BPM").fill("80");
-    await expect(page).toHaveURL(/bpmMin=80/);
-    await page.getByLabel("Max BPM").fill("100");
-    await expect(page).toHaveURL(/bpmMax=100/);
-    await page.getByLabel("Key", { exact: true }).click();
-    await page.getByRole("option", { name: "G", exact: true }).click();
-    await expect(page).toHaveURL(/key=G/);
-    await page.getByLabel("Tag").fill("ballad");
-    await expect(page).toHaveURL(/tag=ballad/);
+    // Wait for the API to be called
+    await page.waitForResponse("/api/discovery");
 
-    await expect(
-      page.getByRole("cell", { name: "Full Match" }).first(),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("cell", { name: "Wrong BPM" }).first(),
-    ).not.toBeVisible();
-    await expect(
-      page.getByRole("cell", { name: "Wrong Key" }).first(),
-    ).not.toBeVisible();
+    // Input filled with suggestion prompt
+    const inputValue = await page.locator("input[type='text']").inputValue();
+    expect(inputValue).toBeTruthy();
+
+    // API received the suggestion prompt
+    expect(capturedBody).toContain("dark");
   });
 
-  test("DISC-08: sort by column; rows reorder on header click", async ({
+  test("DISC-07: clear button resets results and search input", async ({
     page,
-    request,
   }) => {
-    await createSong(request, {
-      name: "Zzz Song",
-      bpm: 200,
-      musicalKey: "C",
-      keySignature: "major",
-    });
-    await createSong(request, {
-      name: "Aaa Song",
-      bpm: 60,
-      musicalKey: "C",
-      keySignature: "major",
+    await page.route("/api/discovery", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          results: MOCK_SONGS,
+          parsedFilters: MOCK_PARSED_FILTERS,
+        }),
+      });
     });
 
-    await page.goto("/songs");
+    await page.goto("/discovery");
+    await page.locator("input[type='text']").fill("dark minor ballad");
+    await page.getByRole("button", { name: "Search" }).click();
+    await expect(page.getByText("Dark Night")).toBeVisible();
 
-    // Wait for table to load initial data
+    // Clear button (X icon)
+    await page.locator("button[type='button']").filter({ hasText: "" }).first().click();
+    // Alternatively target by its position next to input:
+    const clearBtn = page.locator("input[type='text'] ~ div button[type='button']").first();
+    // The results should disappear and input should be empty after clear
+    // Click the X button that appears in the search bar
+    await page.locator("input[type='text']").fill("");
+    await page.keyboard.press("Escape");
+
+    // Use the X button rendered when query is non-empty
+    await page.goto("/discovery");
+    await page.locator("input[type='text']").fill("dark");
+    // X button should be visible now
+    const xButton = page.locator("form button[type='button']");
+    await expect(xButton).toBeVisible();
+    await xButton.click();
+    await expect(page.locator("input[type='text']")).toHaveValue("");
+  });
+
+  test("DISC-08: 'Save as Playlist' button appears with results and opens builder", async ({
+    page,
+  }) => {
+    await page.route("/api/discovery", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          results: MOCK_SONGS,
+          parsedFilters: MOCK_PARSED_FILTERS,
+        }),
+      });
+    });
+
+    await page.goto("/discovery");
+    await page.locator("input[type='text']").fill("dark minor ballad");
+    await page.getByRole("button", { name: "Search" }).click();
+    await expect(page.getByText("Dark Night")).toBeVisible();
+
+    // "Save as Playlist" button appears in the status bar
+    const saveBtn = page.getByRole("button", { name: "Save as Playlist" });
+    await expect(saveBtn).toBeVisible();
+    await saveBtn.click();
+
+    // PlaylistBuilder is shown
     await expect(
-      page.getByRole("cell", { name: "Zzz Song" }).first(),
+      page.getByRole("heading", { name: "Build your playlist" }),
     ).toBeVisible();
-
-    // Click BPM header once — ascending
-    await page.getByRole("button", { name: /BPM/i }).click();
-
-    // The observed behavior is that the first click sorts descending.
-    // We will assert this to make the test stable.
-    await expect(
-      page.locator("tbody tr:first-child > td:first-child"),
-    ).toHaveText("Zzz Song");
-
-    // Click again — descending
-    await page.getByRole("button", { name: /BPM/i }).click();
-    // The second click should now sort ascending.
-    await expect(
-      page.locator("tbody tr:first-child > td:first-child"),
-    ).toHaveText("Aaa Song");
   });
 });

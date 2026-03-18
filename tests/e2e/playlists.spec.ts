@@ -91,3 +91,100 @@ test.describe("Playlists — CRUD", () => {
     expect(getRes.status()).toBe(404);
   });
 });
+
+// Simulate a dnd-kit drag with activationConstraint.distance=8
+async function dragToReorder(
+  page: any,
+  sourceLocator: any,
+  targetLocator: any,
+) {
+  const sourceBox = await sourceLocator.boundingBox();
+  const targetBox = await targetLocator.boundingBox();
+
+  const startX = sourceBox.x + sourceBox.width / 2;
+  const startY = sourceBox.y + sourceBox.height / 2;
+  const endX = targetBox.x + targetBox.width / 2;
+  const endY = targetBox.y + targetBox.height / 2;
+
+  await page.mouse.move(startX, startY);
+  await page.mouse.down();
+  // Move past activationConstraint.distance=8 to start the drag
+  await page.mouse.move(startX, startY + 12, { steps: 5 });
+  // Drag to target
+  await page.mouse.move(endX, endY, { steps: 20 });
+  await page.mouse.up();
+}
+
+test.describe("Playlists — Reorder", () => {
+  test("PLAY-05: drag first song to last position; order updates in UI and persists", async ({
+    page,
+    request,
+  }) => {
+    const songId1 = await createSong(request, "First Track");
+    const songId2 = await createSong(request, "Middle Track");
+    const songId3 = await createSong(request, "Last Track");
+
+    const res = await request.post("/api/playlists", {
+      data: {
+        name: "Reorder Test Playlist",
+        items: [
+          { song: { id: songId1 }, rank: 10000 },
+          { song: { id: songId2 }, rank: 20000 },
+          { song: { id: songId3 }, rank: 30000 },
+        ],
+      },
+    });
+    expect(res.ok()).toBeTruthy();
+    const playlist = await res.json();
+
+    await page.goto(`/playlists/${playlist.id}`);
+
+    // Verify initial order
+    const rows = page.locator(".font-medium.truncate");
+    await expect(rows.nth(0)).toHaveText("First Track");
+    await expect(rows.nth(1)).toHaveText("Middle Track");
+    await expect(rows.nth(2)).toHaveText("Last Track");
+
+    // Drag first grip handle to below the third row
+    const gripHandles = page.locator(".cursor-grab");
+    await dragToReorder(page, gripHandles.nth(0), gripHandles.nth(2));
+
+    // First Track should now be after the others
+    await expect(rows.nth(2)).toHaveText("First Track");
+
+    // Reload — verify order persisted via API
+    await page.reload();
+    await expect(rows.nth(2)).toHaveText("First Track");
+  });
+
+  test("PLAY-06: remove a song from playlist; song disappears from list", async ({
+    page,
+    request,
+  }) => {
+    const songId1 = await createSong(request, "Keep This Track");
+    const songId2 = await createSong(request, "Remove This Track");
+
+    const res = await request.post("/api/playlists", {
+      data: {
+        name: "Remove Test Playlist",
+        items: [
+          { song: { id: songId1 }, rank: 10000 },
+          { song: { id: songId2 }, rank: 20000 },
+        ],
+      },
+    });
+    const playlist = await res.json();
+
+    await page.goto(`/playlists/${playlist.id}`);
+
+    await expect(page.getByText("Remove This Track")).toBeVisible();
+
+    // Hover the second row to reveal the remove button, then click it
+    const secondRow = page.locator(".group").filter({ hasText: "Remove This Track" }).first();
+    await secondRow.hover();
+    await secondRow.locator("button").last().click();
+
+    await expect(page.getByText("Remove This Track")).not.toBeVisible();
+    await expect(page.getByText("Keep This Track")).toBeVisible();
+  });
+});

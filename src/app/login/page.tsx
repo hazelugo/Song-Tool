@@ -4,7 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Music } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 type Mode = "signin" | "signup";
 
@@ -43,7 +45,7 @@ export default function LoginPage() {
           return;
         }
         setMessage(
-          "Account created! Check your email to confirm, then sign in.",
+          "Account created. Check your email to confirm, then sign in.",
         );
         setMode("signin");
       }
@@ -55,50 +57,43 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm">
-        {/* Logo */}
-        <div className="flex flex-col items-center mb-8 gap-3">
-          <div className="size-12 rounded-2xl bg-primary/10 flex items-center justify-center">
-            <Music className="size-6 text-primary" />
-          </div>
-          <h1 className="text-2xl font-bold">Song Tool</h1>
-          <p className="text-sm text-muted-foreground">
-            Your personal music library
+
+        {/* Header */}
+        <div className="mb-8 border-b border-border/60 pb-4">
+          <p className="text-[10px] font-mono font-semibold tracking-[0.25em] uppercase text-muted-foreground mb-1">
+            Song Tool
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Song catalog for working musicians
           </p>
         </div>
 
-        {/* Tab toggle */}
-        <div className="flex rounded-xl border border-border p-1 mb-6 bg-muted/40">
-          <button
-            type="button"
-            onClick={() => { setMode("signin"); setError(null); setMessage(null); }}
-            className={`flex-1 text-sm py-1.5 rounded-lg font-medium transition-all ${
-              mode === "signin"
-                ? "bg-background shadow-sm text-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Sign in
-          </button>
-          <button
-            type="button"
-            onClick={() => { setMode("signup"); setError(null); setMessage(null); }}
-            className={`flex-1 text-sm py-1.5 rounded-lg font-medium transition-all ${
-              mode === "signup"
-                ? "bg-background shadow-sm text-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Create account
-          </button>
+        {/* Tab toggle — underline style */}
+        <div className="flex border-b border-border mb-6">
+          {(["signin", "signup"] as Mode[]).map((m) => (
+            <button
+              key={m}
+              type="button"
+              onClick={() => { setMode(m); setError(null); setMessage(null); }}
+              className={cn(
+                "flex-1 text-xs font-medium uppercase tracking-wider py-2 border-b-2 -mb-px transition-colors duration-100",
+                mode === m
+                  ? "border-b-[color:var(--color-chart-4)] text-foreground"
+                  : "border-b-transparent text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {m === "signin" ? "Sign in" : "Create account"}
+            </button>
+          ))}
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium" htmlFor="email">
+            <Label htmlFor="email" className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
               Email
-            </label>
-            <input
+            </Label>
+            <Input
               id="email"
               type="email"
               value={email}
@@ -106,15 +101,15 @@ export default function LoginPage() {
               required
               autoComplete="email"
               autoFocus
-              className="h-10 px-3 rounded-lg border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all text-sm"
+              className="h-8 rounded-sm text-sm"
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium" htmlFor="password">
+            <Label htmlFor="password" className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
               Password
-            </label>
-            <input
+            </Label>
+            <Input
               id="password"
               type="password"
               value={password}
@@ -122,23 +117,23 @@ export default function LoginPage() {
               required
               autoComplete={mode === "signin" ? "current-password" : "new-password"}
               minLength={6}
-              className="h-10 px-3 rounded-lg border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all text-sm"
+              className="h-8 rounded-sm text-sm"
             />
           </div>
 
           {error && (
-            <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg">
+            <p className="text-xs text-destructive border border-destructive/30 bg-destructive/8 px-3 py-2 rounded-sm font-mono">
               {error}
             </p>
           )}
 
           {message && (
-            <p className="text-sm text-emerald-600 bg-emerald-500/10 px-3 py-2 rounded-lg">
+            <p className="text-xs text-muted-foreground border border-border bg-muted/30 px-3 py-2 rounded-sm font-mono">
               {message}
             </p>
           )}
 
-          <Button type="submit" disabled={loading} className="mt-1 h-10">
+          <Button type="submit" disabled={loading} className="mt-1 h-8 rounded-sm w-full text-xs">
             {loading
               ? "..."
               : mode === "signin"

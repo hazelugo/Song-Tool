@@ -118,7 +118,7 @@ function SongsPageContent() {
         <h1 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Songs</h1>
         <div className="flex items-center gap-2">
           <Button
-            variant="outline"
+            variant="default"
             size="sm"
             onClick={() => setShowPlaylistBuilder(true)}
             disabled={songs.length === 0}
@@ -127,7 +127,7 @@ function SongsPageContent() {
             Save as Playlist
           </Button>
           <CsvImportDialog onSuccess={loadSongs} />
-          <Button variant="outline" onClick={openAddSheet} size="sm" className="h-7 text-xs rounded-sm">
+          <Button variant="default" onClick={openAddSheet} size="sm" className="h-7 text-xs rounded-sm">
             Add Song
           </Button>
         </div>

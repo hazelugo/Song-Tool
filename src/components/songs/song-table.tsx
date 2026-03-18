@@ -232,7 +232,7 @@ export function SongTable({
           </span>
           <div className="flex gap-2">
             <Button
-              variant="outline"
+              variant="default"
               size="sm"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
@@ -241,7 +241,7 @@ export function SongTable({
               Previous
             </Button>
             <Button
-              variant="outline"
+              variant="default"
               size="sm"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}

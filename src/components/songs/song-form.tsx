@@ -318,7 +318,7 @@ export function SongForm({
           <DialogFooter className="px-6 py-4 border-t">
             <Button
               type="button"
-              variant="outline"
+              variant="default"
               onClick={() => setLyricsOpen(false)}
             >
               Cancel

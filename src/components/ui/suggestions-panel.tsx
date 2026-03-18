@@ -137,7 +137,7 @@ export function SuggestionsPanel({
                   </div>
                   <Button
                     size="sm"
-                    variant="outline"
+                    variant="default"
                     onClick={() => handleAdd(s.id)}
                     disabled={addingIds.has(s.id)}
                     className="flex-shrink-0 rounded-sm"

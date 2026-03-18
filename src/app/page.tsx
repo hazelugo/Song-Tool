@@ -32,19 +32,19 @@ export default function Home() {
       <div className="flex gap-3">
         <Link
           href="/songs"
-          className={buttonVariants({ size: "sm" }) + " rounded-sm text-xs h-8 px-5"}
+          className={buttonVariants({ variant: "default", size: "sm" }) + " rounded-sm text-xs h-7"}
         >
           Browse Songs
         </Link>
         <Link
           href="/discovery"
-          className={buttonVariants({ variant: "outline", size: "sm" }) + " rounded-sm text-xs h-8 px-5"}
+          className={buttonVariants({ variant: "default", size: "sm" }) + " rounded-sm text-xs h-7"}
         >
           Discovery
         </Link>
         <Link
           href="/playlists"
-          className={buttonVariants({ variant: "ghost", size: "sm" }) + " rounded-sm text-xs h-8 px-5 text-muted-foreground"}
+          className={buttonVariants({ variant: "default", size: "sm" }) + " rounded-sm text-xs h-7"}
         >
           Playlists
         </Link>

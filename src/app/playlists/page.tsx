@@ -163,7 +163,7 @@ export default function ViewPlaylistsPage() {
               </span>
               <div className="flex items-center gap-1">
                 <Button
-                  variant="outline"
+                  variant="default"
                   size="sm"
                   className="h-7 text-xs rounded-sm"
                   disabled={pageIndex === 0}
@@ -172,7 +172,7 @@ export default function ViewPlaylistsPage() {
                   Previous
                 </Button>
                 <Button
-                  variant="outline"
+                  variant="default"
                   size="sm"
                   className="h-7 text-xs rounded-sm"
                   disabled={pageIndex >= pageCount - 1}

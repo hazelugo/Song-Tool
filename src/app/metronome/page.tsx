@@ -168,7 +168,7 @@ function MetronomeContent() {
 
       <div className="flex justify-center">
         {isPlaying ? (
-          <Button onClick={stop} variant="outline" size="lg" className="rounded-sm">
+          <Button onClick={stop} variant="default" size="lg" className="rounded-sm">
             Stop
           </Button>
         ) : (

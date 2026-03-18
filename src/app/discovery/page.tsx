@@ -200,7 +200,7 @@ function DiscoveryContent() {
             </span>
             <Button
               size="sm"
-              variant="outline"
+              variant="default"
               onClick={() => setShowPlaylistBuilder(true)}
               className="h-7 text-xs rounded-sm"
             >

@@ -27,7 +27,9 @@ export default function Home() {
 
       {/* Body copy */}
       <p className="text-sm text-muted-foreground leading-relaxed max-w-sm mx-auto text-center">
-        Group songs by key, BPM, time signature, or feel. Build sets that flow.
+        Group songs by key, BPM, time signature, or feel.
+        <br />
+        Build sets that flow.
       </p>
 
       {/* CTA row */}

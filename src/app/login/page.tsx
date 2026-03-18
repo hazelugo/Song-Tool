@@ -60,6 +60,9 @@ export default function LoginPage() {
 
         {/* Header */}
         <div className="mb-8 border-b border-border/60 pb-4">
+          <span className="text-[10px] font-mono font-semibold uppercase tracking-[0.3em] text-muted-foreground border border-border/60 rounded-sm px-3 py-1 inline-block mb-4">
+            v1.0
+          </span>
           <h1 className="text-4xl font-bold tracking-tight leading-none mb-2">
             Repertoire
           </h1>

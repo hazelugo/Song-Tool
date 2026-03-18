@@ -10,23 +10,26 @@ export default function Home() {
           "repeating-linear-gradient(0deg, transparent, transparent 39px, oklch(1 0 0 / 0.025) 39px, oklch(1 0 0 / 0.025) 40px), repeating-linear-gradient(90deg, transparent, transparent 39px, oklch(1 0 0 / 0.025) 39px, oklch(1 0 0 / 0.025) 40px)",
       }}
     >
-      {/* Eyebrow */}
+      {/* Version badge */}
       <span className="text-[10px] font-mono font-semibold uppercase tracking-[0.3em] text-muted-foreground border border-border/60 rounded-sm px-3 py-1">
-        Repertoire v1
+        v1.0
       </span>
 
-      {/* Hero headline */}
-      <div className="text-center max-w-xl">
-        <h1 className="text-5xl font-bold tracking-tight leading-none mb-4">
-          Your repertoire.
-          <br />
-          <span className="text-muted-foreground">Built for flow.</span>
+      {/* Brand wordmark + tagline */}
+      <div className="text-center">
+        <h1 className="text-6xl font-bold tracking-tight leading-none mb-3">
+          Repertoire
         </h1>
-        <p className="text-sm text-muted-foreground leading-relaxed max-w-sm mx-auto">
-          Group songs by key, BPM, time signature, or feel. Build sets that
-          flow. For worship leaders and MDs.
+        <p className="text-xl text-muted-foreground tracking-wide">
+          Built for flow.
         </p>
       </div>
+
+      {/* Body copy */}
+      <p className="text-sm text-muted-foreground leading-relaxed max-w-sm mx-auto text-center">
+        Group songs by key, BPM, time signature, or feel. Build sets that flow.
+        For worship leaders and MDs.
+      </p>
 
       {/* CTA row */}
       <div className="flex gap-3">

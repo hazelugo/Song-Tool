@@ -10,8 +10,8 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] })
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Song Tool",
-  description: "Find songs that share musical DNA",
+  title: "Repertoire",
+  description: "Your repertoire. Built for flow.",
 }
 
 export default function RootLayout({

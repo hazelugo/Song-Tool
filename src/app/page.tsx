@@ -12,19 +12,19 @@ export default function Home() {
     >
       {/* Eyebrow */}
       <span className="text-[10px] font-mono font-semibold uppercase tracking-[0.3em] text-muted-foreground border border-border/60 rounded-sm px-3 py-1">
-        Song Tool v1
+        Repertoire v1
       </span>
 
       {/* Hero headline */}
       <div className="text-center max-w-xl">
         <h1 className="text-5xl font-bold tracking-tight leading-none mb-4">
-          Your catalog,
+          Your repertoire.
           <br />
-          <span className="text-muted-foreground">under control.</span>
+          <span className="text-muted-foreground">Built for flow.</span>
         </h1>
         <p className="text-sm text-muted-foreground leading-relaxed max-w-sm mx-auto">
-          Search by key, BPM, mood, or chords. Build setlists in seconds.
-          Built for working musicians.
+          Group songs by key, BPM, time signature, or feel. Build sets that
+          flow. For worship leaders and MDs.
         </p>
       </div>
 
@@ -32,19 +32,28 @@ export default function Home() {
       <div className="flex gap-3">
         <Link
           href="/songs"
-          className={buttonVariants({ variant: "default", size: "sm" }) + " rounded-sm text-xs h-7"}
+          className={
+            buttonVariants({ variant: "default", size: "sm" }) +
+            " rounded-sm text-xs h-7"
+          }
         >
           Browse Songs
         </Link>
         <Link
           href="/discovery"
-          className={buttonVariants({ variant: "default", size: "sm" }) + " rounded-sm text-xs h-7"}
+          className={
+            buttonVariants({ variant: "default", size: "sm" }) +
+            " rounded-sm text-xs h-7"
+          }
         >
           Discovery
         </Link>
         <Link
           href="/playlists"
-          className={buttonVariants({ variant: "default", size: "sm" }) + " rounded-sm text-xs h-7"}
+          className={
+            buttonVariants({ variant: "default", size: "sm" }) +
+            " rounded-sm text-xs h-7"
+          }
         >
           Playlists
         </Link>
@@ -59,7 +68,9 @@ export default function Home() {
           ["CAMELOT", "2A"],
         ].map(([label, val]) => (
           <div key={label} className="flex flex-col items-center gap-0.5">
-            <span className="text-[9px] uppercase tracking-[0.25em] font-medium">{label}</span>
+            <span className="text-[9px] uppercase tracking-[0.25em] font-medium">
+              {label}
+            </span>
             <span className="font-mono text-sm tabular-nums">{val}</span>
           </div>
         ))}

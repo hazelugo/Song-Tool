@@ -61,10 +61,10 @@ export default function LoginPage() {
         {/* Header */}
         <div className="mb-8 border-b border-border/60 pb-4">
           <p className="text-[10px] font-mono font-semibold tracking-[0.25em] uppercase text-muted-foreground mb-1">
-            Song Tool
+            Repertoire
           </p>
           <p className="text-xs text-muted-foreground">
-            Song catalog for working musicians
+            Your repertoire. Built for flow.
           </p>
         </div>
 

@@ -60,11 +60,11 @@ export function AppSidebar() {
       {/* DAW-style header: monospaced, uppercase, tight */}
       <SidebarHeader className="border-b border-sidebar-border px-3 py-3">
         <a
-          href="https://songtool.hazelugo.com/"
+          href="https://repertoire.hazelugo.com/"
           rel="noopener noreferrer"
           className="font-mono text-xs font-semibold tracking-[0.2em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-100"
         >
-          SONG TOOL
+          REPERTOIRE
         </a>
       </SidebarHeader>
       <SidebarContent>

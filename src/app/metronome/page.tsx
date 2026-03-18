@@ -97,8 +97,11 @@ function MetronomeContent() {
   }, []);
 
   return (
-    <div className="max-w-md mx-auto p-6 space-y-8">
-      <h1 className="text-2xl font-bold">Metronome</h1>
+    <div className="flex flex-col gap-6 p-6 max-w-md mx-auto w-full">
+      {/* Header row — DAW toolbar style */}
+      <div className="border-b border-border/60 pb-3">
+        <h1 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Metronome</h1>
+      </div>
 
       <div className="space-y-5">
         <div className="space-y-2">
@@ -165,11 +168,11 @@ function MetronomeContent() {
 
       <div className="flex justify-center">
         {isPlaying ? (
-          <Button onClick={stop} variant="outline" size="lg">
+          <Button onClick={stop} variant="outline" size="lg" className="rounded-sm">
             Stop
           </Button>
         ) : (
-          <Button onClick={start} size="lg">
+          <Button onClick={start} size="lg" className="rounded-sm">
             Start
           </Button>
         )}

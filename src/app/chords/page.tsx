@@ -47,70 +47,75 @@ function ChordPadsContent() {
   const chords = getDiatonicChords(key, keySig);
 
   return (
-    <div className="max-w-2xl mx-auto p-6 space-y-8">
-      <h1 className="text-2xl font-bold">Chord Pads</h1>
-
-      <div className="flex gap-6">
-        <div className="space-y-2">
-          <Label>Key</Label>
-          <Select
-            value={key}
-            onValueChange={(v) => setKey(v as (typeof MUSICAL_KEYS)[number])}
-          >
-            <SelectTrigger className="w-24">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {MUSICAL_KEYS.map((k) => (
-                <SelectItem key={k} value={k}>
-                  {k}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label>Mode</Label>
-          <Select value={keySig} onValueChange={(v) => setKeySig(v as KeySig)}>
-            <SelectTrigger className="w-28">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="major">Major</SelectItem>
-              <SelectItem value="minor">Minor</SelectItem>
-            </SelectContent>
-          </Select>
+    <div className="flex flex-col gap-4 p-6 max-w-2xl mx-auto w-full">
+      {/* Header row — DAW toolbar style */}
+      <div className="flex items-center justify-between border-b border-border/60 pb-3">
+        <h1 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+          Chord Pads
+        </h1>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Key</Label>
+            <Select
+              value={key}
+              onValueChange={(v) => setKey(v as (typeof MUSICAL_KEYS)[number])}
+            >
+              <SelectTrigger className="h-7 w-20 text-xs rounded-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {MUSICAL_KEYS.map((k) => (
+                  <SelectItem key={k} value={k}>
+                    {k}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-2">
+            <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Mode</Label>
+            <Select value={keySig} onValueChange={(v) => setKeySig(v as KeySig)}>
+              <SelectTrigger className="h-7 w-24 text-xs rounded-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="major">Major</SelectItem>
+                <SelectItem value="minor">Minor</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-4 gap-2">
         {chords.map((chord, i) => (
           <button
             key={i}
             onClick={() => handlePadClick(chord)}
             className={cn(
-              "h-24 rounded-xl border-2 flex flex-col items-center justify-center gap-1 transition-all cursor-pointer",
-              "hover:scale-105 active:scale-95",
+              "h-20 rounded-sm border flex flex-col items-center justify-center gap-0.5",
+              "transition-colors duration-75 cursor-pointer",
+              "active:translate-y-px",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
               chord.quality === "major" &&
-                "bg-primary/10 border-primary/40 hover:bg-primary/20",
+                "bg-primary/5 border-border hover:bg-primary/10 hover:border-primary/30",
               chord.quality === "minor" &&
-                "bg-secondary/20 border-secondary-foreground/30 hover:bg-secondary/40",
+                "bg-transparent border-border hover:bg-muted/50",
               chord.quality === "dim" &&
-                "bg-orange-500/10 border-orange-500/40 hover:bg-orange-500/20",
+                "bg-destructive/5 border-destructive/20 hover:bg-destructive/10 hover:border-destructive/40",
               activeChord === chord.label &&
-                "ring-2 ring-primary scale-105 brightness-110",
+                "border-[color:var(--color-chart-4)] bg-[color:var(--color-chart-4)]/10",
             )}
           >
-            <span className="text-xs text-muted-foreground">{chord.roman}</span>
-            <span className="text-lg font-bold">{chord.label}</span>
-            <span className="text-xs capitalize text-muted-foreground">
+            <span className="text-[10px] font-mono text-muted-foreground">{chord.roman}</span>
+            <span className="text-base font-semibold font-mono">{chord.label}</span>
+            <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
               {chord.quality}
             </span>
           </button>
         ))}
         {/* Empty 8th slot */}
-        <div className="h-24 rounded-xl border-2 border-dashed border-muted/30" />
+        <div className="h-20 rounded-sm border border-dashed border-muted/30" />
       </div>
     </div>
   );

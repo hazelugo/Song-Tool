@@ -37,7 +37,7 @@ export default async function PlaylistDetailPage({
   const existingSongIds = playlist.songs.map((ps) => ps.song.id);
 
   return (
-    <main className="min-h-screen bg-background p-8">
+    <main className="min-h-screen bg-background p-6">
       <div className="max-w-3xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-start justify-between gap-4">
@@ -76,7 +76,7 @@ export default async function PlaylistDetailPage({
 
         {/* Song list */}
         {playlist.songs.length === 0 ? (
-          <div className="border-2 border-dashed rounded-xl p-12 text-center text-muted-foreground">
+          <div className="border border-dashed rounded-sm p-12 text-center text-muted-foreground">
             <p className="font-medium">This playlist is empty</p>
             <p className="text-sm mt-1">Use &quot;Add Songs&quot; to get started</p>
           </div>

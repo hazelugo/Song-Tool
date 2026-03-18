@@ -67,7 +67,7 @@ function ItemRow({ song, index, onRemove, isRemoving, isDragOverlay }: ItemRowPr
     <div
       className={cn(
         "group flex items-center gap-4 px-4 py-3 hover:bg-muted/40 transition-colors bg-card",
-        isDragOverlay && "rounded-xl shadow-2xl border opacity-95",
+        isDragOverlay && "rounded-sm shadow-md border opacity-95",
       )}
     >
       {/* Track number */}
@@ -79,15 +79,15 @@ function ItemRow({ song, index, onRemove, isRemoving, isDragOverlay }: ItemRowPr
         <div className="font-medium truncate">{song.name}</div>
         <div className="flex gap-2 items-center mt-0.5 flex-wrap">
           {camelot && (
-            <span className="font-mono text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded font-semibold">
+            <span className="font-mono text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded-sm font-semibold">
               {formatCamelot(camelot)}
             </span>
           )}
-          <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded text-muted-foreground">
+          <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded-sm text-muted-foreground">
             {song.musicalKey} {song.keySignature}
           </span>
           {song.timeSignature && (
-            <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded text-muted-foreground">
+            <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded-sm text-muted-foreground">
               {song.timeSignature}
             </span>
           )}
@@ -281,7 +281,7 @@ export function PlaylistEditor({
         items={items.map((item) => item.id)}
         strategy={verticalListSortingStrategy}
       >
-        <div className="border rounded-xl bg-card shadow-sm overflow-hidden">
+        <div className="border rounded-sm bg-card overflow-hidden">
           {items.map((item, index) => (
             <SortableItem
               key={item.id}

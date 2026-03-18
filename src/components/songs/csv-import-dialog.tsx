@@ -271,7 +271,7 @@ export function CsvImportDialog({ onSuccess }: { onSuccess: () => void }) {
           {step === "preview" && (
             <div className="flex flex-col gap-3 min-h-0">
               <div className="flex gap-4 text-sm">
-                <span className="flex items-center gap-1 text-green-600">
+                <span className="flex items-center gap-1 text-[color:var(--color-accent-data)]">
                   <CheckCircle2 className="h-4 w-4" />
                   {validRows.length} valid
                 </span>
@@ -305,7 +305,7 @@ export function CsvImportDialog({ onSuccess }: { onSuccess: () => void }) {
                         key={row.index}
                         className={cn(
                           "border-t",
-                          row.validated ? "bg-green-50/40 dark:bg-green-950/20" : "bg-red-50/40 dark:bg-red-950/20",
+                          row.validated ? "bg-[color:var(--color-chart-4)]/5" : "bg-destructive/5",
                         )}
                       >
                         <td className="px-2 py-1.5 text-muted-foreground">{row.index}</td>
@@ -315,7 +315,7 @@ export function CsvImportDialog({ onSuccess }: { onSuccess: () => void }) {
                         <td className="px-2 py-1.5">{String(row.mapped.keySignature)}</td>
                         <td className="px-2 py-1.5">
                           {row.validated ? (
-                            <span className="flex items-center gap-1 text-green-600">
+                            <span className="flex items-center gap-1 text-[color:var(--color-accent-data)]">
                               <CheckCircle2 className="h-3 w-3" /> OK
                             </span>
                           ) : (
@@ -343,8 +343,8 @@ export function CsvImportDialog({ onSuccess }: { onSuccess: () => void }) {
           {/* Done step */}
           {step === "done" && (
             <div className="flex flex-col items-center justify-center gap-3 py-10 text-center">
-              <CheckCircle2 className="h-10 w-10 text-green-500" />
-              <p className="text-lg font-medium">{importedCount} songs imported</p>
+              <CheckCircle2 className="h-10 w-10 text-[color:var(--color-accent-data)]" />
+              <p className="text-base font-medium">{importedCount} songs imported</p>
               {invalidRows.length > 0 && (
                 <p className="text-sm text-muted-foreground">
                   {invalidRows.length} rows were skipped due to validation errors.

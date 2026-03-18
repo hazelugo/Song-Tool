@@ -1,44 +1,59 @@
-"use client"
-import { useEffect, useState } from "react"
+"use client";
+import { useEffect, useState } from "react";
 import {
-  Sidebar, SidebarContent, SidebarFooter, SidebarGroup,
-  SidebarGroupContent, SidebarHeader,
-  SidebarMenu, SidebarMenuButton, SidebarMenuItem,
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { Music, Search, ListMusic, Moon, Sun, Timer, Piano, LogOut } from "lucide-react"
-import { useTheme } from "next-themes"
-import { createClient } from "@/lib/supabase/client"
-import { useRouter } from "next/navigation"
+} from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import {
+  Music,
+  Search,
+  ListMusic,
+  Moon,
+  Sun,
+  Timer,
+  Piano,
+  LogOut,
+} from "lucide-react";
+import { useTheme } from "next-themes";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 
 const navItems = [
-  { title: "Songs",      url: "/songs",     icon: Music },
-  { title: "Discovery",  url: "/discovery", icon: Search },
-  { title: "Playlists",  url: "/playlists", icon: ListMusic },
-  { title: "Metronome",  url: "/metronome", icon: Timer },
-  { title: "Chord Pads", url: "/chords",    icon: Piano },
-]
+  { title: "Songs", url: "/songs", icon: Music },
+  { title: "Discovery", url: "/discovery", icon: Search },
+  { title: "Playlists", url: "/playlists", icon: ListMusic },
+  { title: "Metronome", url: "/metronome", icon: Timer },
+  { title: "Chord Pads", url: "/chords", icon: Piano },
+];
 
 export function AppSidebar() {
-  const { theme, setTheme } = useTheme()
-  const { setOpenMobile } = useSidebar()
-  const router = useRouter()
-  const [userEmail, setUserEmail] = useState<string | null>(null)
-  const supabase = createClient()
+  const { theme, setTheme } = useTheme();
+  const { setOpenMobile } = useSidebar();
+  const router = useRouter();
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const supabase = createClient();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
-      setUserEmail(user?.email ?? null)
-    })
-  }, [])
+      setUserEmail(user?.email ?? null);
+    });
+  }, []);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    router.push("/login")
-    router.refresh()
-  }
+    await supabase.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  };
 
   return (
     <Sidebar>
@@ -46,7 +61,6 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-sidebar-border px-3 py-3">
         <a
           href="https://songtool.hazelugo.com/"
-          target="_blank"
           rel="noopener noreferrer"
           className="font-mono text-xs font-semibold tracking-[0.2em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-100"
         >
@@ -61,7 +75,12 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.title}>
                   {/* DAW tabs: no rounding, strong left-border accent on active */}
                   <SidebarMenuButton
-                    render={<Link href={item.url} onClick={() => setOpenMobile(false)} />}
+                    render={
+                      <Link
+                        href={item.url}
+                        onClick={() => setOpenMobile(false)}
+                      />
+                    }
                     className="rounded-none h-9 px-3 text-xs font-medium tracking-wide uppercase gap-2.5
                       border-l-2 border-transparent
                       hover:bg-sidebar-accent hover:border-l-sidebar-primary hover:text-sidebar-foreground
@@ -104,5 +123,5 @@ export function AppSidebar() {
         </Button>
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

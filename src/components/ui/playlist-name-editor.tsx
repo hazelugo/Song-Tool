@@ -56,12 +56,12 @@ export function PlaylistNameEditor({
           value={name}
           onChange={(e) => setName(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="text-2xl font-bold h-auto py-1 px-2"
+          className="text-xl font-semibold h-auto py-1 px-2"
           autoFocus
           disabled={saving}
         />
         <Button size="icon" variant="ghost" onClick={handleSave} disabled={saving}>
-          <Check className="h-4 w-4 text-green-600" />
+          <Check className="h-4 w-4 text-foreground" />
         </Button>
         <Button
           size="icon"
@@ -79,7 +79,7 @@ export function PlaylistNameEditor({
 
   return (
     <div className="flex items-center gap-2 group">
-      <h1 className="text-3xl font-bold">{name}</h1>
+      <h1 className="text-xl font-semibold">{name}</h1>
       <Button
         size="icon"
         variant="ghost"

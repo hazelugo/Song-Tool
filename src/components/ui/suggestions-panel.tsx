@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Sparkles, ChevronDown, ChevronUp, Plus } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -75,15 +75,14 @@ export function SuggestionsPanel({
   const filtered = suggestions.filter((s) => !existingSongIds.includes(s.id));
 
   return (
-    <div className="border rounded-xl overflow-hidden bg-card shadow-sm">
+    <div className="border rounded-sm overflow-hidden bg-card">
       <button
         onClick={handleToggle}
-        className="w-full flex items-center justify-between px-5 py-4 hover:bg-muted/40 transition-colors"
+        className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/40 transition-colors"
       >
-        <div className="flex items-center gap-2 font-semibold text-sm">
-          <Sparkles className="h-4 w-4 text-primary" />
+        <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
           Smart Suggestions
-        </div>
+        </span>
         {open ? (
           <ChevronUp className="h-4 w-4 text-muted-foreground" />
         ) : (
@@ -113,7 +112,7 @@ export function SuggestionsPanel({
                   <div className="flex-1 min-w-0 mr-4">
                     <div className="font-medium truncate">{s.name}</div>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-xs font-mono bg-muted px-1.5 py-0.5 rounded">
+                      <span className="text-xs font-mono bg-muted px-1.5 py-0.5 rounded-sm">
                         {s.musicalKey} {s.keySignature}
                       </span>
                       {s.bpm && (
@@ -125,10 +124,10 @@ export function SuggestionsPanel({
                         <span
                           key={r}
                           className={cn(
-                            "text-xs px-1.5 py-0.5 rounded-full",
+                            "text-xs px-1.5 py-0.5 rounded-sm font-mono uppercase tracking-wide",
                             s.score >= 3
-                              ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                              : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+                              ? "bg-[color:var(--color-chart-4)]/15 text-[color:var(--color-chart-4)]"
+                              : "bg-muted text-muted-foreground",
                           )}
                         >
                           {r}
@@ -141,7 +140,7 @@ export function SuggestionsPanel({
                     variant="outline"
                     onClick={() => handleAdd(s.id)}
                     disabled={addingIds.has(s.id)}
-                    className="flex-shrink-0"
+                    className="flex-shrink-0 rounded-sm"
                   >
                     <Plus className="h-3 w-3 mr-1" />
                     Add

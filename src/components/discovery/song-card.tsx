@@ -6,10 +6,9 @@ import { getCamelotPosition, formatCamelot } from "@/lib/camelot";
 import { Youtube, ExternalLink } from "lucide-react";
 
 function bpmStyle(bpm: number) {
-  // Use chart palette — cooler, professional, no consumer color
-  if (bpm < 90) return "bg-[oklch(0.488_0.243_264/0.12)] text-[oklch(0.623_0.214_259)] border border-[oklch(0.488_0.243_264/0.25)]";
-  if (bpm < 120) return "bg-[oklch(0.546_0.245_262/0.12)] text-[oklch(0.623_0.214_259)] border border-[oklch(0.546_0.245_262/0.25)]";
-  return "bg-[oklch(0.75_0.12_85/0.12)] text-[oklch(0.65_0.15_75)] border border-[oklch(0.75_0.12_85/0.25)]";
+  if (bpm < 90) return "bg-[color:var(--color-chart-4)]/10 text-[color:var(--color-chart-2)] border border-[color:var(--color-chart-4)]/25";
+  if (bpm < 120) return "bg-[color:var(--color-chart-3)]/10 text-[color:var(--color-chart-2)] border border-[color:var(--color-chart-3)]/25";
+  return "bg-[color:var(--color-accent-data)]/10 text-[color:var(--color-accent-data)] border border-[color:var(--color-accent-data)]/25";
 }
 
 interface SongCardProps {

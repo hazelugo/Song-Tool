@@ -191,7 +191,7 @@ export function ExportMenu({ playlistName, songs }: ExportMenuProps) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>
+      <DropdownMenuTrigger className={cn(buttonVariants({ variant: "default", size: "sm" }))}>
         <Download className="h-4 w-4 mr-2" />
         Export
       </DropdownMenuTrigger>

@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, MonitorPlay } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
 import { db } from "@/db";
 import { playlists } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
@@ -56,6 +57,15 @@ export default async function PlaylistDetailPage({
             </p>
           </div>
           <div className="flex items-center gap-2 mt-8">
+            {playlist.songs.length > 0 && (
+              <Link
+                href={`/playlists/${id}/live`}
+                className={buttonVariants({ size: "sm" }) + " h-7 text-xs rounded-sm"}
+              >
+                <MonitorPlay className="h-3.5 w-3.5 mr-1.5" />
+                Live
+              </Link>
+            )}
             <ExportMenu
               playlistName={playlist.name}
               songs={playlist.songs.map((ps) => ({

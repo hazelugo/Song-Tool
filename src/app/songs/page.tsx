@@ -137,10 +137,21 @@ function SongsPageContent() {
       <SongFilters />
 
       {/* Empty state */}
-      {!isLoading && songs.length === 0 && searchParams.toString() === "" ? (
+      {!isLoading && songs.length === 0 && !["bpmMin","bpmMax","key","keySig","timeSig","chord","tag","lyric"].some((k) => searchParams.get(k)) ? (
         <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
           <p className="text-muted-foreground text-sm">No songs yet</p>
           <Button onClick={openAddSheet} size="sm" className="rounded-sm">Add your first song</Button>
+        </div>
+      ) : !isLoading && songs.length === 0 ? (
+        <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
+          <p className="text-muted-foreground text-sm">No songs match your filters</p>
+          <Button
+            size="sm"
+            className="h-7 text-xs rounded-sm"
+            onClick={() => router.replace("/songs")}
+          >
+            Clear filters
+          </Button>
         </div>
       ) : (
         <SongTable

@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback, Suspense } from "react";
-import { Search, Sparkles, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import type { SongWithTags } from "@/db/schema";
 import { SongSheet } from "@/components/songs/song-sheet";
 import { SongCard } from "@/components/discovery/song-card";
@@ -76,7 +75,6 @@ function DiscoveryContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Cycle placeholder text
   useEffect(() => {
     const interval = setInterval(() => {
       setPlaceholderIdx((i) => (i + 1) % PLACEHOLDER_PROMPTS.length);
@@ -111,7 +109,6 @@ function DiscoveryContent() {
     }
   }, []);
 
-  // Auto-search if ?q= param is present (e.g. navigating from /songs "Find similar")
   const didAutoSearch = useRef(false);
   useEffect(() => {
     if (didAutoSearch.current) return;
@@ -184,107 +181,98 @@ function DiscoveryContent() {
     );
   }
 
-  const isIdle = !hasSearched;
   const interpreted = parsedFilters ? buildInterpretedLabel(parsedFilters) : "";
 
   return (
-    <div className="w-full">
-      {/* Search section — centered when idle, compact when results shown */}
-      <div
-        className={`w-full transition-all duration-300 ${
-          isIdle
-            ? "flex flex-col items-center justify-center min-h-[calc(100vh-140px)]"
-            : "mb-6"
-        }`}
-      >
-        <div className={`w-full ${isIdle ? "max-w-2xl mx-auto" : "max-w-3xl"}`}>
-          {isIdle && (
-            <div className="text-center mb-8">
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <Sparkles className="size-5 text-muted-foreground" />
-                <h1 className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                  Discovery
-                </h1>
-              </div>
-              <p className="text-2xl font-semibold tracking-tight text-foreground mb-1">
-                Find songs by feel
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Describe tempo, key, mood — in plain language
-              </p>
-            </div>
-          )}
-
-          {!isIdle && (
-            <div className="flex items-center gap-2 mb-3">
-              <Sparkles className="size-3.5 text-muted-foreground" />
-              <h1 className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Discovery</h1>
-            </div>
-          )}
-
-          {/* Search bar — command palette style */}
-          <form onSubmit={handleSubmit}>
-            <div className="relative flex items-center">
-              <Search className="absolute left-3 size-4 text-muted-foreground pointer-events-none z-10" />
-              <input
-                ref={inputRef}
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder={PLACEHOLDER_PROMPTS[placeholderIdx]}
-                autoFocus={isIdle}
-                className="w-full h-10 pl-9 pr-28 text-sm rounded-sm border border-border bg-card font-mono focus:outline-none focus:ring-1 focus:ring-[color:var(--color-chart-4)] focus:border-[color:var(--color-chart-4)] transition-all placeholder:text-muted-foreground/40 placeholder:font-sans"
-              />
-              <div className="absolute right-1.5 flex items-center gap-1">
-                {query && (
-                  <button
-                    type="button"
-                    onClick={handleClear}
-                    className="p-1 rounded-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    <X className="size-3.5" />
-                  </button>
-                )}
-                <Button
-                  type="submit"
-                  size="sm"
-                  disabled={!query.trim() || isLoading}
-                  className="rounded-sm h-7 px-4 text-xs"
-                >
-                  {isLoading ? (
-                    <span className="flex gap-0.5 items-center">
-                      <span className="size-1 rounded-none bg-current animate-bounce [animation-delay:0ms]" />
-                      <span className="size-1 rounded-none bg-current animate-bounce [animation-delay:150ms]" />
-                      <span className="size-1 rounded-none bg-current animate-bounce [animation-delay:300ms]" />
-                    </span>
-                  ) : (
-                    "Search"
-                  )}
-                </Button>
-              </div>
-            </div>
-          </form>
-
-          {/* Suggestion chips — tight, rectangular */}
-          <div className={`flex flex-wrap gap-1.5 mt-3 ${isIdle ? "justify-center" : ""}`}>
-            {SUGGESTIONS.map(({ label, prompt }) => (
-              <button
-                key={label}
-                type="button"
-                onClick={() => handleSuggestion(prompt)}
-                className="text-xs px-2.5 py-1 rounded-sm border border-border/60 bg-muted/30 hover:bg-muted hover:border-[color:var(--color-chart-4)]/50 text-muted-foreground hover:text-foreground transition-all uppercase tracking-wide font-medium"
-              >
-                {label}
-              </button>
-            ))}
+    <div className="flex flex-col gap-4 p-6 max-w-6xl mx-auto w-full">
+      {/* Header row — DAW toolbar style */}
+      <div className="flex items-center justify-between border-b border-border/60 pb-3">
+        <h1 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+          Discovery
+        </h1>
+        {!isLoading && results !== null && results.length > 0 && (
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-mono text-muted-foreground tabular-nums">
+              {results.length} result{results.length !== 1 ? "s" : ""}
+              {interpreted && (
+                <> · <span className="text-foreground">{interpreted}</span></>
+              )}
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setShowPlaylistBuilder(true)}
+              className="h-7 text-xs rounded-sm"
+            >
+              Save as Playlist
+            </Button>
           </div>
-        </div>
+        )}
       </div>
 
-      {/* Error state */}
+      {/* Search bar */}
+      <form onSubmit={handleSubmit}>
+        <div className="relative flex items-center">
+          <Search className="absolute left-3 size-4 text-muted-foreground pointer-events-none z-10" />
+          <input
+            ref={inputRef}
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={PLACEHOLDER_PROMPTS[placeholderIdx]}
+            autoFocus
+            className="w-full h-10 pl-9 pr-28 text-sm rounded-sm border border-border bg-card font-mono focus:outline-none focus:ring-1 focus:ring-[color:var(--color-chart-4)] focus:border-[color:var(--color-chart-4)] transition-all placeholder:text-muted-foreground/40 placeholder:font-sans"
+          />
+          <div className="absolute right-1.5 flex items-center gap-1">
+            {query && (
+              <button
+                type="button"
+                onClick={handleClear}
+                className="p-1 rounded-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X className="size-3.5" />
+              </button>
+            )}
+            <Button
+              type="submit"
+              size="sm"
+              disabled={!query.trim() || isLoading}
+              className="rounded-sm h-7 px-4 text-xs"
+            >
+              {isLoading ? (
+                <span className="flex gap-0.5 items-center">
+                  <span className="size-1 rounded-none bg-current animate-bounce [animation-delay:0ms]" />
+                  <span className="size-1 rounded-none bg-current animate-bounce [animation-delay:150ms]" />
+                  <span className="size-1 rounded-none bg-current animate-bounce [animation-delay:300ms]" />
+                </span>
+              ) : (
+                "Search"
+              )}
+            </Button>
+          </div>
+        </div>
+      </form>
+
+      {/* Suggestion chips */}
+      <div className="flex flex-wrap gap-1.5">
+        {SUGGESTIONS.map(({ label, prompt }) => (
+          <button
+            key={label}
+            type="button"
+            onClick={() => handleSuggestion(prompt)}
+            className="text-xs px-2.5 py-1 rounded-sm border border-border/60 bg-muted/30 hover:bg-muted hover:border-[color:var(--color-chart-4)]/50 text-muted-foreground hover:text-foreground transition-all uppercase tracking-wide font-medium"
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* Error */}
       {!isLoading && searchError && (
-        <div className="text-center py-20">
-          <p className="text-destructive text-lg mb-2">Search failed</p>
+        <div className="py-12 text-center">
+          <p className="text-xs font-mono uppercase tracking-widest text-destructive mb-1">
+            Search failed
+          </p>
           <p className="text-sm text-muted-foreground">{searchError}</p>
         </div>
       )}
@@ -300,59 +288,29 @@ function DiscoveryContent() {
 
       {/* Results */}
       {!isLoading && results !== null && (
-        <div>
-          {/* Status bar */}
-          <div className="flex items-center justify-between gap-4 mb-4 flex-wrap border-b border-border/40 pb-3">
-            <div className="flex items-center gap-2 flex-wrap">
-              {interpreted && (
-                <>
-                  <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">Parsed:</span>
-                  <Badge variant="secondary" className="text-xs rounded-sm font-mono px-1.5 py-0">
-                    {interpreted}
-                  </Badge>
-                </>
-              )}
-              <span className="text-xs text-muted-foreground font-mono tabular-nums">
-                {results.length === 0
-                  ? "No songs found"
-                  : `${results.length} result${results.length !== 1 ? "s" : ""}`}
-              </span>
-            </div>
-            {results.length > 0 && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setShowPlaylistBuilder(true)}
-                className="h-7 text-xs rounded-sm"
-              >
-                Save as Playlist
-              </Button>
-            )}
+        results.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {results.map((song) => (
+              <SongCard
+                key={song.id}
+                song={song}
+                onClick={openSheet}
+                onFindSimilar={handleFindSimilar}
+              />
+            ))}
           </div>
-
-          {/* Card grid */}
-          {results.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {results.map((song) => (
-                <SongCard
-                  key={song.id}
-                  song={song}
-                  onClick={openSheet}
-                  onFindSimilar={handleFindSimilar}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-20">
-              <p className="text-muted-foreground text-sm mb-1">
+        ) : (
+          hasSearched && (
+            <div className="py-16 text-center">
+              <p className="text-sm text-muted-foreground mb-1">
                 No songs matched your search
               </p>
               <p className="text-xs text-muted-foreground">
                 Try different words, adjust the BPM, or use one of the suggestions above
               </p>
             </div>
-          )}
-        </div>
+          )
+        )
       )}
 
       <SongSheet

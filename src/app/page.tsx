@@ -3,13 +3,7 @@ import { buttonVariants } from "@/components/ui/button";
 
 export default function Home() {
   return (
-    <div
-      className="flex flex-col items-center justify-center min-h-screen gap-8 p-8 relative overflow-hidden bg-background"
-      style={{
-        backgroundImage:
-          "repeating-linear-gradient(0deg, transparent, transparent 39px, oklch(1 0 0 / 0.025) 39px, oklch(1 0 0 / 0.025) 40px), repeating-linear-gradient(90deg, transparent, transparent 39px, oklch(1 0 0 / 0.025) 39px, oklch(1 0 0 / 0.025) 40px)",
-      }}
-    >
+    <div className="flex flex-col items-center justify-center min-h-screen gap-8 p-8 relative overflow-hidden">
       {/* Version badge */}
       <span className="text-[10px] font-mono font-semibold uppercase tracking-[0.3em] text-muted-foreground border border-border/60 rounded-sm px-3 py-1">
         Repertoire v1.0

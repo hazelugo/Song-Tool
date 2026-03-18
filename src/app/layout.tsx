@@ -21,7 +21,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+        style={{
+          backgroundImage:
+            "repeating-linear-gradient(0deg, transparent, transparent 39px, oklch(1 0 0 / 0.025) 39px, oklch(1 0 0 / 0.025) 40px), repeating-linear-gradient(90deg, transparent, transparent 39px, oklch(1 0 0 / 0.025) 39px, oklch(1 0 0 / 0.025) 40px)",
+        }}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

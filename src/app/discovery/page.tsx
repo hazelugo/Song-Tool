@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import { Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import Link from "next/link";
 import type { SongWithTags } from "@/db/schema";
 import { SongSheet } from "@/components/songs/song-sheet";
 import { SongCard } from "@/components/discovery/song-card";
@@ -71,9 +73,17 @@ function DiscoveryContent() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [showPlaylistBuilder, setShowPlaylistBuilder] = useState(false);
   const [placeholderIdx, setPlaceholderIdx] = useState(0);
+  const [aiAvailable, setAiAvailable] = useState<boolean | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  useEffect(() => {
+    fetch("/api/discovery")
+      .then((r) => r.json())
+      .then((d) => setAiAvailable(d.aiAvailable === true))
+      .catch(() => setAiAvailable(false));
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -178,6 +188,33 @@ function DiscoveryContent() {
         onSave={savePlaylist}
         onClose={() => setShowPlaylistBuilder(false)}
       />
+    );
+  }
+
+  if (aiAvailable === false) {
+    return (
+      <div className="flex flex-col gap-4 p-6 max-w-6xl mx-auto w-full">
+        <div className="flex items-center border-b border-border/60 pb-3">
+          <h1 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            Discovery
+          </h1>
+        </div>
+        <div className="py-20 flex flex-col items-center gap-4 text-center">
+          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+            AI search unavailable
+          </p>
+          <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
+            Natural language search requires a Gemini API key. Use structured
+            filters to browse your catalog.
+          </p>
+          <Link
+            href="/songs"
+            className={buttonVariants({ variant: "default", size: "sm" }) + " rounded-sm text-xs h-7"}
+          >
+            Browse with filters
+          </Link>
+        </div>
+      </div>
     );
   }
 

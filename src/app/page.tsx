@@ -12,7 +12,7 @@ export default function Home() {
     >
       {/* Version badge */}
       <span className="text-[10px] font-mono font-semibold uppercase tracking-[0.3em] text-muted-foreground border border-border/60 rounded-sm px-3 py-1">
-        v1.0
+        Repertoire v1.0
       </span>
 
       {/* Brand wordmark + tagline */}

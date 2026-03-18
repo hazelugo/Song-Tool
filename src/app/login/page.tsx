@@ -57,16 +57,15 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm">
-
         {/* Header */}
         <div className="mb-8 border-b border-border/60 pb-4">
-          <span className="text-[10px] font-mono font-semibold uppercase tracking-[0.3em] text-muted-foreground border border-border/60 rounded-sm px-3 py-1 inline-block mb-4">
-            v1.0
+          <span className="text-[10px] font-mono font-semibold uppercase tracking-[0.3em] text-muted-foreground border border-border/60 rounded-sm px-3 py-1">
+            Repertoire v1.0
           </span>
-          <h1 className="text-4xl font-bold tracking-tight leading-none mb-2">
+          <h1 className="text-6xl font-bold tracking-tight leading-none mb-3">
             Repertoire
           </h1>
-          <p className="text-base text-muted-foreground tracking-wide">
+          <p className="text-xl text-muted-foreground tracking-wide">
             Built for flow.
           </p>
         </div>
@@ -77,12 +76,16 @@ export default function LoginPage() {
             <button
               key={m}
               type="button"
-              onClick={() => { setMode(m); setError(null); setMessage(null); }}
+              onClick={() => {
+                setMode(m);
+                setError(null);
+                setMessage(null);
+              }}
               className={cn(
                 "flex-1 text-xs font-medium uppercase tracking-wider py-2 border-b-2 -mb-px transition-colors duration-100",
                 mode === m
                   ? "border-b-[color:var(--color-chart-4)] text-foreground"
-                  : "border-b-transparent text-muted-foreground hover:text-foreground"
+                  : "border-b-transparent text-muted-foreground hover:text-foreground",
               )}
             >
               {m === "signin" ? "Sign in" : "Create account"}
@@ -93,7 +96,10 @@ export default function LoginPage() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="email" className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
+            <Label
+              htmlFor="email"
+              className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium"
+            >
               Email
             </Label>
             <Input
@@ -109,7 +115,10 @@ export default function LoginPage() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="password" className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
+            <Label
+              htmlFor="password"
+              className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium"
+            >
               Password
             </Label>
             <Input
@@ -118,7 +127,9 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              autoComplete={mode === "signin" ? "current-password" : "new-password"}
+              autoComplete={
+                mode === "signin" ? "current-password" : "new-password"
+              }
               minLength={6}
               className="h-8 rounded-sm text-sm"
             />
@@ -136,12 +147,12 @@ export default function LoginPage() {
             </p>
           )}
 
-          <Button type="submit" disabled={loading} className="mt-1 h-8 rounded-sm w-full text-xs">
-            {loading
-              ? "..."
-              : mode === "signin"
-                ? "Sign in"
-                : "Create account"}
+          <Button
+            type="submit"
+            disabled={loading}
+            className="mt-1 h-8 rounded-sm w-full text-xs"
+          >
+            {loading ? "..." : mode === "signin" ? "Sign in" : "Create account"}
           </Button>
         </form>
       </div>

@@ -118,6 +118,10 @@ async function extractFiltersWithGemini(prompt: string): Promise<Filters> {
   return filters;
 }
 
+export async function GET() {
+  return NextResponse.json({ aiAvailable: !!process.env.GEMINI_API_KEY });
+}
+
 export async function POST(request: Request) {
   const { userId, error: authError } = await requireUser();
   if (authError) return authError;

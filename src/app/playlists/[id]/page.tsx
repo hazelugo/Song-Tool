@@ -38,8 +38,7 @@ export default async function PlaylistDetailPage({
   const existingSongIds = playlist.songs.map((ps) => ps.song.id);
 
   return (
-    <main className="min-h-screen bg-background p-6">
-      <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1">
@@ -106,6 +105,5 @@ export default async function PlaylistDetailPage({
           existingSongIds={existingSongIds}
         />
       </div>
-    </main>
   );
 }

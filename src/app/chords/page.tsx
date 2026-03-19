@@ -47,7 +47,7 @@ function ChordPadsContent() {
   const chords = getDiatonicChords(key, keySig);
 
   return (
-    <div className="flex flex-col gap-4 p-6 max-w-2xl mx-auto w-full">
+    <div className="flex flex-col gap-4 p-6 max-w-2xl mx-auto w-full bg-card border border-border/40 rounded-sm">
       {/* Header row — DAW toolbar style */}
       <div className="flex items-center justify-between border-b border-border/60 pb-3">
         <h1 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">

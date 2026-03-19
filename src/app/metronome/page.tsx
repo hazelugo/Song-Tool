@@ -97,7 +97,7 @@ function MetronomeContent() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-6 p-6 max-w-md mx-auto w-full">
+    <div className="flex flex-col gap-6 p-6 max-w-md mx-auto w-full bg-card border border-border/40 rounded-sm">
       {/* Header row — DAW toolbar style */}
       <div className="border-b border-border/60 pb-3">
         <h1 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Metronome</h1>

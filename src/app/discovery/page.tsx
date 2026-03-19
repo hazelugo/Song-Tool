@@ -239,6 +239,8 @@ function DiscoveryContent() {
   const [showSaveForm, setShowSaveForm] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
+  const [connectorPaths, setConnectorPaths] = useState<string[]>([]);
   const router = useRouter();
 
   // Scroll chain to the right when a new column is added
@@ -250,6 +252,44 @@ function DiscoveryContent() {
       });
     }
   }, [chain.length]);
+
+  // Measure selected card positions and compute SVG connector paths
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      if (!innerRef.current) return;
+      const container = innerRef.current;
+      const cr = container.getBoundingClientRect();
+      const paths: string[] = [];
+
+      for (let depth = 0; depth < chain.length - 1; depth++) {
+        const fromIdx = chain[depth].selectedIdx;
+        const toIdx = chain[depth + 1].selectedIdx;
+        if (fromIdx === null || toIdx === null) continue;
+
+        const fromEl = container.querySelector<HTMLElement>(
+          `[data-depth="${depth}"][data-idx="${fromIdx}"]`,
+        );
+        const toEl = container.querySelector<HTMLElement>(
+          `[data-depth="${depth + 1}"][data-idx="${toIdx}"]`,
+        );
+        if (!fromEl || !toEl) continue;
+
+        const fr = fromEl.getBoundingClientRect();
+        const tr = toEl.getBoundingClientRect();
+
+        const x1 = fr.right - cr.left;
+        const y1 = fr.top - cr.top + fr.height / 2;
+        const x2 = tr.left - cr.left;
+        const y2 = tr.top - cr.top + tr.height / 2;
+        const cx = (x1 + x2) / 2;
+
+        paths.push(`M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`);
+      }
+
+      setConnectorPaths(paths);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [chain]);
 
   // The active path: all songs where selectedIdx is set
   const activePath = chain
@@ -426,7 +466,27 @@ function DiscoveryContent() {
           className="flex-1 overflow-x-auto overflow-y-hidden px-6 pb-4"
           style={{ scrollbarWidth: "thin" }}
         >
-          <div className="flex items-start gap-0 min-w-max min-h-full pt-2">
+          <div ref={innerRef} className="relative flex items-start gap-0 min-w-max min-h-full pt-2">
+            {/* SVG connector lines between selected cards */}
+            {connectorPaths.length > 0 && (
+              <svg
+                className="absolute inset-0 w-full h-full pointer-events-none"
+                style={{ overflow: "visible" }}
+              >
+                {connectorPaths.map((d, i) => (
+                  <path
+                    key={i}
+                    d={d}
+                    fill="none"
+                    stroke="var(--color-chart-4)"
+                    strokeWidth="1.5"
+                    strokeOpacity="0.55"
+                    strokeDasharray="none"
+                  />
+                ))}
+              </svg>
+            )}
+
             {chain.map((col, depth) => (
               <Fragment key={depth}>
                 {/* Connector arrow between columns */}
@@ -463,15 +523,16 @@ function DiscoveryContent() {
                       </div>
                     ) : (
                       col.songs.map((song, idx) => (
-                        <ChainCard
-                          key={song.id}
-                          song={song}
-                          isSelected={col.selectedIdx === idx}
-                          isSeed={depth === 0}
-                          onClick={() =>
-                            depth === 0 ? undefined : selectSong(depth, idx)
-                          }
-                        />
+                        <div key={song.id} data-depth={depth} data-idx={idx}>
+                          <ChainCard
+                            song={song}
+                            isSelected={col.selectedIdx === idx}
+                            isSeed={depth === 0}
+                            onClick={() =>
+                              depth === 0 ? undefined : selectSong(depth, idx)
+                            }
+                          />
+                        </div>
                       ))
                     )}
                   </div>
@@ -487,19 +548,19 @@ function DiscoveryContent() {
 
       {/* Sticky bottom bar — active path + save */}
       {activePath.length > 1 && (
-        <div className="flex-none border-t border-border/60 bg-background/95 backdrop-blur-sm px-6 py-3">
-          <div className="max-w-6xl mx-auto flex items-center gap-4 justify-between">
+        <div className="flex-none border-t border-border/60 bg-background/95 backdrop-blur-sm px-6 pt-4 pb-6">
+          <div className="max-w-6xl mx-auto flex items-center gap-6 justify-between">
             {/* Path breadcrumb */}
-            <div className="flex items-center gap-1.5 overflow-x-auto min-w-0 flex-1">
-              <span className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground/50 shrink-0">
+            <div className="flex items-center gap-2 overflow-x-auto min-w-0 flex-1">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/50 shrink-0">
                 Path
               </span>
               {activePath.map((song, i) => (
                 <Fragment key={song.id}>
                   {i > 0 && (
-                    <ChevronRight className="size-3 text-muted-foreground/30 shrink-0" />
+                    <ChevronRight className="size-3.5 text-muted-foreground/30 shrink-0" />
                   )}
-                  <span className="text-xs font-medium whitespace-nowrap text-foreground/80">
+                  <span className="text-sm font-medium whitespace-nowrap text-foreground/80">
                     {song.name}
                   </span>
                 </Fragment>
@@ -518,13 +579,13 @@ function DiscoveryContent() {
                   value={playlistName}
                   onChange={(e) => setPlaylistName(e.target.value)}
                   placeholder="Playlist name…"
-                  className="h-7 text-xs rounded-sm border border-border bg-card px-2.5 font-mono focus:outline-none focus:ring-1 focus:ring-[color:var(--color-chart-4)] focus:border-[color:var(--color-chart-4)] w-44"
+                  className="h-9 text-sm rounded-sm border border-border bg-card px-3 font-mono focus:outline-none focus:ring-1 focus:ring-[color:var(--color-chart-4)] focus:border-[color:var(--color-chart-4)] w-52"
                 />
                 <Button
                   type="submit"
                   size="sm"
                   disabled={!playlistName.trim() || isSaving}
-                  className="h-7 text-xs rounded-sm px-3"
+                  className="h-9 text-sm rounded-sm px-4"
                 >
                   {isSaving ? "Saving…" : "Save"}
                 </Button>
@@ -536,14 +597,14 @@ function DiscoveryContent() {
                   }}
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  <X className="size-3.5" />
+                  <X className="size-4" />
                 </button>
               </form>
             ) : (
               <Button
-                size="sm"
+                size="default"
                 onClick={() => setShowSaveForm(true)}
-                className="h-7 text-xs rounded-sm shrink-0"
+                className="h-9 text-sm rounded-sm shrink-0"
               >
                 Save as Playlist
               </Button>

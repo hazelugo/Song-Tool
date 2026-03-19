@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, X, ScrollText } from "lucide-react";
 import { getCamelotPosition, formatCamelot } from "@/lib/camelot";
 import { cn } from "@/lib/utils";
@@ -17,6 +18,7 @@ export function LiveMode({ playlistName, songs, backHref }: Props) {
   const [index, setIndex] = useState(0);
   const [showLyrics, setShowLyrics] = useState(false);
   const song = songs[index];
+  const router = useRouter();
 
   const prev = useCallback(() => setIndex((i) => Math.max(0, i - 1)), []);
   const next = useCallback(
@@ -37,10 +39,11 @@ export function LiveMode({ playlistName, songs, backHref }: Props) {
         next();
       }
       if (e.key === "l" || e.key === "L") setShowLyrics((v) => !v);
+      if (e.key === "Escape") router.push(backHref);
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [prev, next]);
+  }, [prev, next, router, backHref]);
 
   if (!song) return null;
 

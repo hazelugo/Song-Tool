@@ -19,21 +19,23 @@ import { toast } from "sonner";
 export const dynamic = "force-dynamic";
 
 const SUGGESTIONS = [
-  { label: "Upbeat & Energetic", prompt: "upbeat energetic dance 120 BPM" },
-  { label: "Dark Minor Ballad", prompt: "dark slow ballad minor key" },
-  { label: "Chill Mid-Tempo", prompt: "chill medium 90 BPM relaxed" },
-  { label: "Fast & Intense", prompt: "fast energetic hype 140 BPM" },
-  { label: "Slow & Peaceful", prompt: "peaceful acoustic slow calm" },
-  { label: "Major Key", prompt: "upbeat major key" },
+  { label: "Coritos", prompt: "corito spanish" },
+  { label: "Slow Worship", prompt: "worship slow" },
+  { label: "Spanish Worship", prompt: "slow spanish worship" },
+  { label: "Fast Spanish Major", prompt: "fast spanish major" },
+  { label: "Latin / Songo", prompt: "latin songo" },
+  { label: "Praise 120+", prompt: "praise" },
+  { label: "Rock", prompt: "rock english" },
+  { label: "Ballads", prompt: "ballad slow" },
 ];
 
 const PLACEHOLDER_PROMPTS = [
-  "dark minor ballad around 80 BPM...",
-  "upbeat dance tracks 120+ BPM...",
-  "something in G major...",
-  "chill acoustic slow songs...",
-  "energetic with Em chord...",
-  "medium tempo 3/4 time...",
+  "slow spanish worship...",
+  "corito 120-140 BPM...",
+  "fast spanish major key...",
+  "latin songo upbeat...",
+  "english rock ballad...",
+  "praise 130 BPM...",
 ];
 
 type ParsedFilters = {

@@ -80,16 +80,27 @@ export function parsePrompt(raw: string): ParsedFilters {
     }
   }
 
-  // 4. Mood-based BPM hints (only if no explicit BPM already set)
+  // 4. Tempo hints — genre words and mood words (only if no explicit BPM already set)
   if (filters.bpmMin === undefined && filters.bpmMax === undefined) {
-    if (/\b(intense|hype|aggressive|very fast)\b/i.test(text)) {
+    if (/\bcorito\b/i.test(text)) {
+      // Fast Spanish praise song
+      filters.bpmMin = 120;
+      filters.bpmMax = 140;
+    } else if (/\b(praise)\b/i.test(text)) {
+      filters.bpmMin = 120;
+    } else if (/\b(latin|songo)\b/i.test(text)) {
+      // Latin/songo genre — high energy
+      filters.bpmMin = 100;
+    } else if (/\b(worship)\b/i.test(text)) {
+      filters.bpmMax = 80;
+    } else if (/\b(intense|hype|aggressive|very fast)\b/i.test(text)) {
       filters.bpmMin = 140;
     } else if (/\b(fast|upbeat|energetic|uptempo|up-tempo|driving)\b/i.test(text)) {
       filters.bpmMin = 115;
     } else if (/\b(medium|mid-?tempo|moderate|groovy)\b/i.test(text)) {
       filters.bpmMin = 85;
       filters.bpmMax = 115;
-    } else if (/\b(slow|chill|relaxed|peaceful|calm|mellow|laid.?back)\b/i.test(text)) {
+    } else if (/\b(slow|chill|relaxed|peaceful|calm|mellow|laid.?back|ballad)\b/i.test(text)) {
       filters.bpmMax = 85;
     }
   }

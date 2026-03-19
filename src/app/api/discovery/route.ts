@@ -25,14 +25,17 @@ export async function POST(request: Request) {
     }
 
     const filters = parsePrompt(parsed.data.prompt);
-    const conditions: SQL[] = [isNull(songs.deletedAt), eq(songs.userId, userId)];
 
-    if (filters.bpmMin !== undefined) conditions.push(gte(songs.bpm, filters.bpmMin));
-    if (filters.bpmMax !== undefined) conditions.push(lte(songs.bpm, filters.bpmMax));
-    if (filters.key) conditions.push(eq(songs.musicalKey, filters.key as any));
-    if (filters.keySig) conditions.push(eq(songs.keySignature, filters.keySig as any));
-    if (filters.timeSig) conditions.push(eq(songs.timeSignature, filters.timeSig as any));
+    // Base structural conditions (BPM, key, mode, time sig) — always applied
+    const baseConditions: SQL[] = [isNull(songs.deletedAt), eq(songs.userId, userId)];
+    if (filters.bpmMin !== undefined) baseConditions.push(gte(songs.bpm, filters.bpmMin));
+    if (filters.bpmMax !== undefined) baseConditions.push(lte(songs.bpm, filters.bpmMax));
+    if (filters.key) baseConditions.push(eq(songs.musicalKey, filters.key as any));
+    if (filters.keySig) baseConditions.push(eq(songs.keySignature, filters.keySig as any));
+    if (filters.timeSig) baseConditions.push(eq(songs.timeSignature, filters.timeSig as any));
 
+    // Build searchTerm condition (matches name, lyrics, tags)
+    let searchCondition: SQL | undefined;
     if (filters.searchTerm) {
       const term = filters.searchTerm;
       const words = term.split(/\s+/).filter((w) => w.length > 1);
@@ -44,21 +47,28 @@ export async function POST(request: Request) {
             .where(and(eq(tags.songId, songs.id), ilike(tags.name, `%${word}%`))),
         ),
       );
-
-      conditions.push(
-        or(
-          ilike(songs.name, `%${term}%`),
-          sql`${songs.lyricsSearch} @@ websearch_to_tsquery('english', ${term})`,
-          ...tagExistsConditions,
-        )!,
-      );
+      searchCondition = or(
+        ilike(songs.name, `%${term}%`),
+        sql`${songs.lyricsSearch} @@ websearch_to_tsquery('english', ${term})`,
+        ...tagExistsConditions,
+      )!;
     }
 
-    const results = await db.query.songs.findMany({
-      where: and(...conditions),
+    // Pass 1: structural + searchTerm
+    // Pass 2: structural only (fallback if searchTerm matched nothing)
+    let results = await db.query.songs.findMany({
+      where: and(...baseConditions, ...(searchCondition ? [searchCondition] : [])),
       with: { tags: true },
       orderBy: (songs, { desc }) => [desc(songs.createdAt)],
     });
+
+    if (results.length === 0 && searchCondition) {
+      results = await db.query.songs.findMany({
+        where: and(...baseConditions),
+        with: { tags: true },
+        orderBy: (songs, { desc }) => [desc(songs.createdAt)],
+      });
+    }
 
     return NextResponse.json({ results, parsedFilters: filters });
   } catch (err) {

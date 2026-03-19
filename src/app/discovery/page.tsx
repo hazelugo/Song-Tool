@@ -298,11 +298,6 @@ function DiscoveryContent() {
     .filter((col) => col.selectedIdx !== null)
     .map((col) => col.songs[col.selectedIdx!]);
 
-  // Collect all song IDs currently in the chain (to exclude from similarity)
-  function getAllIds(cols: Column[]): string[] {
-    return cols.flatMap((col) => col.songs.map((s) => s.id));
-  }
-
   const loadSimilar = useCallback(
     async (songId: string, excludeIds: string[], depth: number) => {
       try {
@@ -362,8 +357,12 @@ function DiscoveryContent() {
       ];
       setChain(withLoading);
 
-      const excludeIds = getAllIds(truncated);
-      await loadSimilar(selectedSong.id, excludeIds, depth + 1);
+      // Only exclude songs on the active path — not every suggestion that appeared.
+      // Excluding all suggestions depletes the catalog by step 7.
+      const activePathIds = truncated
+        .filter((col) => col.selectedIdx !== null)
+        .map((col) => col.songs[col.selectedIdx!].id);
+      await loadSimilar(selectedSong.id, activePathIds, depth + 1);
     },
     [chain, loadSimilar],
   );

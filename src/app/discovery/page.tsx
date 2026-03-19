@@ -243,14 +243,16 @@ function DiscoveryContent() {
   const [connectorPaths, setConnectorPaths] = useState<string[]>([]);
   const router = useRouter();
 
-  // Scroll chain to the right when a new column is added
+  // Scroll chain to reveal new columns — RAF ensures layout is settled first
   useEffect(() => {
-    if (chain.length > 1 && scrollRef.current) {
-      scrollRef.current.scrollTo({
+    if (chain.length <= 1) return;
+    const frame = requestAnimationFrame(() => {
+      scrollRef.current?.scrollTo({
         left: scrollRef.current.scrollWidth,
         behavior: "smooth",
       });
-    }
+    });
+    return () => cancelAnimationFrame(frame);
   }, [chain.length]);
 
   // Measure selected card positions and compute SVG connector paths

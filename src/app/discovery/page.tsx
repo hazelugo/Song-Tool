@@ -238,12 +238,17 @@ function DiscoveryContent() {
   const [playlistName, setPlaylistName] = useState("");
   const [showSaveForm, setShowSaveForm] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  // Navigation prompt state
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
+  const [navPromptName, setNavPromptName] = useState("");
+  const [isNavSaving, setIsNavSaving] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const [connectorPaths, setConnectorPaths] = useState<string[]>([]);
   const router = useRouter();
 
-  // Scroll chain to reveal new columns — RAF ensures layout is settled first
+  // Scroll to reveal new columns or when last column finishes loading
+  const lastColLoading = chain[chain.length - 1]?.isLoading ?? false;
   useEffect(() => {
     if (chain.length <= 1) return;
     const frame = requestAnimationFrame(() => {
@@ -253,7 +258,37 @@ function DiscoveryContent() {
       });
     });
     return () => cancelAnimationFrame(frame);
-  }, [chain.length]);
+  }, [chain.length, lastColLoading]);
+
+  // Block browser close/refresh when there's an unsaved path
+  const hasUnsavedPath = chain.length > 0 &&
+    chain.filter((c) => c.selectedIdx !== null).length > 1;
+  useEffect(() => {
+    if (!hasUnsavedPath) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [hasUnsavedPath]);
+
+  // Intercept in-app link clicks (capture phase fires before Next.js router)
+  useEffect(() => {
+    if (!hasUnsavedPath) return;
+    const handler = (e: MouseEvent) => {
+      const anchor = (e.target as HTMLElement).closest("a");
+      if (!anchor) return;
+      const href = anchor.getAttribute("href");
+      if (!href || !href.startsWith("/") || href.startsWith("/discovery")) return;
+      e.preventDefault();
+      e.stopPropagation();
+      setPendingHref(href);
+      setNavPromptName("");
+    };
+    document.addEventListener("click", handler, { capture: true });
+    return () => document.removeEventListener("click", handler, { capture: true });
+  }, [hasUnsavedPath]);
 
   // Measure selected card positions and compute SVG connector paths
   useEffect(() => {
@@ -397,10 +432,87 @@ function DiscoveryContent() {
     }
   }
 
+  async function saveAndNavigate(e: React.FormEvent) {
+    e.preventDefault();
+    if (!navPromptName.trim() || !pendingHref) return;
+    setIsNavSaving(true);
+    try {
+      const items = activePath.map((song, i) => ({
+        song: { id: song.id },
+        rank: (i + 1) * 1000,
+      }));
+      const res = await fetch("/api/playlists", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: navPromptName.trim(), items }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        toast.error(err.message ?? "Failed to save playlist");
+        return;
+      }
+      toast.success(`"${navPromptName.trim()}" saved`);
+      router.push(pendingHref);
+    } catch {
+      toast.error("Failed to save playlist");
+    } finally {
+      setIsNavSaving(false);
+    }
+  }
+
   const hasChain = chain.length > 0;
 
   return (
     <div className="flex flex-col h-full min-h-0">
+      {/* Navigation prompt modal */}
+      {pendingHref && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/75 backdrop-blur-sm">
+          <div className="bg-card border border-border rounded-sm shadow-2xl p-6 w-96 flex flex-col gap-5">
+            <div>
+              <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-2">
+                Unsaved path
+              </p>
+              <p className="text-sm text-foreground leading-relaxed">
+                You have a {activePath.length}-song discovery path. Save it as a playlist before leaving?
+              </p>
+            </div>
+            <form onSubmit={saveAndNavigate} className="flex flex-col gap-2">
+              <input
+                autoFocus
+                type="text"
+                value={navPromptName}
+                onChange={(e) => setNavPromptName(e.target.value)}
+                placeholder="Playlist name…"
+                className="h-9 text-sm rounded-sm border border-border bg-background px-3 font-mono focus:outline-none focus:ring-1 focus:ring-[color:var(--color-chart-4)] focus:border-[color:var(--color-chart-4)] w-full"
+              />
+              <Button
+                type="submit"
+                disabled={!navPromptName.trim() || isNavSaving}
+                className="w-full rounded-sm h-9 text-sm"
+              >
+                {isNavSaving ? "Saving…" : "Save & Leave"}
+              </Button>
+            </form>
+            <div className="flex flex-col gap-1.5">
+              <button
+                type="button"
+                onClick={() => { router.push(pendingHref!); }}
+                className="w-full h-8 text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors rounded-sm border border-border/40 hover:border-border"
+              >
+                Leave without saving
+              </button>
+              <button
+                type="button"
+                onClick={() => { setPendingHref(null); setNavPromptName(""); }}
+                className="w-full h-8 text-xs font-mono uppercase tracking-widest text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+              >
+                Stay on page
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header + search */}
       <div className="flex-none flex flex-col gap-4 p-6 pb-4 max-w-6xl w-full mx-auto">
         <div className="flex items-center justify-between border-b border-border/60 pb-3">

@@ -10,6 +10,14 @@ import {
 } from "react";
 import { Search, X, ChevronRight, GitBranch } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import type { SongWithTags } from "@/db/schema";
 import { ChainCard } from "@/components/discovery/chain-card";
@@ -465,53 +473,59 @@ function DiscoveryContent() {
   return (
     <div className="flex flex-col h-full min-h-0">
       {/* Navigation prompt modal */}
-      {pendingHref && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/75 backdrop-blur-sm">
-          <div className="bg-card border border-border rounded-sm shadow-2xl p-6 w-96 flex flex-col gap-5">
-            <div>
-              <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-2">
-                Unsaved path
-              </p>
-              <p className="text-sm text-foreground leading-relaxed">
-                You have a {activePath.length}-song discovery path. Save it as a playlist before leaving?
-              </p>
-            </div>
-            <form onSubmit={saveAndNavigate} className="flex flex-col gap-2">
-              <input
-                autoFocus
-                type="text"
-                value={navPromptName}
-                onChange={(e) => setNavPromptName(e.target.value)}
-                placeholder="Playlist name…"
-                className="h-9 text-sm rounded-sm border border-border bg-background px-3 font-mono focus:outline-none focus:ring-1 focus:ring-[color:var(--color-chart-4)] focus:border-[color:var(--color-chart-4)] w-full"
-              />
-              <Button
-                type="submit"
-                disabled={!navPromptName.trim() || isNavSaving}
-                className="w-full rounded-sm h-9 text-sm"
-              >
-                {isNavSaving ? "Saving…" : "Save & Leave"}
-              </Button>
-            </form>
-            <div className="flex flex-col gap-1.5">
-              <button
-                type="button"
-                onClick={() => { router.push(pendingHref!); }}
-                className="w-full h-8 text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors rounded-sm border border-border/40 hover:border-border"
-              >
-                Leave without saving
-              </button>
-              <button
-                type="button"
-                onClick={() => { setPendingHref(null); setNavPromptName(""); }}
-                className="w-full h-8 text-xs font-mono uppercase tracking-widest text-muted-foreground/50 hover:text-muted-foreground transition-colors"
-              >
-                Stay on page
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Dialog
+        open={!!pendingHref}
+        onOpenChange={(open) => {
+          if (!open) { setPendingHref(null); setNavPromptName(""); }
+        }}
+      >
+        <DialogContent showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle>Unsaved path</DialogTitle>
+            <DialogDescription>
+              You have a {activePath.length}-song discovery path. Save it as a playlist before leaving?
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={saveAndNavigate} className="flex flex-col gap-2 pt-1">
+            <input
+              autoFocus
+              type="text"
+              value={navPromptName}
+              onChange={(e) => setNavPromptName(e.target.value)}
+              placeholder="Playlist name…"
+              className="h-8 text-sm rounded-lg border border-border bg-background px-3 font-mono focus:outline-none focus:ring-3 focus:ring-ring/50 focus:border-ring w-full"
+            />
+            <Button
+              type="submit"
+              size="default"
+              disabled={!navPromptName.trim() || isNavSaving}
+              className="w-full"
+            >
+              {isNavSaving ? "Saving…" : "Save & Leave"}
+            </Button>
+          </form>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              size="default"
+              onClick={() => router.push(pendingHref!)}
+              className="flex-1"
+            >
+              Leave without saving
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="default"
+              onClick={() => { setPendingHref(null); setNavPromptName(""); }}
+              className="flex-1"
+            >
+              Stay on page
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Header + search */}
       <div className="flex-none flex flex-col gap-4 p-6 pb-4 max-w-6xl w-full mx-auto">

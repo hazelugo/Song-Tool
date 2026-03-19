@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { playChord } from "@/lib/audio";
+import { playChord, stopChord, type ActiveChordNodes } from "@/lib/audio";
 import { getDiatonicChords, type ChordDef } from "@/lib/chords";
 import { MUSICAL_KEYS } from "@/lib/validations/song";
 import { Label } from "@/components/ui/label";
@@ -16,6 +16,13 @@ import { cn } from "@/lib/utils";
 
 type KeySig = "major" | "minor";
 
+const WAVEFORMS: { type: OscillatorType; label: string; character: string }[] = [
+  { type: "sine",     label: "Sine",     character: "Clean, smooth" },
+  { type: "triangle", label: "Triangle", character: "Warm, rounded" },
+  { type: "sawtooth", label: "Sawtooth", character: "Bright, buzzy" },
+  { type: "square",   label: "Square",   character: "Hollow, reedy" },
+];
+
 function ChordPadsContent() {
   const searchParams = useSearchParams();
 
@@ -29,8 +36,10 @@ function ChordPadsContent() {
   const [key, setKey] = useState<(typeof MUSICAL_KEYS)[number]>(initKey);
   const [keySig, setKeySig] = useState<KeySig>(initKeySig);
   const [activeChord, setActiveChord] = useState<string | null>(null);
+  const [waveform, setWaveform] = useState<OscillatorType>("sine");
 
   const audioCtxRef = useRef<AudioContext | null>(null);
+  const activeNodesRef = useRef<ActiveChordNodes | null>(null);
 
   const handlePadClick = useCallback((chord: ChordDef) => {
     if (!audioCtxRef.current) {
@@ -39,10 +48,16 @@ function ChordPadsContent() {
     const ctx = audioCtxRef.current;
     if (ctx.state === "suspended") ctx.resume();
 
-    playChord(chord.frequencies, ctx);
+    // Stop the previous chord before starting a new one
+    if (activeNodesRef.current) {
+      stopChord(activeNodesRef.current, ctx);
+      activeNodesRef.current = null;
+    }
+
+    activeNodesRef.current = playChord(chord.frequencies, ctx, waveform);
     setActiveChord(chord.label);
     setTimeout(() => setActiveChord(null), 1800);
-  }, []);
+  }, [waveform]);
 
   const chords = getDiatonicChords(key, keySig);
 
@@ -116,6 +131,31 @@ function ChordPadsContent() {
         ))}
         {/* Empty 8th slot */}
         <div className="h-20 rounded-sm border border-dashed border-muted/30" />
+      </div>
+
+      {/* Waveform selector */}
+      <div className="flex flex-col gap-2 border-t border-border/60 pt-3">
+        <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+          Sound
+        </span>
+        <div className="grid grid-cols-4 gap-2">
+          {WAVEFORMS.map((w) => (
+            <button
+              key={w.type}
+              type="button"
+              onClick={() => setWaveform(w.type)}
+              className={cn(
+                "flex flex-col items-center justify-center gap-0.5 h-14 rounded-sm border transition-colors duration-75",
+                waveform === w.type
+                  ? "border-[color:var(--color-chart-4)] bg-[color:var(--color-chart-4)]/10 text-foreground"
+                  : "border-border/50 bg-transparent text-muted-foreground hover:border-border hover:bg-muted/30",
+              )}
+            >
+              <span className="text-xs font-mono font-semibold">{w.label}</span>
+              <span className="text-[9px] font-mono text-muted-foreground">{w.character}</span>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

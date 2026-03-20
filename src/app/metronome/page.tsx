@@ -22,8 +22,8 @@ function MetronomeContent() {
   const searchParams = useSearchParams();
 
   const initBpm = Math.min(
-    240,
-    Math.max(40, parseInt(searchParams.get("bpm") ?? "120", 10) || 120),
+    200,
+    Math.max(50, parseInt(searchParams.get("bpm") ?? "120", 10) || 120),
   );
   const rawTimeSig = searchParams.get("timeSig") ?? "";
   const initTimeSig = (TIME_SIGNATURES as readonly string[]).includes(rawTimeSig)
@@ -31,6 +31,7 @@ function MetronomeContent() {
     : "4/4";
 
   const [bpm, setBpm] = useState(initBpm);
+  const [bpmInput, setBpmInput] = useState(String(initBpm));
   const [timeSig, setTimeSig] = useState<(typeof TIME_SIGNATURES)[number]>(initTimeSig);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentBeat, setCurrentBeat] = useState(0);
@@ -109,20 +110,31 @@ function MetronomeContent() {
           <div className="flex items-center gap-3">
             <Input
               type="number"
-              min={40}
-              max={240}
-              value={bpm}
-              onChange={(e) =>
-                setBpm(Math.min(240, Math.max(40, parseInt(e.target.value, 10) || 40)))
-              }
+              min={50}
+              max={200}
+              value={bpmInput}
+              onChange={(e) => setBpmInput(e.target.value)}
+              onBlur={(e) => {
+                const val = parseInt(e.target.value, 10);
+                const clamped = isNaN(val) ? bpm : Math.min(200, Math.max(50, val));
+                setBpm(clamped);
+                setBpmInput(String(clamped));
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+              }}
               className="w-24"
             />
             <input
               type="range"
-              min={40}
-              max={240}
+              min={50}
+              max={200}
               value={bpm}
-              onChange={(e) => setBpm(parseInt(e.target.value, 10))}
+              onChange={(e) => {
+                const val = parseInt(e.target.value, 10);
+                setBpm(val);
+                setBpmInput(String(val));
+              }}
               className="flex-1 accent-primary"
             />
           </div>

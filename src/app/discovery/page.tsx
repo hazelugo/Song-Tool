@@ -676,7 +676,7 @@ function DiscoveryContent() {
       {/* Sticky bottom bar — active path + save */}
       {activePath.length > 1 && (
         <div className="flex-none border-t border-border/60 bg-background/95 backdrop-blur-sm px-6 pt-4 pb-6">
-          <div className="max-w-6xl mx-auto flex items-center gap-6 justify-between">
+          <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 sm:justify-between">
             {/* Path breadcrumb */}
             <div className="flex items-center gap-2 overflow-x-auto min-w-0 flex-1">
               <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/50 shrink-0">

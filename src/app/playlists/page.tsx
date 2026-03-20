@@ -109,7 +109,7 @@ export default function ViewPlaylistsPage() {
           size="sm"
           onClick={handleNewPlaylist}
           disabled={loadingSongs}
-          className="h-7 text-xs rounded-sm"
+          className="h-10 md:h-7 text-xs rounded-sm"
         >
           {loadingSongs ? "Loading..." : "+ New Playlist"}
         </Button>
@@ -141,13 +141,13 @@ export default function ViewPlaylistsPage() {
                     {new Date(playlist.updatedAt).toLocaleDateString()}
                   </span>
                 </Link>
-                <div className="pr-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="pr-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                   <Button
                     size="sm"
                     variant="ghost"
                     disabled={deletingId === playlist.id}
                     onClick={() => handleDelete(playlist.id, playlist.name)}
-                    className="h-6 px-2 text-xs rounded-sm text-destructive hover:text-destructive hover:bg-destructive/10"
+                    className="h-9 sm:h-6 px-2 text-xs rounded-sm text-destructive hover:text-destructive hover:bg-destructive/10"
                   >
                     {deletingId === playlist.id ? "..." : "Delete"}
                   </Button>
@@ -165,7 +165,7 @@ export default function ViewPlaylistsPage() {
                 <Button
                   variant="default"
                   size="sm"
-                  className="h-7 text-xs rounded-sm"
+                  className="h-10 md:h-7 text-xs rounded-sm"
                   disabled={pageIndex === 0}
                   onClick={() => setPageIndex((p) => p - 1)}
                 >
@@ -174,7 +174,7 @@ export default function ViewPlaylistsPage() {
                 <Button
                   variant="default"
                   size="sm"
-                  className="h-7 text-xs rounded-sm"
+                  className="h-10 md:h-7 text-xs rounded-sm"
                   disabled={pageIndex >= pageCount - 1}
                   onClick={() => setPageIndex((p) => p + 1)}
                 >

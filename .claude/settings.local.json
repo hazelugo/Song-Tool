@@ -20,7 +20,9 @@
       "mcp__gemini-cli__ask-gemini",
       "Bash(gemini:*)",
       "Bash(cd:*)",
-      "Bash(where gemini:*)"
+      "Bash(where gemini:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(claude upgrade:*)"
     ]
   }
 }

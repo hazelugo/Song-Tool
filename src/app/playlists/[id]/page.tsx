@@ -40,7 +40,7 @@ export default async function PlaylistDetailPage({
   return (
     <div className="max-w-3xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="space-y-1">
             <Link
               href="/playlists"
@@ -55,11 +55,11 @@ export default async function PlaylistDetailPage({
               {" · "}Last updated {new Date(playlist.updatedAt).toLocaleDateString()}
             </p>
           </div>
-          <div className="flex items-center gap-2 mt-8">
+          <div className="flex items-center gap-2 sm:mt-8">
             {playlist.songs.length > 0 && (
               <Link
                 href={`/playlists/${id}/live`}
-                className={buttonVariants({ size: "sm" }) + " h-7 text-xs rounded-sm"}
+                className={buttonVariants({ size: "sm" }) + " h-10 md:h-7 text-xs rounded-sm"}
               >
                 <MonitorPlay className="h-3.5 w-3.5 mr-1.5" />
                 Live

@@ -64,7 +64,7 @@ function ChordPadsContent() {
   return (
     <div className="flex flex-col gap-4 p-6 max-w-2xl mx-auto w-full bg-card border border-border/40 rounded-sm">
       {/* Header row — DAW toolbar style */}
-      <div className="flex items-center justify-between border-b border-border/60 pb-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3">
         <h1 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
           Chord Pads
         </h1>
@@ -75,7 +75,7 @@ function ChordPadsContent() {
               value={key}
               onValueChange={(v) => setKey(v as (typeof MUSICAL_KEYS)[number])}
             >
-              <SelectTrigger className="h-7 w-20 text-xs rounded-sm">
+              <SelectTrigger className="h-10 md:h-7 w-20 text-xs rounded-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -90,7 +90,7 @@ function ChordPadsContent() {
           <div className="flex items-center gap-2">
             <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Mode</Label>
             <Select value={keySig} onValueChange={(v) => setKeySig(v as KeySig)}>
-              <SelectTrigger className="h-7 w-24 text-xs rounded-sm">
+              <SelectTrigger className="h-10 md:h-7 w-24 text-xs rounded-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

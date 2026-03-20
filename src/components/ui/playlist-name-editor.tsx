@@ -84,7 +84,7 @@ export function PlaylistNameEditor({
         size="icon"
         variant="ghost"
         onClick={() => setEditing(true)}
-        className="opacity-0 group-hover:opacity-100 transition-opacity"
+        className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
       >
         <Pencil className="h-4 w-4 text-muted-foreground" />
       </Button>

@@ -92,7 +92,7 @@ function SongFiltersContent() {
             aria-invalid={bpmRangeError || undefined}
             aria-describedby={bpmRangeError ? "bpm-range-error" : undefined}
             className={cn(
-              "h-7 text-xs rounded-sm font-mono w-20 px-2",
+              "h-10 md:h-7 text-xs rounded-sm font-mono w-20 px-2",
               bpmRangeError && "border-destructive focus-visible:ring-destructive",
             )}
           />
@@ -120,7 +120,7 @@ function SongFiltersContent() {
             aria-invalid={bpmRangeError || undefined}
             aria-describedby={bpmRangeError ? "bpm-range-error" : undefined}
             className={cn(
-              "h-7 text-xs rounded-sm font-mono w-20 px-2",
+              "h-10 md:h-7 text-xs rounded-sm font-mono w-20 px-2",
               bpmRangeError && "border-destructive focus-visible:ring-destructive",
             )}
           />
@@ -140,7 +140,7 @@ function SongFiltersContent() {
               updateFilter("key", val === "all" ? "" : (val ?? undefined))
             }
           >
-            <SelectTrigger id="key" className="h-7 text-xs rounded-sm w-24 font-mono">
+            <SelectTrigger id="key" className="h-10 md:h-7 text-xs rounded-sm w-24 font-mono">
               <SelectValue placeholder="All" />
             </SelectTrigger>
             <SelectContent className="rounded-sm">
@@ -166,7 +166,7 @@ function SongFiltersContent() {
               updateFilter("keySig", val === "all" ? "" : (val ?? undefined))
             }
           >
-            <SelectTrigger id="keySig" className="h-7 text-xs rounded-sm w-24">
+            <SelectTrigger id="keySig" className="h-10 md:h-7 text-xs rounded-sm w-24">
               <SelectValue placeholder="All" />
             </SelectTrigger>
             <SelectContent className="rounded-sm">
@@ -191,7 +191,7 @@ function SongFiltersContent() {
               updateFilter("timeSig", val === "all" ? "" : (val ?? undefined))
             }
           >
-            <SelectTrigger id="timeSig" className="h-7 text-xs rounded-sm w-20 font-mono">
+            <SelectTrigger id="timeSig" className="h-10 md:h-7 text-xs rounded-sm w-20 font-mono">
               <SelectValue placeholder="All" />
             </SelectTrigger>
             <SelectContent className="rounded-sm">
@@ -219,7 +219,7 @@ function SongFiltersContent() {
             placeholder="Em, G, D..."
             defaultValue={searchParams.get("chord") ?? ""}
             onChange={(e) => debouncedUpdate("chord", e.target.value)}
-            className="h-7 text-xs rounded-sm font-mono"
+            className="h-10 md:h-7 text-xs rounded-sm font-mono"
           />
         </div>
         <div className="flex flex-col gap-1 flex-1 min-w-[120px]">
@@ -235,7 +235,7 @@ function SongFiltersContent() {
             placeholder="Filter tag..."
             defaultValue={searchParams.get("tag") ?? ""}
             onChange={(e) => debouncedUpdate("tag", e.target.value)}
-            className="h-7 text-xs rounded-sm"
+            className="h-10 md:h-7 text-xs rounded-sm"
           />
         </div>
         <div className="flex flex-col gap-1 flex-1 min-w-[140px]">
@@ -251,7 +251,7 @@ function SongFiltersContent() {
             placeholder="Search..."
             defaultValue={searchParams.get("lyric") ?? ""}
             onChange={(e) => debouncedUpdate("lyric", e.target.value)}
-            className="h-7 text-xs rounded-sm"
+            className="h-10 md:h-7 text-xs rounded-sm"
           />
         </div>
 
@@ -261,7 +261,7 @@ function SongFiltersContent() {
             variant="ghost"
             size="sm"
             onClick={clearAllFilters}
-            className="h-7 self-end text-xs rounded-sm px-2 text-muted-foreground hover:text-foreground"
+            className="h-10 md:h-7 self-end text-xs rounded-sm px-2 text-muted-foreground hover:text-foreground"
           >
             Clear
           </Button>

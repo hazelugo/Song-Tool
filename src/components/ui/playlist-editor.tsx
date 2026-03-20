@@ -104,7 +104,7 @@ function ItemRow({ song, index, onRemove, isRemoving, isDragOverlay }: ItemRowPr
         <Button
           variant="ghost"
           size="icon"
-          className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0"
+          className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0"
           onClick={() => onRemove(song.id)}
           disabled={isRemoving}
         >

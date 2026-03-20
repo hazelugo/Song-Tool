@@ -119,7 +119,7 @@ export function LiveMode({ playlistName, songs, backHref }: Props) {
           </div>
         ) : (
           /* Default view */
-          <div className="flex-1 flex flex-col items-center justify-center gap-8 px-6 py-12 text-center overflow-y-auto">
+          <div className="flex-1 flex flex-col items-center justify-start gap-8 px-6 py-12 text-center overflow-y-auto">
             {/* Name */}
             <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-tight break-words max-w-2xl">
               {song.name}

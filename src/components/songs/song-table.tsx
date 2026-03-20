@@ -236,7 +236,7 @@ export function SongTable({
               size="sm"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
-              className="h-7 text-xs rounded-sm"
+              className="h-10 md:h-7 text-xs rounded-sm"
             >
               Previous
             </Button>
@@ -245,7 +245,7 @@ export function SongTable({
               size="sm"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
-              className="h-7 text-xs rounded-sm"
+              className="h-10 md:h-7 text-xs rounded-sm"
             >
               Next
             </Button>

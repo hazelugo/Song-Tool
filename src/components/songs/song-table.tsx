@@ -18,11 +18,34 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useState } from "react";
-import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { ArrowUpDown, ArrowUp, ArrowDown, Youtube, Music2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Dialog,
+  DialogContent,
+} from "@/components/ui/dialog";
 import type { SongWithTags, Tag } from "@/db/schema";
+
+function getYoutubeEmbedUrl(url: string): string | null {
+  try {
+    const u = new URL(url);
+    let videoId: string | null = null;
+    if (u.hostname.includes("youtube.com")) videoId = u.searchParams.get("v");
+    else if (u.hostname === "youtu.be") videoId = u.pathname.slice(1).split("?")[0];
+    return videoId ? `https://www.youtube-nocookie.com/embed/${videoId}` : null;
+  } catch { return null; }
+}
+
+function getSpotifyEmbedUrl(url: string): string | null {
+  try {
+    const u = new URL(url);
+    if (!u.hostname.includes("spotify.com")) return null;
+    const embedPath = u.pathname.replace(/^\/(track|album|playlist|episode)/, "/embed/$1");
+    return `https://open.spotify.com${embedPath}?utm_source=generator&theme=0`;
+  } catch { return null; }
+}
 
 interface SongTableProps {
   data: SongWithTags[];
@@ -51,16 +74,50 @@ function SortableHeader({ column, label }: { column: any; label: string }) {
   );
 }
 
-const columns: ColumnDef<SongWithTags>[] = [
+function buildColumns(
+  onEmbed: (song: SongWithTags, type: "youtube" | "spotify") => void,
+): ColumnDef<SongWithTags>[] {
+  return [
   {
     accessorKey: "name",
     header: ({ column }) => <SortableHeader column={column} label="Name" />,
     // No fixed width — expands to fill available space alongside Tags
-    cell: ({ getValue }) => (
-      <span className="block whitespace-normal break-words text-sm font-medium">
-        {getValue<string>()}
-      </span>
-    ),
+    cell: ({ row }) => {
+      const song = row.original;
+      const youtubeEmbed = getYoutubeEmbedUrl(song.youtubeUrl ?? "");
+      const spotifyEmbed = getSpotifyEmbedUrl(song.spotifyUrl ?? "");
+      return (
+        <div className="flex items-center gap-1.5">
+          <span className="whitespace-normal break-words text-sm font-medium">
+            {song.name}
+          </span>
+          {(youtubeEmbed || spotifyEmbed) && (
+            <div className="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+              {youtubeEmbed && (
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); onEmbed(song, "youtube"); }}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  title="Watch on YouTube"
+                >
+                  <Youtube className="size-3.5" />
+                </button>
+              )}
+              {spotifyEmbed && (
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); onEmbed(song, "spotify"); }}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  title="Play on Spotify"
+                >
+                  <Music2 className="size-3.5" />
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "bpm",
@@ -128,7 +185,8 @@ const columns: ColumnDef<SongWithTags>[] = [
       );
     },
   },
-];
+  ]; // end return
+} // end buildColumns
 
 export function SongTable({
   data,
@@ -141,6 +199,9 @@ export function SongTable({
   onSortingChange,
 }: SongTableProps) {
   const [localSorting, setLocalSorting] = useState<SortingState>([]);
+  const [embedSong, setEmbedSong] = useState<SongWithTags | null>(null);
+  const [embedType, setEmbedType] = useState<"youtube" | "spotify" | null>(null);
+
   const isManual = pageCount !== undefined && pageIndex !== undefined && onPageChange !== undefined;
   const isManualSort = sortingProp !== undefined && onSortingChange !== undefined;
 
@@ -154,6 +215,11 @@ export function SongTable({
         onSortingChange!(next);
       }
     : setLocalSorting;
+
+  const columns = buildColumns((song, type) => {
+    setEmbedSong(song);
+    setEmbedType(type);
+  });
 
   const table = useReactTable({
     data,
@@ -252,6 +318,42 @@ export function SongTable({
           </div>
         </div>
       )}
+
+      {/* YouTube embed dialog */}
+      <Dialog
+        open={embedType === "youtube" && !!embedSong}
+        onOpenChange={(open) => { if (!open) { setEmbedSong(null); setEmbedType(null); } }}
+      >
+        <DialogContent className="max-w-2xl p-0 overflow-hidden">
+          <div className="aspect-video w-full">
+            {embedSong?.youtubeUrl && (
+              <iframe
+                src={getYoutubeEmbedUrl(embedSong.youtubeUrl) ?? ""}
+                className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Spotify embed dialog */}
+      <Dialog
+        open={embedType === "spotify" && !!embedSong}
+        onOpenChange={(open) => { if (!open) { setEmbedSong(null); setEmbedType(null); } }}
+      >
+        <DialogContent className="max-w-sm p-0 overflow-hidden">
+          {embedSong?.spotifyUrl && (
+            <iframe
+              src={getSpotifyEmbedUrl(embedSong.spotifyUrl) ?? ""}
+              height="152"
+              className="w-full"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

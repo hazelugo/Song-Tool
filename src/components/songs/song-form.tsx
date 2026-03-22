@@ -29,8 +29,35 @@ import {
 } from "@/components/ui/dialog";
 import { TagInput } from "./tag-input";
 import Link from "next/link";
-import { Timer } from "lucide-react";
+import { Timer, Youtube, Music2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+function getYoutubeEmbedUrl(url: string): string | null {
+  try {
+    const u = new URL(url);
+    let videoId: string | null = null;
+    if (u.hostname.includes("youtube.com")) {
+      videoId = u.searchParams.get("v");
+    } else if (u.hostname === "youtu.be") {
+      videoId = u.pathname.slice(1).split("?")[0];
+    }
+    return videoId ? `https://www.youtube-nocookie.com/embed/${videoId}` : null;
+  } catch {
+    return null;
+  }
+}
+
+function getSpotifyEmbedUrl(url: string): string | null {
+  try {
+    const u = new URL(url);
+    if (!u.hostname.includes("spotify.com")) return null;
+    // Convert open.spotify.com/track/ID → open.spotify.com/embed/track/ID
+    const embedPath = u.pathname.replace(/^\/(track|album|playlist|episode)/, "/embed/$1");
+    return `https://open.spotify.com${embedPath}?utm_source=generator&theme=0`;
+  } catch {
+    return null;
+  }
+}
 
 interface SongFormProps {
   defaultValues?: Partial<SongFormValues>;
@@ -48,6 +75,8 @@ export function SongForm({
   const [tags, setTags] = useState<string[]>(defaultValues?.tags ?? []);
   const [lyricsOpen, setLyricsOpen] = useState(false);
   const [draftLyrics, setDraftLyrics] = useState("");
+  const [youtubeOpen, setYoutubeOpen] = useState(false);
+  const [spotifyOpen, setSpotifyOpen] = useState(false);
 
   const form = useForm<SongFormInput, unknown, SongFormValues>({
     resolver: zodResolver(songSchema),
@@ -70,16 +99,45 @@ export function SongForm({
     await onSubmit({ ...values, tags });
   });
 
+  const youtubeEmbedUrl = getYoutubeEmbedUrl(form.watch("youtubeUrl") ?? "");
+  const spotifyEmbedUrl = getSpotifyEmbedUrl(form.watch("spotifyUrl") ?? "");
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Name */}
       <div className="space-y-1.5">
         <Label htmlFor="name">Song name *</Label>
-        <Input
-          id="name"
-          {...form.register("name")}
-          placeholder="Enter song name"
-        />
+        <div className="flex gap-2">
+          <Input
+            id="name"
+            {...form.register("name")}
+            placeholder="Enter song name"
+          />
+          {youtubeEmbedUrl && (
+            <button
+              type="button"
+              onClick={() => setYoutubeOpen(true)}
+              className={cn(
+                "inline-flex items-center justify-center rounded-md border border-input bg-background px-3 text-sm hover:bg-accent hover:text-accent-foreground transition-colors shrink-0",
+              )}
+              title="Watch on YouTube"
+            >
+              <Youtube className="h-4 w-4" />
+            </button>
+          )}
+          {spotifyEmbedUrl && (
+            <button
+              type="button"
+              onClick={() => setSpotifyOpen(true)}
+              className={cn(
+                "inline-flex items-center justify-center rounded-md border border-input bg-background px-3 text-sm hover:bg-accent hover:text-accent-foreground transition-colors shrink-0",
+              )}
+              title="Play on Spotify"
+            >
+              <Music2 className="h-4 w-4" />
+            </button>
+          )}
+        </div>
         {form.formState.errors.name && (
           <p className="text-sm text-destructive">
             {form.formState.errors.name.message}
@@ -302,6 +360,36 @@ export function SongForm({
       <Button type="submit" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? "Saving..." : "Save Song"}
       </Button>
+
+      {/* Spotify embed dialog */}
+      <Dialog open={spotifyOpen} onOpenChange={setSpotifyOpen}>
+        <DialogContent className="max-w-sm p-0 overflow-hidden">
+          {spotifyEmbedUrl && (
+            <iframe
+              src={spotifyEmbedUrl}
+              height="152"
+              className="w-full"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* YouTube embed dialog */}
+      <Dialog open={youtubeOpen} onOpenChange={setYoutubeOpen}>
+        <DialogContent className="max-w-2xl p-0 overflow-hidden">
+          <div className="aspect-video w-full">
+            {youtubeEmbedUrl && (
+              <iframe
+                src={youtubeEmbedUrl}
+                className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Lyrics editor dialog */}
       <Dialog open={lyricsOpen} onOpenChange={setLyricsOpen}>

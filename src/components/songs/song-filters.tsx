@@ -48,9 +48,10 @@ function SongFiltersContent() {
     !isNaN(bpmMaxNum) &&
     bpmMinNum > bpmMaxNum;
 
-  // Helper to update URL params
+  // Helper to update URL params — reads from window.location.search (not the React
+  // snapshot) so concurrent debounced updates don't overwrite each other.
   const updateFilter = (key: string, value: string | undefined) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(window.location.search);
     if (value) {
       params.set(key, value);
     } else {

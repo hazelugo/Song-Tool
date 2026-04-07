@@ -22,7 +22,17 @@
       "Bash(cd:*)",
       "Bash(where gemini:*)",
       "WebFetch(domain:raw.githubusercontent.com)",
-      "Bash(claude upgrade:*)"
+      "Bash(claude upgrade:*)",
+      "Bash(python -m json.tool)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); mcps=d.get\\(''''mcpServers'''',{}\\); [print\\(k,'''':'''',json.dumps\\(v,indent=2\\)\\) for k,v in mcps.items\\(\\) if ''''gemini'''' in k.lower\\(\\)]\")",
+      "Bash(python3 -c \":*)",
+      "Bash(python3:*)",
+      "Bash(xargs grep:*)",
+      "Bash(gemini-mcp --help)",
+      "Bash(npx -y gemini-mcp-tool --help)",
+      "Bash(npx gemini-mcp-tool:*)",
+      "Read(//c/Users/Hector/.gemini//**)",
+      "Read(//c/Users/Hector/.gemini/**)"
     ]
   }
 }

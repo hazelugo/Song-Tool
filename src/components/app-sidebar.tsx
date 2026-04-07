@@ -102,6 +102,17 @@ export function AppSidebar() {
             {userEmail}
           </p>
         )}
+        <p className="px-3 py-1 text-[9px] font-mono text-muted-foreground/50 tracking-wide">
+          BPM data by{" "}
+          <a
+            href="https://getsongbpm.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-muted-foreground transition-colors duration-100"
+          >
+            GetSongBPM
+          </a>
+        </p>
         <Button
           variant="ghost"
           size="sm"

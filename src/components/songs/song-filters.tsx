@@ -202,13 +202,13 @@ function SongFiltersContent() {
             />
           </div>
 
-          {/* Title / Lyrics */}
+          {/* Artist / Title / Lyrics */}
           <div className="flex flex-col gap-1 flex-1 min-w-[140px]">
             <Label
               htmlFor="lyric"
               className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium"
             >
-              Title / Lyrics
+              Artist / Title / Lyrics
             </Label>
             <Input
               key={`lyric-${resetKey}`}

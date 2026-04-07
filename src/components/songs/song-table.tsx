@@ -80,7 +80,7 @@ function buildColumns(
   return [
   {
     accessorKey: "name",
-    header: ({ column }) => <SortableHeader column={column} label="Name" />,
+    header: ({ column }) => <SortableHeader column={column} label="Title" />,
     // No fixed width — expands to fill available space alongside Tags
     cell: ({ row }) => {
       const song = row.original;

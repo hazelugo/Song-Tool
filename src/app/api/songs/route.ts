@@ -47,7 +47,7 @@ export async function GET(request: Request) {
       // Search both song title (ILIKE) and lyrics (FTS). OR so either match returns the song.
       // Use websearch_to_tsquery for lyrics — NOT to_tsquery, which fails on raw user input.
       conditions.push(
-        sql`(${songs.name} ILIKE ${"%" + f.lyric + "%"} OR ${songs.lyricsSearch} @@ websearch_to_tsquery('english', ${f.lyric}))`,
+        sql`(${songs.name} ILIKE ${"%" + f.lyric + "%"} OR ${songs.artist} ILIKE ${"%" + f.lyric + "%"} OR ${songs.lyricsSearch} @@ websearch_to_tsquery('english', ${f.lyric}))`,
       );
     }
 

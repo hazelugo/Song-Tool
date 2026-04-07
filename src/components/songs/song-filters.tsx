@@ -19,7 +19,7 @@ import { MUSICAL_KEYS, TIME_SIGNATURES } from "@/lib/validations/song";
 
 const ADVANCED_KEYS = ["keySig", "timeSig", "chord"] as const;
 
-const FILTER_KEYS = ["bpmMin", "bpmMax", "key", "keySig", "timeSig", "chord", "tag", "lyric"] as const;
+const FILTER_KEYS = ["bpmMin", "bpmMax", "key", "keySig", "timeSig", "chord", "tag", "lyric", "artist"] as const;
 
 function SongFiltersContent() {
   const router = useRouter();
@@ -180,6 +180,24 @@ function SongFiltersContent() {
               placeholder="Filter tag..."
               defaultValue={searchParams.get("tag") ?? ""}
               onChange={(e) => debouncedUpdate("tag", e.target.value)}
+              className="h-10 md:h-7 text-xs rounded-sm"
+            />
+          </div>
+
+          {/* Artist */}
+          <div className="flex flex-col gap-1 flex-1 min-w-[120px]">
+            <Label
+              htmlFor="artist"
+              className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium"
+            >
+              Artist
+            </Label>
+            <Input
+              key={`artist-${resetKey}`}
+              id="artist"
+              placeholder="Filter artist..."
+              defaultValue={searchParams.get("artist") ?? ""}
+              onChange={(e) => debouncedUpdate("artist", e.target.value)}
               className="h-10 md:h-7 text-xs rounded-sm"
             />
           </div>

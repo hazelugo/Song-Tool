@@ -54,6 +54,7 @@ export function SongForm({
     resolver: zodResolver(songSchema),
     defaultValues: {
       name: "",
+      artist: "",
       bpm: undefined,
       musicalKey: undefined,
       keySignature: undefined,
@@ -86,6 +87,16 @@ export function SongForm({
             {form.formState.errors.name.message}
           </p>
         )}
+      </div>
+
+      {/* Artist */}
+      <div className="space-y-1.5">
+        <Label htmlFor="artist">Artist</Label>
+        <Input
+          id="artist"
+          {...form.register("artist")}
+          placeholder="Enter artist name"
+        />
       </div>
 
       {/* BPM + Key */}

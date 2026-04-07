@@ -120,6 +120,18 @@ function buildColumns(
     },
   },
   {
+    accessorKey: "artist",
+    header: () => (
+      <span className="text-xs uppercase tracking-widest font-medium text-muted-foreground">Artist</span>
+    ),
+    enableSorting: false,
+    meta: { className: "hidden md:table-cell" },
+    cell: ({ getValue }) => {
+      const v = getValue<string | null>();
+      return v ? <span className="text-sm text-muted-foreground">{v}</span> : null;
+    },
+  },
+  {
     accessorKey: "bpm",
     header: ({ column }) => <SortableHeader column={column} label="BPM" />,
     meta: { className: "w-16" },

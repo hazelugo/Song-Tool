@@ -51,6 +51,10 @@ export async function GET(request: Request) {
       );
     }
 
+    if (f.artist) {
+      conditions.push(ilike(songs.artist, "%" + f.artist + "%"));
+    }
+
     if (f.tag) {
       // Use EXISTS subquery — NOT INNER JOIN. JOIN would duplicate rows when
       // a song has multiple tags that both match (e.g. tag="a" matches "ballad" AND "anthem")

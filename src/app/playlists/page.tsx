@@ -74,6 +74,7 @@ export default function ViewPlaylistsPage() {
   };
 
   const handleDelete = async (id: string, name: string) => {
+    if (!window.confirm(`Delete "${name}"? This cannot be undone.`)) return;
     setDeletingId(id);
     try {
       const res = await fetch(`/api/playlists/${id}`, { method: "DELETE" });

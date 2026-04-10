@@ -7,6 +7,7 @@ import { playlists } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { PlaylistEditor } from "@/components/ui/playlist-editor";
 import { PlaylistActions } from "@/components/ui/playlist-actions";
+import { SuggestionsPanel } from "@/components/ui/suggestions-panel";
 import { PlaylistNameEditor } from "@/components/ui/playlist-name-editor";
 import { createClient } from "@/lib/supabase/server";
 
@@ -79,7 +80,6 @@ export default async function PlaylistDetailPage({
           playlistName={playlist.name}
           existingSongIds={existingSongIds}
           exportSongs={exportSongs}
-          hasSongs={playlist.songs.length > 0}
           liveLink={liveLink}
         />
       </div>
@@ -91,23 +91,29 @@ export default async function PlaylistDetailPage({
           <p className="text-sm mt-1">Use &quot;Add Songs&quot; to get started</p>
         </div>
       ) : (
-        <PlaylistEditor
-          playlistId={id}
-          initialSongs={playlist.songs.map((ps) => ({
-            song: {
-              id: ps.song.id,
-              name: ps.song.name,
-              artist: ps.song.artist,
-              musicalKey: ps.song.musicalKey,
-              keySignature: ps.song.keySignature,
-              timeSignature: ps.song.timeSignature,
-              bpm: ps.song.bpm,
-              youtubeUrl: ps.song.youtubeUrl,
-              spotifyUrl: ps.song.spotifyUrl,
-            },
-            position: ps.position,
-          }))}
-        />
+        <>
+          <PlaylistEditor
+            playlistId={id}
+            initialSongs={playlist.songs.map((ps) => ({
+              song: {
+                id: ps.song.id,
+                name: ps.song.name,
+                artist: ps.song.artist,
+                musicalKey: ps.song.musicalKey,
+                keySignature: ps.song.keySignature,
+                timeSignature: ps.song.timeSignature,
+                bpm: ps.song.bpm,
+                youtubeUrl: ps.song.youtubeUrl,
+                spotifyUrl: ps.song.spotifyUrl,
+              },
+              position: ps.position,
+            }))}
+          />
+          <SuggestionsPanel
+            playlistId={id}
+            existingSongIds={existingSongIds}
+          />
+        </>
       )}
     </div>
   );

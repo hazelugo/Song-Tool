@@ -42,14 +42,14 @@ function toSafeFilename(name: string) {
 
 export function ExportMenu({ playlistName, songs }: ExportMenuProps) {
   const handleCsv = () => {
-    const headers = ["Name", "Artist", "BPM", "Key", "Key Signature", "Time Signature", "Tags"];
+    const headers = ["Artist", "Name", "BPM", "Key", "Key Signature", "Time Signature", "Tags"];
     const rows = songs.map((s) => [
-      `"${s.name.replace(/"/g, '""')}"`,
       `"${(s.artist ?? "").replace(/"/g, '""')}"`,
+      `"${s.name.replace(/"/g, '""')}"`,
       s.bpm ?? "",
       s.musicalKey ?? "",
       s.keySignature ?? "",
-      s.timeSignature ?? "",
+      s.timeSignature ? `="` + s.timeSignature.replace(/"/g, '""') + `"` : "",
       `"${(s.tags ?? []).map((t) => t.name).join(", ")}"`,
     ]);
     const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");

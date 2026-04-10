@@ -19,16 +19,13 @@ interface Suggestion {
 interface SuggestionsPanelProps {
   playlistId: string;
   existingSongIds: string[];
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
 }
 
 export function SuggestionsPanel({
   playlistId,
   existingSongIds,
-  open,
-  onOpenChange,
 }: SuggestionsPanelProps) {
+  const [open, setOpen] = React.useState(true);
   const [suggestions, setSuggestions] = React.useState<Suggestion[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [addingIds, setAddingIds] = React.useState<Set<string>>(new Set());
@@ -53,6 +50,20 @@ export function SuggestionsPanel({
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
+
+  if (!open) {
+    return (
+      <div className="border rounded-sm overflow-hidden">
+        <button
+          onClick={() => setOpen(true)}
+          className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/30 transition-colors text-left"
+        >
+          <span className="text-sm font-semibold">Suggested Songs</span>
+          <span className="text-xs text-muted-foreground">Show</span>
+        </button>
+      </div>
+    );
+  }
 
   const handleAdd = async (songId: string) => {
     setAddingIds((prev) => new Set(prev).add(songId));
@@ -79,19 +90,17 @@ export function SuggestionsPanel({
   // Filter out songs already in playlist
   const filtered = suggestions.filter((s) => !existingSongIds.includes(s.id));
 
-  if (!open) return null;
-
   return (
     <div className="border rounded-sm bg-card overflow-hidden">
       <div className="flex items-center justify-between px-4 py-3 border-b">
-        <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+        <span className="text-sm font-semibold">
           Suggested Songs
         </span>
         <Button
           variant="ghost"
           size="icon"
           className="h-6 w-6 text-muted-foreground hover:text-foreground"
-          onClick={() => onOpenChange(false)}
+          onClick={() => setOpen(false)}
         >
           <X className="h-3.5 w-3.5" />
         </Button>

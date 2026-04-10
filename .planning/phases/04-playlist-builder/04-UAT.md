@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 04-playlist-builder
 source: [04-01-SUMMARY.md, 04-02-SUMMARY.md, 04-03-SUMMARY.md, 04-04-SUMMARY.md]
 started: 2026-04-09T00:00:00Z
@@ -80,8 +80,13 @@ pending: 0
   reason: "User reported: there is no youtube or spotify indicator on the playlist detail page"
   severity: major
   test: 5
-  artifacts: []
-  missing: [YouTube and Spotify link buttons in PlaylistEditor song rows]
+  root_cause: "Song interface in playlist-editor.tsx does not include youtubeUrl/spotifyUrl fields and ItemRow has no button markup for them — feature was never implemented in this component"
+  artifacts:
+    - path: "src/components/ui/playlist-editor.tsx"
+      issue: "Song interface missing youtubeUrl/spotifyUrl; ItemRow has no streaming link buttons"
+  missing:
+    - "Add youtubeUrl: string | null and spotifyUrl: string | null to Song interface"
+    - "Add conditional link buttons in ItemRow for each non-null streaming URL"
 
 - truth: "Discovery page provides intelligent song discovery beyond a plain text search bar"
   status: failed
@@ -96,29 +101,53 @@ pending: 0
   reason: "User reported: after i save a playlist it does not go to the new playlists detail page it goes to the playlist page where all of the other playlists exist"
   severity: major
   test: 3
-  artifacts: []
-  missing: [router.push('/playlists/[id]') using returned playlist id from POST response]
+  root_cause: "handleSave in playlists/page.tsx calls router.push('/playlists/[id]') correctly but never calls setShowBuilder(false) first, so the builder is still mounted when navigation fires — the still-live /playlists page component shadows the push. Also, onClick in PlaylistBuilder calls onSave without await so the async save runs as a floating Promise."
+  artifacts:
+    - path: "src/app/playlists/page.tsx"
+      issue: "handleSave never calls setShowBuilder(false) before router.push; builder stays mounted and shadows navigation"
+    - path: "src/components/playlist-builder.tsx"
+      issue: "onClick fires onSave without await — async save is a floating Promise"
+  missing:
+    - "Call setShowBuilder(false) in handleSave before or alongside router.push"
+    - "Await onSave in PlaylistBuilder button onClick"
 
 - truth: "Drag-and-drop reorder in PlaylistBuilder is smooth"
   status: failed
   reason: "User reported: the drag is a little janky it could be smoother"
   severity: minor
   test: 3
-  artifacts: []
-  missing: []
+  root_cause: "PlaylistBuilder is missing DragOverlay — dnd-kit physically moves the real DOM node, causing full-list repaints on every pointer-move. PlaylistEditor uses DragOverlay with dropAnimation={null} so only a lightweight portal clone moves. Also missing activationConstraint: {distance: 8} on PointerSensor."
+  artifacts:
+    - path: "src/components/playlist-builder.tsx"
+      issue: "No DragOverlay; PointerSensor has no activationConstraint"
+  missing:
+    - "Add DragOverlay with dropAnimation={null}, track activeId via onDragStart/onDragCancel"
+    - "Add activationConstraint: { distance: 8 } to PointerSensor"
 
 - truth: "Adding a song from the available songs section in PlaylistBuilder removes it from the available list"
   status: failed
   reason: "User reported: when i add a song from this pre-populated section, it does add it but it also stays in that pre-populated side instead of disappearing"
   severity: minor
   test: 2
-  artifacts: []
-  missing: [filter added songs out of availableSongs list in PlaylistBuilder state]
+  root_cause: "filteredSongs in PlaylistBuilder derives from availableSongs prop filtered only by search term — it never excludes songs already present in items state. addItem appends to items but availableSongs is an external prop that never changes."
+  artifacts:
+    - path: "src/components/playlist-builder.tsx"
+      issue: "filteredSongs computation (line 159) does not exclude songs whose id is already in items"
+  missing:
+    - "Build a Set of current item song IDs from items state and filter them out of filteredSongs"
 
 - truth: "Playlists list shows each playlist's name, song count, and last updated date labeled clearly"
   status: failed
   reason: "User reported: i see the playlist names and a date (doesnt specify its the last updated date) i do not see number of songs in the playlist from this overview page"
   severity: major
   test: 1
-  artifacts: []
-  missing: [song count column, labeled last-updated date]
+  root_cause: "GET /api/playlists selects only from playlists table with no join to playlistSongs — no songCount is computed or returned. PlaylistSummary interface only has {id, name, updatedAt}. Date is rendered with toLocaleDateString() and no label."
+  artifacts:
+    - path: "src/app/api/playlists/route.ts"
+      issue: "SELECT query never joins playlistSongs — no songCount in response"
+    - path: "src/app/playlists/page.tsx"
+      issue: "PlaylistSummary missing songCount field; date rendered with no 'Last updated:' label"
+  missing:
+    - "LEFT JOIN playlistSongs grouped by playlist id to compute songCount aggregate"
+    - "Add songCount to PlaylistSummary interface and render it in each row"
+    - "Prefix date with 'Last updated:' label"

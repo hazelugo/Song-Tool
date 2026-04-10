@@ -17,6 +17,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Song Catalog** - Full CRUD for songs with all musical metadata fields (completed 2026-03-10)
 - [x] **Phase 3: Discovery** - Filter and sort engine — find songs by shared musical properties (completed 2026-03-10)
 - [ ] **Phase 4: Playlist Builder** - Save, view, reorder, and use playlists from filtered results (UAT gap closure in progress)
+- [ ] **Phase 5: Gap Closure — Compile Fixes + Find Similar** - Fix sonner install blocker, restore Find Similar Songs flow
+- [ ] **Phase 6: Gap Closure — Auth Middleware** - Add Next.js middleware to redirect unauthenticated users to login
+- [ ] **Phase 7: Gap Closure — Polish + Docs** - Time signature filter UI, POST /api/discovery decision, stale REQUIREMENTS.md
 
 ## Phase Details
 
@@ -103,14 +106,55 @@ Plans:
 - [x] 04-06: Gap closure — PlaylistBuilder available pool filtering + smooth drag
 - [ ] 04-07: Gap closure — YouTube/Spotify buttons, export fields, suggestions discoverability
 
+### Phase 5: Gap Closure — Compile Fixes + Find Similar
+
+**Goal**: Unblock the TypeScript build and restore the Find Similar Songs user flow. Two independent fixes: install the missing `sonner` package so toast notifications work, and wire the `/discovery` page to consume the `?q=` URL param produced by SongSheet's "Find similar songs" button.
+**Depends on**: Phase 4
+**Gap Closure**: Closes compile blocker (sonner) and broken E2E flow (Find Similar Songs)
+**Success Criteria**:
+1. `npx tsc --noEmit` returns zero errors
+2. Clicking "Find similar songs" on any song navigates to `/discovery` with the chain pre-seeded for that song
+
+Plans:
+- [ ] 05-01-PLAN.md — Install sonner, fix toast imports, restore Find Similar Songs flow on /discovery
+
+### Phase 6: Gap Closure — Auth Middleware
+
+**Goal**: Redirect unauthenticated users to `/login` when they navigate directly to `/songs`, `/playlists`, or `/discovery`. Currently auth is enforced at the API layer only — logged-out users see empty loading states rather than the login page.
+**Depends on**: Phase 5
+**Gap Closure**: Closes missing middleware integration gap
+**Success Criteria**:
+1. Unauthenticated user navigating to `/songs` is redirected to `/login`
+2. Authenticated user navigating to `/songs` sees their songs normally
+3. `/`, `/login`, `/metronome`, `/chords` remain accessible without auth
+
+Plans:
+- [ ] 06-01-PLAN.md — Add src/middleware.ts with Supabase session check, protect /songs /playlists /discovery routes
+
+### Phase 7: Gap Closure — Polish + Docs
+
+**Goal**: Three small improvements: add time signature filter to the SongFilters UI (schema and API already support it), resolve the orphaned `POST /api/discovery` endpoint (wire or remove), and update REQUIREMENTS.md so all completed SONG/DISC requirements are correctly marked and the traceability table reflects current state.
+**Depends on**: Phase 5
+**Gap Closure**: Closes timeSig UI gap, resolves orphaned endpoint, fixes stale documentation
+**Success Criteria**:
+1. SongFilters UI includes a time signature filter control that calls GET /api/songs with `timeSig` param
+2. POST /api/discovery is either wired to a UI entry point or removed with a clear commit message
+3. REQUIREMENTS.md checkboxes for SONG-01..06 and DISC-01..08 show `[x]`; traceability table shows Complete for all implemented requirements
+
+Plans:
+- [ ] 07-01-PLAN.md — timeSig filter UI, POST /api/discovery decision, REQUIREMENTS.md update
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
-| Phase               | Plans Complete | Status      | Completed  |
-| ------------------- | -------------- | ----------- | ---------- |
-| 1. Foundation       | 2/2            | Complete    | 2026-03-09 |
-| 2. Song Catalog     | 3/3            | Complete    | 2026-03-10 |
-| 3. Discovery        | 2/2            | Complete    | 2026-03-10 |
-| 4. Playlist Builder | 7/7 | In Progress|  |
+| Phase                                   | Plans Complete | Status      | Completed  |
+| --------------------------------------- | -------------- | ----------- | ---------- |
+| 1. Foundation                           | 2/2            | Complete    | 2026-03-09 |
+| 2. Song Catalog                         | 3/3            | Complete    | 2026-03-10 |
+| 3. Discovery                            | 2/2            | Complete    | 2026-03-10 |
+| 4. Playlist Builder                     | 7/7            | In Progress |            |
+| 5. Gap Closure — Compile + Find Similar | 0/1            | Pending     |            |
+| 6. Gap Closure — Auth Middleware        | 0/1            | Pending     |            |
+| 7. Gap Closure — Polish + Docs          | 0/1            | Pending     |            |

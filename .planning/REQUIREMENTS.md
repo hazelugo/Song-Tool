@@ -11,23 +11,23 @@ Requirements for initial release. Each maps to a roadmap phase.
 
 ### Songs
 
-- [ ] **SONG-01**: User can add a song with required fields: name, BPM (integer), key (dropdown of 12 keys), key signature (major/minor dropdown), chord progressions (free text)
-- [ ] **SONG-02**: User can add optional fields per song: lyrics (long text), YouTube URL, Spotify URL
-- [ ] **SONG-03**: User can add one or more freeform tags to a song (e.g. "opener", "ballad", "crowd-pleaser")
-- [ ] **SONG-04**: User can edit any field of an existing song
-- [ ] **SONG-05**: User can delete a song from the database
-- [ ] **SONG-06**: User can view all songs in a paginated table with key metadata columns visible
+- [x] **SONG-01**: User can add a song with required fields: name, BPM (integer), key (dropdown of 12 keys), key signature (major/minor dropdown), chord progressions (free text)
+- [x] **SONG-02**: User can add optional fields per song: lyrics (long text), YouTube URL, Spotify URL
+- [x] **SONG-03**: User can add one or more freeform tags to a song (e.g. "opener", "ballad", "crowd-pleaser")
+- [x] **SONG-04**: User can edit any field of an existing song
+- [x] **SONG-05**: User can delete a song from the database
+- [x] **SONG-06**: User can view all songs in a paginated table with key metadata columns visible
 
 ### Discovery
 
-- [ ] **DISC-01**: User can filter songs by BPM range (set minimum and maximum BPM values)
-- [ ] **DISC-02**: User can filter songs by musical key (select from the 12-key dropdown)
-- [ ] **DISC-03**: User can filter songs by key signature (major or minor)
-- [ ] **DISC-04**: User can filter songs by chord progression (keyword text match against the chord progressions field)
-- [ ] **DISC-05**: User can search songs by lyric keyword or phrase (full-text search)
-- [ ] **DISC-06**: User can filter songs by tag
-- [ ] **DISC-07**: User can apply multiple filters simultaneously and see combined results
-- [ ] **DISC-08**: User can sort filtered results by any column (BPM, name, key, etc.) in ascending or descending order
+- [x] **DISC-01**: User can filter songs by BPM range (set minimum and maximum BPM values)
+- [x] **DISC-02**: User can filter songs by musical key (select from the 12-key dropdown)
+- [x] **DISC-03**: User can filter songs by key signature (major or minor)
+- [x] **DISC-04**: User can filter songs by chord progression (keyword text match against the chord progressions field)
+- [x] **DISC-05**: User can search songs by lyric keyword or phrase (full-text search)
+- [x] **DISC-06**: User can filter songs by tag
+- [x] **DISC-07**: User can apply multiple filters simultaneously and see combined results
+- [x] **DISC-08**: User can sort filtered results by any column (BPM, name, key, etc.) in ascending or descending order
 
 ### Playlists
 
@@ -91,20 +91,20 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SONG-01 | Phase 2 | Pending |
-| SONG-02 | Phase 2 | Pending |
-| SONG-03 | Phase 2 | Pending |
-| SONG-04 | Phase 2 | Pending |
-| SONG-05 | Phase 2 | Pending |
-| SONG-06 | Phase 2 | Pending |
-| DISC-01 | Phase 3 | Pending |
-| DISC-02 | Phase 3 | Pending |
-| DISC-03 | Phase 3 | Pending |
-| DISC-04 | Phase 3 | Pending |
-| DISC-05 | Phase 3 | Pending |
-| DISC-06 | Phase 3 | Pending |
-| DISC-07 | Phase 3 | Pending |
-| DISC-08 | Phase 3 | Pending |
+| SONG-01 | Phase 2 | Complete |
+| SONG-02 | Phase 2 | Complete |
+| SONG-03 | Phase 2 | Complete |
+| SONG-04 | Phase 2 | Complete |
+| SONG-05 | Phase 2 | Complete |
+| SONG-06 | Phase 2 | Complete |
+| DISC-01 | Phase 3 | Complete |
+| DISC-02 | Phase 3 | Complete |
+| DISC-03 | Phase 3 | Complete |
+| DISC-04 | Phase 3 | Complete |
+| DISC-05 | Phase 3 | Complete |
+| DISC-06 | Phase 3 | Complete |
+| DISC-07 | Phase 3 | Complete |
+| DISC-08 | Phase 3 | Complete |
 | PLAY-01 | Phase 4 | Complete |
 | PLAY-02 | Phase 4 | Complete |
 | PLAY-03 | Phase 4 | Complete |

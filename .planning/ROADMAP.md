@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation** - Project scaffolding, database schema, and Vercel deployment (completed 2026-03-09)
 - [x] **Phase 2: Song Catalog** - Full CRUD for songs with all musical metadata fields (completed 2026-03-10)
 - [x] **Phase 3: Discovery** - Filter and sort engine — find songs by shared musical properties (completed 2026-03-10)
-- [x] **Phase 4: Playlist Builder** - Save, view, reorder, and use playlists from filtered results (completed 2026-03-11)
+- [ ] **Phase 4: Playlist Builder** - Save, view, reorder, and use playlists from filtered results (UAT gap closure in progress)
 
 ## Phase Details
 
@@ -91,7 +91,7 @@ Plans:
 4. User can click a YouTube or Spotify link on any song in a playlist and it opens in a new tab
 5. User can remove a song from a playlist without deleting the song from the database
 6. User can delete a playlist and it disappears from the playlists list
-   **Plans**: TBD
+   **Plans**: 7 plans
 
 Plans:
 
@@ -99,6 +99,9 @@ Plans:
 - [x] 04-02: Save playlist flow (PlaylistBuilder component, "Save results as Playlist" on Songs and Discovery pages, Playlists list page)
 - [x] 04-03: Playlist view UI (playlist detail page, PlaylistEditor with streaming links, AddSongsDialog, SuggestionsPanel, ExportMenu, PlaylistNameEditor)
 - [x] 04-04: Drag-and-drop reorder (dnd-kit sortable, DragOverlay, optimistic update, PUT /api/playlists/[id]/songs, UI rollback on persist failure)
+- [ ] 04-05: Gap closure — playlists list song count + date label, save redirect fix
+- [ ] 04-06: Gap closure — PlaylistBuilder available pool filtering + smooth drag
+- [ ] 04-07: Gap closure — YouTube/Spotify buttons, export fields, suggestions discoverability
 
 ## Progress
 
@@ -110,4 +113,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 1. Foundation       | 2/2            | Complete    | 2026-03-09 |
 | 2. Song Catalog     | 3/3            | Complete    | 2026-03-10 |
 | 3. Discovery        | 2/2            | Complete    | 2026-03-10 |
-| 4. Playlist Builder | 4/4            | Complete    | 2026-03-11 |
+| 4. Playlist Builder | 4/7            | Gap closure | —          |

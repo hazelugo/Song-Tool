@@ -255,17 +255,26 @@ function DiscoveryContent() {
   const [connectorPaths, setConnectorPaths] = useState<string[]>([]);
   const router = useRouter();
 
-  // Scroll to reveal new columns or when last column finishes loading
+  // Scroll to reveal new columns or when last column finishes loading.
+  // Double-rAF: first frame commits the new DOM nodes, second frame fires
+  // after layout so scrollWidth is fully updated before we read it.
   const lastColLoading = chain[chain.length - 1]?.isLoading ?? false;
   useEffect(() => {
     if (chain.length <= 1) return;
-    const frame = requestAnimationFrame(() => {
-      scrollRef.current?.scrollTo({
-        left: scrollRef.current.scrollWidth,
-        behavior: "smooth",
+    let outer: number;
+    let inner: number;
+    outer = requestAnimationFrame(() => {
+      inner = requestAnimationFrame(() => {
+        scrollRef.current?.scrollTo({
+          left: scrollRef.current.scrollWidth,
+          behavior: "smooth",
+        });
       });
     });
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(outer);
+      cancelAnimationFrame(inner);
+    };
   }, [chain.length, lastColLoading]);
 
   // Block browser close/refresh when there's an unsaved path

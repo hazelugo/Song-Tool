@@ -117,8 +117,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — Find Similar seedId wiring + POST /api/discovery removal + parsePrompt cleanup
-- [ ] 05-02-PLAN.md — Auth middleware (Supabase SSR session check, protected route redirect)
+- [x] 05-01-PLAN.md — Find Similar seedId wiring + POST /api/discovery removal + parsePrompt cleanup
+- [x] 05-02-PLAN.md — Auth middleware (Supabase SSR session check, protected route redirect)
 
 ## Progress
 

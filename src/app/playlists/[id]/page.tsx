@@ -69,9 +69,11 @@ export default async function PlaylistDetailPage({
               playlistName={playlist.name}
               songs={playlist.songs.map((ps) => ({
                 name: ps.song.name,
+                artist: ps.song.artist,
                 bpm: ps.song.bpm,
                 musicalKey: ps.song.musicalKey,
                 keySignature: ps.song.keySignature,
+                timeSignature: ps.song.timeSignature,
                 lyrics: ps.song.lyrics,
                 tags: ps.song.tags,
               }))}
@@ -93,7 +95,17 @@ export default async function PlaylistDetailPage({
           <PlaylistEditor
             playlistId={id}
             initialSongs={playlist.songs.map((ps) => ({
-              song: ps.song,
+              song: {
+                id: ps.song.id,
+                name: ps.song.name,
+                artist: ps.song.artist,
+                musicalKey: ps.song.musicalKey,
+                keySignature: ps.song.keySignature,
+                timeSignature: ps.song.timeSignature,
+                bpm: ps.song.bpm,
+                youtubeUrl: ps.song.youtubeUrl,
+                spotifyUrl: ps.song.spotifyUrl,
+              },
               position: ps.position,
             }))}
           />

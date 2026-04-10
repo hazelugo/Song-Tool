@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { playlists, playlistSongs } from "@/db/schema";
-import { and, eq, isNull, desc, count } from "drizzle-orm";
+import { and, eq, isNull, desc, count, sql } from "drizzle-orm";
 import { z } from "zod";
 import { randomUUID } from "crypto";
 import { requireUser } from "@/lib/auth";
@@ -34,9 +34,18 @@ export async function GET(request: Request) {
   try {
     const [data, [{ total }]] = await Promise.all([
       db
-        .select()
+        .select({
+          id: playlists.id,
+          name: playlists.name,
+          updatedAt: playlists.updatedAt,
+          userId: playlists.userId,
+          deletedAt: playlists.deletedAt,
+          songCount: sql<number>`cast(count(${playlistSongs.songId}) as integer)`,
+        })
         .from(playlists)
+        .leftJoin(playlistSongs, eq(playlistSongs.playlistId, playlists.id))
         .where(where)
+        .groupBy(playlists.id)
         .orderBy(desc(playlists.updatedAt))
         .limit(limit)
         .offset(offset),

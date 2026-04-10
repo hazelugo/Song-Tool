@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Song Catalog** - Full CRUD for songs with all musical metadata fields (completed 2026-03-10)
 - [x] **Phase 3: Discovery** - Filter and sort engine — find songs by shared musical properties (completed 2026-03-10)
 - [ ] **Phase 4: Playlist Builder** - Save, view, reorder, and use playlists from filtered results (UAT gap closure in progress)
-- [ ] **Phase 5: Gap Closure** - Fix sonner blocker, Find Similar Songs, auth middleware, timeSig filter UI, POST /api/discovery
+- [ ] **Phase 5: Gap Closure** - Fix Find Similar Songs flow, auth middleware, remove orphaned POST /api/discovery
 
 ## Phase Details
 
@@ -106,18 +106,19 @@ Plans:
 
 ### Phase 5: Gap Closure
 
-**Goal**: Close all v1.0 audit gaps in one focused pass: fix the sonner compile blocker, restore the Find Similar Songs flow, add auth middleware to protect client routes, add the missing timeSig filter to SongFilters UI, and resolve the orphaned POST /api/discovery endpoint.
+**Goal**: Close remaining v1.0 audit gaps: restore the Find Similar Songs flow (seedId-based pre-seeding), add auth middleware to redirect unauthenticated users from protected routes, and remove the orphaned POST /api/discovery endpoint.
 **Depends on**: Phase 4
-**Gap Closure**: Closes sonner blocker, Find Similar broken flow, missing auth middleware, timeSig UI gap, orphaned endpoint
+**Gap Closure**: Closes Find Similar broken flow, missing auth middleware, orphaned endpoint
 **Success Criteria**:
 1. `npx tsc --noEmit` returns zero errors
-2. Clicking "Find similar songs" navigates to `/discovery` with the chain pre-seeded for that song
+2. Clicking "Find similar songs" navigates to `/discovery?seedId={id}` with the chain pre-seeded for that song
 3. Unauthenticated user navigating to `/songs`, `/playlists`, or `/discovery` is redirected to `/login`
-4. SongFilters UI includes a time signature filter that calls GET /api/songs with `timeSig` param
-5. POST /api/discovery is either wired to a UI entry point or removed
+4. POST /api/discovery is removed (orphaned — no UI consumer)
+**Plans**: 2 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — All gap fixes: sonner, Find Similar, middleware, timeSig filter, /api/discovery
+- [ ] 05-01-PLAN.md — Find Similar seedId wiring + POST /api/discovery removal + parsePrompt cleanup
+- [ ] 05-02-PLAN.md — Auth middleware (Supabase SSR session check, protected route redirect)
 
 ## Progress
 
@@ -130,4 +131,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 2. Song Catalog         | 3/3            | Complete    | 2026-03-10 |
 | 3. Discovery            | 2/2            | Complete    | 2026-03-10 |
 | 4. Playlist Builder     | 7/7            | In Progress |            |
-| 5. Gap Closure          | 0/1            | Pending     |            |
+| 5. Gap Closure          | 0/2            | Pending     |            |

@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 import type { SongWithTags } from "@/db/schema";
 import { ChainCard } from "@/components/discovery/chain-card";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -254,6 +254,28 @@ function DiscoveryContent() {
   const innerRef = useRef<HTMLDivElement>(null);
   const [connectorPaths, setConnectorPaths] = useState<string[]>([]);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const seedId = searchParams.get("seedId");
+
+  // Auto-start chain when seedId param is present
+  useEffect(() => {
+    if (!seedId || chain.length > 0) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/similar?songId=${encodeURIComponent(seedId)}`);
+        if (!res.ok || cancelled) return;
+        const json = await res.json();
+        if (cancelled) return;
+        if (json.seed) {
+          startChain(json.seed);
+        }
+      } catch {
+        // D-04: if seedId fetch fails, chain opens empty
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [seedId, chain.length, startChain]);
 
   // Scroll to reveal new columns or when last column finishes loading.
   // Double-rAF: first frame commits the new DOM nodes, second frame fires

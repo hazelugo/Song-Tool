@@ -12,8 +12,6 @@ import {
   PlaylistBuilder,
   PlaylistItem,
 } from "@/components/playlist-builder";
-import { buildSimilarQuery } from "@/lib/similar-query";
-
 export const dynamic = "force-dynamic";
 
 function SongsPageContent() {
@@ -175,9 +173,7 @@ function SongsPageContent() {
         onFindSimilar={
           selectedSong
             ? () =>
-                router.push(
-                  `/discovery?q=${encodeURIComponent(buildSimilarQuery(selectedSong))}`,
-                )
+                router.push(`/discovery?seedId=${selectedSong.id}`)
             : undefined
         }
       />

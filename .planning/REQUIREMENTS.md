@@ -34,7 +34,7 @@ Requirements for initial release. Each maps to a roadmap phase.
 - [x] **PLAY-01**: User can save the current filtered and ordered song list as a named playlist
 - [x] **PLAY-02**: User can view a list of all saved playlists
 - [x] **PLAY-03**: User can open a saved playlist and see all its songs in saved order
-- [ ] **PLAY-04**: User can reorder songs within a saved playlist via drag-and-drop
+- [x] **PLAY-04**: User can reorder songs within a saved playlist via drag-and-drop
 - [ ] **PLAY-05**: User can open a song's YouTube or Spotify link from within a playlist view (opens in new tab)
 - [ ] **PLAY-06**: User can remove a song from a playlist without deleting the song from the database
 - [ ] **PLAY-07**: User can delete a saved playlist
@@ -108,7 +108,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PLAY-01 | Phase 4 | Complete |
 | PLAY-02 | Phase 4 | Complete |
 | PLAY-03 | Phase 4 | Complete |
-| PLAY-04 | Phase 4 | Pending |
+| PLAY-04 | Phase 4 | Complete |
 | PLAY-05 | Phase 4 | Pending |
 | PLAY-06 | Phase 4 | Pending |
 | PLAY-07 | Phase 4 | Pending |

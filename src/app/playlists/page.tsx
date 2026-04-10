@@ -69,6 +69,7 @@ export default function ViewPlaylistsPage() {
     if (!res.ok) throw new Error("Failed to save playlist");
     const data = await res.json();
     toast.success(`"${name}" saved`);
+    setShowBuilder(false);
     router.push(`/playlists/${data.id}`);
   };
 

@@ -252,7 +252,7 @@ export function PlaylistBuilder({
                   <Trash2 className="h-4 w-4 mr-2" /> Delete
                 </Button>
               )}
-              <Button onClick={() => onSave(name, items)}>Save Playlist</Button>
+              <Button onClick={async () => { await onSave(name, items); }}>Save Playlist</Button>
             </div>
           </div>
 

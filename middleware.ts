@@ -1,6 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
+export const runtime = "edge";
+
 const PROTECTED_PREFIXES = ["/songs", "/playlists", "/discovery"];
 
 export async function middleware(request: NextRequest) {

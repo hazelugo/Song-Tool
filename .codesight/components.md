@@ -1,0 +1,31 @@
+# Components
+
+- **ChordsPage** [client] — `src/app/chords/page.tsx`
+- **DiscoveryError** [client] — props: error, reset — `src/app/discovery/error.tsx`
+- **DiscoveryPage** [client] — `src/app/discovery/page.tsx`
+- **GlobalError** [client] — props: error, reset — `src/app/error.tsx`
+- **RootLayout** — `src/app/layout.tsx`
+- **LoginPage** [client] — `src/app/login/page.tsx`
+- **MetronomePage** [client] — `src/app/metronome/page.tsx`
+- **Home** — `src/app/page.tsx`
+- **PlaylistEditorError** [client] — props: error, reset — `src/app/playlists/[id]/error.tsx`
+- **LiveModePage** — props: params — `src/app/playlists/[id]/live/page.tsx`
+- **PlaylistDetailPage** — props: params — `src/app/playlists/[id]/page.tsx`
+- **PlaylistsError** [client] — props: error, reset — `src/app/playlists/error.tsx`
+- **ViewPlaylistsPage** [client] — `src/app/playlists/page.tsx`
+- **SongsError** [client] — props: error, reset — `src/app/songs/error.tsx`
+- **SongsPage** [client] — `src/app/songs/page.tsx`
+- **AppSidebar** [client] — `src/components/app-sidebar.tsx`
+- **ChainCard** [client] — props: song, isSelected, isSeed, onClick — `src/components/discovery/chain-card.tsx`
+- **SongCard** [client] — props: song, onClick, onFindSimilar — `src/components/discovery/song-card.tsx`
+- **PageError** [client] — props: error, reset, context — `src/components/page-error.tsx`
+- **PlaylistBuilder** [client] — props: availableSongs, onSave, initialName, initialItems, onClose, onDelete — `src/components/playlist-builder.tsx`
+- **CsvImportDialog** [client] — props: onSuccess — `src/components/songs/csv-import-dialog.tsx`
+- **DeleteConfirm** [client] — props: onConfirm, isDeleting — `src/components/songs/delete-confirm.tsx`
+- **SongFilters** [client] — `src/components/songs/song-filters.tsx`
+- **SongForm** [client] — props: defaultValues, onSubmit, isSubmitting, metronomeHref — `src/components/songs/song-form.tsx`
+- **SongSheet** [client] — props: open, onOpenChange, song, onSuccess, onFindSimilar — `src/components/songs/song-sheet.tsx`
+- **SongTable** [client] — props: data, onRowClick, isLoading, pageCount, pageIndex, onPageChange, sortingProp, onSortingChange — `src/components/songs/song-table.tsx`
+- **TagInput** [client] — props: value, onChange, id — `src/components/songs/tag-input.tsx`
+- **ThemeProvider** [client] — `src/components/theme-provider.tsx`
+- **PlaylistViewPage** [client] — `tests/e2e/page.tsx`

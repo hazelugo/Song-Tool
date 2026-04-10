@@ -1,0 +1,31 @@
+# Libraries
+
+- `src/hooks/use-mobile.ts` — function useIsMobile: () => void
+- `src/lib/audio.ts`
+  - function playTick: (accent, audioCtx, when) => void
+  - function playChord: (frequencies, audioCtx, waveform) => ActiveChordNodes
+  - function stopChord: (nodes, audioCtx) => void
+  - type ActiveChordNodes
+- `src/lib/auth.ts` — function requireUser: () => Promise<
+- `src/lib/camelot.ts`
+  - function getCamelotPosition: (musicalKey, keySignature) => CamelotPosition | null
+  - function getKeyCompatibility: (key1, sig1, key2, sig2) => CompatibilityResult
+  - function formatCamelot: (pos) => string
+  - type CamelotPosition
+  - type CompatibilityResult
+- `src/lib/chords.ts`
+  - function noteToFrequency: (semitone, octave) => number
+  - function getDiatonicChords: (key, keySig) => ChordDef[]
+  - interface ChordDef
+  - const NOTE_SEMITONES: Record<MusicalKey, number>
+- `src/lib/parse-prompt.ts` — function parsePrompt: (raw) => ParsedFilters, interface ParsedFilters
+- `src/lib/ranking.ts` — function generateRank: (prev, next) => number, function rebalanceRanks: (items) => T[]
+- `src/lib/similar-query.ts` — function buildSimilarQuery: (song) => string
+- `src/lib/supabase/client.ts` — function createClient: () => void
+- `src/lib/supabase/server.ts` — function createClient: () => void
+- `src/lib/utils.ts` — function cn: (...inputs) => void
+- `src/lib/validations/route.ts`
+  - function GET: (_request, {...}) => void
+  - function PUT: (request, {...}) => void
+  - function DELETE: (_request, {...}) => void
+- `src/proxy.ts` — function proxy: (request) => void, const config

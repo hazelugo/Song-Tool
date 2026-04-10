@@ -99,8 +99,8 @@ Plans:
 - [x] 04-02: Save playlist flow (PlaylistBuilder component, "Save results as Playlist" on Songs and Discovery pages, Playlists list page)
 - [x] 04-03: Playlist view UI (playlist detail page, PlaylistEditor with streaming links, AddSongsDialog, SuggestionsPanel, ExportMenu, PlaylistNameEditor)
 - [x] 04-04: Drag-and-drop reorder (dnd-kit sortable, DragOverlay, optimistic update, PUT /api/playlists/[id]/songs, UI rollback on persist failure)
-- [ ] 04-05: Gap closure — playlists list song count + date label, save redirect fix
-- [ ] 04-06: Gap closure — PlaylistBuilder available pool filtering + smooth drag
+- [x] 04-05: Gap closure — playlists list song count + date label, save redirect fix
+- [x] 04-06: Gap closure — PlaylistBuilder available pool filtering + smooth drag
 - [ ] 04-07: Gap closure — YouTube/Spotify buttons, export fields, suggestions discoverability
 
 ## Progress
@@ -113,4 +113,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 1. Foundation       | 2/2            | Complete    | 2026-03-09 |
 | 2. Song Catalog     | 3/3            | Complete    | 2026-03-10 |
 | 3. Discovery        | 2/2            | Complete    | 2026-03-10 |
-| 4. Playlist Builder | 4/7            | Gap closure | —          |
+| 4. Playlist Builder | 6/7 | In Progress|  |

@@ -31,8 +31,8 @@ Requirements for initial release. Each maps to a roadmap phase.
 
 ### Playlists
 
-- [ ] **PLAY-01**: User can save the current filtered and ordered song list as a named playlist
-- [ ] **PLAY-02**: User can view a list of all saved playlists
+- [x] **PLAY-01**: User can save the current filtered and ordered song list as a named playlist
+- [x] **PLAY-02**: User can view a list of all saved playlists
 - [ ] **PLAY-03**: User can open a saved playlist and see all its songs in saved order
 - [ ] **PLAY-04**: User can reorder songs within a saved playlist via drag-and-drop
 - [ ] **PLAY-05**: User can open a song's YouTube or Spotify link from within a playlist view (opens in new tab)
@@ -105,8 +105,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DISC-06 | Phase 3 | Pending |
 | DISC-07 | Phase 3 | Pending |
 | DISC-08 | Phase 3 | Pending |
-| PLAY-01 | Phase 4 | Pending |
-| PLAY-02 | Phase 4 | Pending |
+| PLAY-01 | Phase 4 | Complete |
+| PLAY-02 | Phase 4 | Complete |
 | PLAY-03 | Phase 4 | Pending |
 | PLAY-04 | Phase 4 | Pending |
 | PLAY-05 | Phase 4 | Pending |

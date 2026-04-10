@@ -105,7 +105,7 @@ export default function ViewPlaylistsPage() {
     <div className="flex flex-col gap-4 p-6 max-w-6xl mx-auto w-full">
       {/* Header row */}
       <div className="flex items-center justify-between border-b border-border/60 pb-3">
-        <h1 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+        <h1 className="text-sm font-semibold uppercase tracking-widest text-foreground">
           Playlists
         </h1>
         <Button

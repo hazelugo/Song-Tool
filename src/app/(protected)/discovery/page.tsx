@@ -581,7 +581,7 @@ function DiscoveryContent() {
       <div className="flex-none flex flex-col gap-4 p-6 pb-4 max-w-6xl w-full mx-auto">
         <div className="flex items-center justify-between border-b border-border/60 pb-3">
           <div className="flex items-center gap-2.5">
-            <h1 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            <h1 className="text-sm font-semibold uppercase tracking-widest text-foreground">
               Discovery
             </h1>
             {hasChain && (
@@ -600,36 +600,24 @@ function DiscoveryContent() {
         <SeedSearch onSelect={startChain} />
 
         {/* Ranking legend */}
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 border border-border/40 bg-muted/10 rounded-sm px-3 py-2">
-          <span className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground/50 shrink-0">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border border-border/40 bg-muted/10 rounded-sm px-3 py-2.5">
+          <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/60 shrink-0">
             Ranked by
           </span>
-          <span className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground">
-            <span className="text-[color:var(--color-chart-3)] font-semibold">
-              ①
-            </span>
+          <span className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground">
+            <span className="text-[color:var(--color-chart-3)] font-semibold">①</span>
             Camelot key compatibility
-            <span className="text-muted-foreground/30">
-              — same / relative / adjacent (±1)
-            </span>
+            <span className="text-muted-foreground/50">— same / relative / adjacent (±1)</span>
           </span>
-          <span className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground">
-            <span className="text-[color:var(--color-chart-3)] font-semibold">
-              ②
-            </span>
+          <span className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground">
+            <span className="text-[color:var(--color-chart-3)] font-semibold">②</span>
             BPM proximity
-            <span className="text-muted-foreground/40">
-              — within ±10% or ±20%
-            </span>
+            <span className="text-muted-foreground/50">— within ±10% or ±20%</span>
           </span>
-          <span className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground">
-            <span className="text-[color:var(--color-chart-3)] font-semibold">
-              ③
-            </span>
+          <span className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground">
+            <span className="text-[color:var(--color-chart-3)] font-semibold">③</span>
             Shared tags
-            <span className="text-muted-foreground/40">
-              — genre, feel, language hard-filtered
-            </span>
+            <span className="text-muted-foreground/50">— genre, feel, language hard-filtered</span>
           </span>
         </div>
       </div>
@@ -637,10 +625,10 @@ function DiscoveryContent() {
       {/* Empty state */}
       {!hasChain && (
         <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center px-6 pb-24">
-          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground/50">
+            <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground/70">
             Search for a song to begin
           </p>
-          <p className="text-sm text-muted-foreground/40 max-w-sm leading-relaxed">
+          <p className="text-sm text-muted-foreground/60 max-w-sm leading-relaxed">
             Select a song from your catalog. It will branch into similar songs,
             which branch further — follow the chain or save your path as a
             playlist.

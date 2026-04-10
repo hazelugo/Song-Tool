@@ -65,7 +65,7 @@ function ChordPadsContent() {
     <div className="flex flex-col gap-4 p-6 max-w-2xl mx-auto w-full bg-card border border-border/40 rounded-sm">
       {/* Header row — DAW toolbar style */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3">
-        <h1 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+        <h1 className="text-sm font-semibold uppercase tracking-widest text-foreground">
           Chord Pads
         </h1>
         <div className="flex items-center gap-4">

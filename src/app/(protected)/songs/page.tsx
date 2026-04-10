@@ -116,7 +116,7 @@ function SongsPageContent() {
     <div className="flex flex-col gap-4 p-6 max-w-6xl mx-auto w-full bg-card border border-border/40 rounded-sm">
       {/* Header row — DAW toolbar style */}
       <div className="flex items-center justify-between border-b border-border/60 pb-3">
-        <h1 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Songs</h1>
+        <h1 className="text-sm font-semibold uppercase tracking-widest text-foreground">Songs</h1>
         <div className="flex items-center gap-2">
           <Button
             variant="default"

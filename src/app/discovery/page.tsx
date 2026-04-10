@@ -257,26 +257,6 @@ function DiscoveryContent() {
   const searchParams = useSearchParams();
   const seedId = searchParams.get("seedId");
 
-  // Auto-start chain when seedId param is present
-  useEffect(() => {
-    if (!seedId || chain.length > 0) return;
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch(`/api/similar?songId=${encodeURIComponent(seedId)}`);
-        if (!res.ok || cancelled) return;
-        const json = await res.json();
-        if (cancelled) return;
-        if (json.seed) {
-          startChain(json.seed);
-        }
-      } catch {
-        // D-04: if seedId fetch fails, chain opens empty
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [seedId, chain.length, startChain]);
-
   // Scroll to reveal new columns or when last column finishes loading.
   // Double-rAF: first frame commits the new DOM nodes, second frame fires
   // after layout so scrollWidth is fully updated before we read it.
@@ -416,6 +396,26 @@ function DiscoveryContent() {
     },
     [loadSimilar],
   );
+
+  // Auto-start chain when seedId param is present (must be after startChain definition)
+  useEffect(() => {
+    if (!seedId || chain.length > 0) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/similar?songId=${encodeURIComponent(seedId)}`);
+        if (!res.ok || cancelled) return;
+        const json = await res.json();
+        if (cancelled) return;
+        if (json.seed) {
+          startChain(json.seed);
+        }
+      } catch {
+        // D-04: if seedId fetch fails, chain opens empty
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [seedId, chain.length, startChain]);
 
   const selectSong = useCallback(
     async (depth: number, idx: number) => {

@@ -36,7 +36,13 @@ type Column = {
 
 // ─── Animated column wrapper ────────────────────────────────────────────────
 
-function SlideIn({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+function SlideIn({
+  children,
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  delay?: number;
+}) {
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), delay);
@@ -280,8 +286,8 @@ function DiscoveryContent() {
   }, [chain.length, lastColLoading]);
 
   // Block browser close/refresh when there's an unsaved path
-  const hasUnsavedPath = chain.length > 0 &&
-    chain.filter((c) => c.selectedIdx !== null).length > 1;
+  const hasUnsavedPath =
+    chain.length > 0 && chain.filter((c) => c.selectedIdx !== null).length > 1;
   useEffect(() => {
     if (!hasUnsavedPath) return;
     const handler = (e: BeforeUnloadEvent) => {
@@ -299,14 +305,16 @@ function DiscoveryContent() {
       const anchor = (e.target as HTMLElement).closest("a");
       if (!anchor) return;
       const href = anchor.getAttribute("href");
-      if (!href || !href.startsWith("/") || href.startsWith("/discovery")) return;
+      if (!href || !href.startsWith("/") || href.startsWith("/discovery"))
+        return;
       e.preventDefault();
       e.stopPropagation();
       setPendingHref(href);
       setNavPromptName("");
     };
     document.addEventListener("click", handler, { capture: true });
-    return () => document.removeEventListener("click", handler, { capture: true });
+    return () =>
+      document.removeEventListener("click", handler, { capture: true });
   }, [hasUnsavedPath]);
 
   // Measure selected card positions and compute SVG connector paths
@@ -403,7 +411,9 @@ function DiscoveryContent() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(`/api/similar?songId=${encodeURIComponent(seedId)}`);
+        const res = await fetch(
+          `/api/similar?songId=${encodeURIComponent(seedId)}`,
+        );
         if (!res.ok || cancelled) return;
         const json = await res.json();
         if (cancelled) return;
@@ -414,7 +424,9 @@ function DiscoveryContent() {
         // D-04: if seedId fetch fails, chain opens empty
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [seedId, chain.length, startChain]);
 
   const selectSong = useCallback(
@@ -422,9 +434,9 @@ function DiscoveryContent() {
       const selectedSong = chain[depth].songs[idx];
 
       // Update selectedIdx at depth, truncate beyond it, add loading column
-      const truncated = chain.slice(0, depth + 1).map((col, i) =>
-        i === depth ? { ...col, selectedIdx: idx } : col,
-      );
+      const truncated = chain
+        .slice(0, depth + 1)
+        .map((col, i) => (i === depth ? { ...col, selectedIdx: idx } : col));
       const withLoading: Column[] = [
         ...truncated,
         { songs: [], selectedIdx: null, isLoading: true },
@@ -507,14 +519,18 @@ function DiscoveryContent() {
       <Dialog
         open={!!pendingHref}
         onOpenChange={(open) => {
-          if (!open) { setPendingHref(null); setNavPromptName(""); }
+          if (!open) {
+            setPendingHref(null);
+            setNavPromptName("");
+          }
         }}
       >
         <DialogContent showCloseButton={false}>
           <DialogHeader>
             <DialogTitle>Unsaved path</DialogTitle>
             <DialogDescription>
-              You have a {activePath.length}-song discovery path. Save it as a playlist before leaving?
+              You have a {activePath.length}-song discovery path. Save it as a
+              playlist before leaving?
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={saveAndNavigate} className="flex flex-col gap-2 pt-1">
@@ -549,7 +565,10 @@ function DiscoveryContent() {
               type="button"
               variant="ghost"
               size="default"
-              onClick={() => { setPendingHref(null); setNavPromptName(""); }}
+              onClick={() => {
+                setPendingHref(null);
+                setNavPromptName("");
+              }}
               className="flex-1"
             >
               Stay on page
@@ -586,19 +605,31 @@ function DiscoveryContent() {
             Ranked by
           </span>
           <span className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground">
-            <span className="text-[color:var(--color-chart-4)] font-semibold">①</span>
+            <span className="text-[color:var(--color-chart-3)] font-semibold">
+              ①
+            </span>
             Camelot key compatibility
-            <span className="text-muted-foreground/40">— same / relative / adjacent (±1)</span>
+            <span className="text-muted-foreground/30">
+              — same / relative / adjacent (±1)
+            </span>
           </span>
           <span className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground">
-            <span className="text-[color:var(--color-chart-3)] font-semibold">②</span>
+            <span className="text-[color:var(--color-chart-3)] font-semibold">
+              ②
+            </span>
             BPM proximity
-            <span className="text-muted-foreground/40">— within ±10% or ±20%</span>
+            <span className="text-muted-foreground/40">
+              — within ±10% or ±20%
+            </span>
           </span>
           <span className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground">
-            <span className="text-muted-foreground/60 font-semibold">③</span>
+            <span className="text-[color:var(--color-chart-3)] font-semibold">
+              ③
+            </span>
             Shared tags
-            <span className="text-muted-foreground/40">— genre, feel, language hard-filtered</span>
+            <span className="text-muted-foreground/40">
+              — genre, feel, language hard-filtered
+            </span>
           </span>
         </div>
       </div>
@@ -624,7 +655,10 @@ function DiscoveryContent() {
           className="flex-1 overflow-x-auto overflow-y-hidden px-6 pb-4"
           style={{ scrollbarWidth: "thin" }}
         >
-          <div ref={innerRef} className="relative flex items-start gap-0 min-w-max min-h-full pt-2">
+          <div
+            ref={innerRef}
+            className="relative flex items-start gap-0 min-w-max min-h-full pt-2"
+          >
             {/* SVG connector lines between selected cards */}
             {connectorPaths.length > 0 && (
               <svg

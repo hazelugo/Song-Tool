@@ -62,6 +62,28 @@ export async function GET(request: Request) {
   }
 }
 
+async function resolvePlaylistName(userId: string, base: string): Promise<string> {
+  // Fetch all non-deleted playlists whose name equals the base or matches "base N"
+  const rows = await db
+    .select({ name: playlists.name })
+    .from(playlists)
+    .where(
+      and(
+        eq(playlists.userId, userId),
+        isNull(playlists.deletedAt),
+        sql`(${playlists.name} = ${base} OR ${playlists.name} LIKE ${base + " %"})`,
+      ),
+    );
+
+  const taken = new Set(rows.map((r) => r.name));
+  if (!taken.has(base)) return base;
+
+  // Find the lowest available "base N" (N >= 2)
+  let n = 2;
+  while (taken.has(`${base} ${n}`)) n++;
+  return `${base} ${n}`;
+}
+
 export async function POST(request: Request) {
   const { userId, error: authError } = await requireUser();
   if (authError) return authError;
@@ -78,6 +100,7 @@ export async function POST(request: Request) {
     }
 
     const { name, items } = result.data;
+    const resolvedName = await resolvePlaylistName(userId, name);
 
     const playlistId = randomUUID();
 
@@ -85,7 +108,7 @@ export async function POST(request: Request) {
       await tx.insert(playlists).values({
         id: playlistId,
         userId,
-        name: name,
+        name: resolvedName,
       });
 
       if (items.length > 0) {

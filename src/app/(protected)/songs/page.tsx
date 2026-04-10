@@ -10,7 +10,7 @@ import { SongFilters } from "@/components/songs/song-filters";
 import { CsvImportDialog } from "@/components/songs/csv-import-dialog";
 import {
   PlaylistBuilder,
-  PlaylistItem,
+  type PlaylistItem,
 } from "@/components/playlist-builder";
 export const dynamic = "force-dynamic";
 
@@ -23,6 +23,8 @@ function SongsPageContent() {
   );
   const searchParams = useSearchParams();
   const [showPlaylistBuilder, setShowPlaylistBuilder] = useState(false);
+  const [selectedSongs, setSelectedSongs] = useState<SongWithTags[]>([]);
+  const [initialPlaylistItems, setInitialPlaylistItems] = useState<PlaylistItem[]>([]);
   const router = useRouter();
   const playlistId = searchParams.get("id");
   const [pageIndex, setPageIndex] = useState(0);
@@ -103,6 +105,7 @@ function SongsPageContent() {
     return (
       <PlaylistBuilder
         availableSongs={songs}
+        initialItems={initialPlaylistItems}
         onSave={savePlaylist}
         onClose={() => setShowPlaylistBuilder(false)}
       />
@@ -118,11 +121,26 @@ function SongsPageContent() {
           <Button
             variant="default"
             size="sm"
-            onClick={() => setShowPlaylistBuilder(true)}
+            onClick={() => {
+              if (selectedSongs.length > 0) {
+                setInitialPlaylistItems(
+                  selectedSongs.map((song, i) => ({
+                    id: crypto.randomUUID(),
+                    song,
+                    rank: i + 1,
+                  })),
+                );
+              } else {
+                setInitialPlaylistItems([]);
+              }
+              setShowPlaylistBuilder(true);
+            }}
             disabled={songs.length === 0}
             className="h-7 text-xs rounded-sm"
           >
-            Save as Playlist
+            {selectedSongs.length > 0
+              ? `Save ${selectedSongs.length} as Playlist`
+              : "Save as Playlist"}
           </Button>
           <CsvImportDialog onSuccess={loadSongs} />
           <Button variant="default" onClick={openAddSheet} size="sm" className="h-7 text-xs rounded-sm">
@@ -161,6 +179,7 @@ function SongsPageContent() {
           onPageChange={setPageIndex}
           sorting={sorting}
           onSortingChange={handleSortingChange}
+          onSelectionChange={setSelectedSongs}
         />
       )}
 

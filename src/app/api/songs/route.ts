@@ -44,10 +44,14 @@ export async function GET(request: Request) {
     }
 
     if (f.lyric) {
-      // Search both song title (ILIKE) and lyrics (FTS). OR so either match returns the song.
+      // Search title, artist, lyrics (FTS), and tags — all via one bar.
       // Use websearch_to_tsquery for lyrics — NOT to_tsquery, which fails on raw user input.
+      const tagSq = db
+        .select({ id: sql<number>`1` })
+        .from(tags)
+        .where(and(eq(tags.songId, songs.id), ilike(tags.name, "%" + f.lyric + "%")));
       conditions.push(
-        sql`(${songs.name} ILIKE ${"%" + f.lyric + "%"} OR ${songs.artist} ILIKE ${"%" + f.lyric + "%"} OR ${songs.lyricsSearch} @@ websearch_to_tsquery('english', ${f.lyric}))`,
+        sql`(${songs.name} ILIKE ${"%" + f.lyric + "%"} OR ${songs.artist} ILIKE ${"%" + f.lyric + "%"} OR ${songs.lyricsSearch} @@ websearch_to_tsquery('english', ${f.lyric}) OR ${exists(tagSq)})`,
       );
     }
 

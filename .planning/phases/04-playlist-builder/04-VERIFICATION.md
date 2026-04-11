@@ -56,9 +56,9 @@ human_verification:
 | 19 | User can add songs via AddSongsDialog (POST /api/playlists/[id]/songs) | VERIFIED | Dialog fetches /api/songs, multi-select, POST songIds array on save |
 | 20 | User can see suggestions via "Suggest songs" header button (SuggestionsPanel) | VERIFIED | PlaylistActions renders Suggest songs Button (Sparkles); SuggestionsPanel controlled |
 | 21 | User can export playlist as CSV/JSON/print with Artist + Time Signature | VERIFIED | ExportMenu CSV has 7 columns including Artist and Time Signature |
-| 22 | sonner package installed — playlists/page.tsx and layout.tsx compile | FAILED | sonner in package.json but npm ls sonner shows empty; tsc TS2307 errors |
+| 22 | sonner package installed — playlists/page.tsx and layout.tsx compile | PASS | sonner@2.0.7 confirmed installed (2026-04-11) — prior FAIL was stale |
 
-**Score:** 21/22 truths verified (1 infrastructure gap)
+**Score:** 22/22 truths verified
 
 ---
 

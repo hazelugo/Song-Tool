@@ -8,6 +8,7 @@ async function createSong(request: any, name: string) {
       bpm: 120,
       musicalKey: "C",
       keySignature: "major",
+      timeSignature: "4/4",
       chordProgressions: "",
       tags: [],
     },

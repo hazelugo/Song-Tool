@@ -8,6 +8,7 @@ async function createSong(request: any, name: string) {
       bpm: 120,
       musicalKey: "C",
       keySignature: "major",
+      timeSignature: "4/4",
       chordProgressions: "",
       tags: [],
     },
@@ -114,6 +115,103 @@ async function dragToReorder(
   await page.mouse.move(endX, endY, { steps: 20 });
   await page.mouse.up();
 }
+
+test.describe("Playlists — songCount field", () => {
+  test("GET /api/playlists returns songCount=0 for a newly created empty playlist", async ({
+    request,
+  }) => {
+    const res = await request.post("/api/playlists", {
+      data: { name: "Empty Playlist For SongCount Test", items: [] },
+    });
+    expect(res.ok()).toBeTruthy();
+    const created = await res.json();
+
+    const listRes = await request.get("/api/playlists");
+    expect(listRes.ok()).toBeTruthy();
+    const body = await listRes.json();
+    // Response shape: { data: [...], total, page, limit }
+    const list: any[] = body.data;
+    const found = list.find((p: any) => p.id === created.id);
+    expect(found).toBeDefined();
+    expect(typeof found.songCount).toBe("number");
+    expect(found.songCount).toBe(0);
+  });
+
+  test("GET /api/playlists returns songCount equal to number of songs in playlist", async ({
+    request,
+  }) => {
+    const songId1 = await createSong(request, "SongCount Track 1");
+    const songId2 = await createSong(request, "SongCount Track 2");
+
+    const res = await request.post("/api/playlists", {
+      data: {
+        name: "SongCount Playlist",
+        items: [
+          { song: { id: songId1 }, rank: 10000 },
+          { song: { id: songId2 }, rank: 20000 },
+        ],
+      },
+    });
+    expect(res.ok()).toBeTruthy();
+    const created = await res.json();
+
+    const listRes = await request.get("/api/playlists");
+    expect(listRes.ok()).toBeTruthy();
+    const body = await listRes.json();
+    const list: any[] = body.data;
+    const found = list.find((p: any) => p.id === created.id);
+    expect(found).toBeDefined();
+    expect(found.songCount).toBe(2);
+  });
+});
+
+test.describe("Playlists — song fields in detail endpoint", () => {
+  test("GET /api/playlists/{id} returns artist, timeSignature, youtubeUrl, spotifyUrl on each song object", async ({
+    request,
+  }) => {
+    // Create a song with all the extra fields
+    const songRes = await request.post("/api/songs", {
+      data: {
+        name: "Song With All Fields",
+        artist: "Test Artist",
+        bpm: 120,
+        musicalKey: "C",
+        keySignature: "major",
+        timeSignature: "3/4",
+        chordProgressions: "",
+        youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        spotifyUrl: "https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT",
+        tags: [],
+      },
+    });
+    expect(songRes.ok()).toBeTruthy();
+    const song = await songRes.json();
+
+    const playlistRes = await request.post("/api/playlists", {
+      data: {
+        name: "Song Fields Test Playlist",
+        items: [{ song: { id: song.id }, rank: 10000 }],
+      },
+    });
+    expect(playlistRes.ok()).toBeTruthy();
+    const playlist = await playlistRes.json();
+
+    const detailRes = await request.get(`/api/playlists/${playlist.id}`);
+    expect(detailRes.ok()).toBeTruthy();
+    const detail = await detailRes.json();
+
+    expect(detail.songs).toHaveLength(1);
+    const songEntry = detail.songs[0].song;
+    expect(songEntry.artist).toBe("Test Artist");
+    expect(songEntry.timeSignature).toBe("3/4");
+    expect(songEntry.youtubeUrl).toBe(
+      "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    );
+    expect(songEntry.spotifyUrl).toBe(
+      "https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT",
+    );
+  });
+});
 
 test.describe("Playlists — Reorder", () => {
   test("PLAY-05: drag first song to last position; order updates in UI and persists", async ({

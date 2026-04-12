@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 import type { SongWithTags } from "@/db/schema";
 import { ChainCard } from "@/components/discovery/chain-card";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -36,7 +36,13 @@ type Column = {
 
 // ─── Animated column wrapper ────────────────────────────────────────────────
 
-function SlideIn({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+function SlideIn({
+  children,
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  delay?: number;
+}) {
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), delay);
@@ -254,23 +260,34 @@ function DiscoveryContent() {
   const innerRef = useRef<HTMLDivElement>(null);
   const [connectorPaths, setConnectorPaths] = useState<string[]>([]);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const seedId = searchParams.get("seedId");
 
-  // Scroll to reveal new columns or when last column finishes loading
+  // Scroll to reveal new columns or when last column finishes loading.
+  // Double-rAF: first frame commits the new DOM nodes, second frame fires
+  // after layout so scrollWidth is fully updated before we read it.
   const lastColLoading = chain[chain.length - 1]?.isLoading ?? false;
   useEffect(() => {
     if (chain.length <= 1) return;
-    const frame = requestAnimationFrame(() => {
-      scrollRef.current?.scrollTo({
-        left: scrollRef.current.scrollWidth,
-        behavior: "smooth",
+    let outer: number;
+    let inner: number;
+    outer = requestAnimationFrame(() => {
+      inner = requestAnimationFrame(() => {
+        scrollRef.current?.scrollTo({
+          left: scrollRef.current.scrollWidth,
+          behavior: "smooth",
+        });
       });
     });
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(outer);
+      cancelAnimationFrame(inner);
+    };
   }, [chain.length, lastColLoading]);
 
   // Block browser close/refresh when there's an unsaved path
-  const hasUnsavedPath = chain.length > 0 &&
-    chain.filter((c) => c.selectedIdx !== null).length > 1;
+  const hasUnsavedPath =
+    chain.length > 0 && chain.filter((c) => c.selectedIdx !== null).length > 1;
   useEffect(() => {
     if (!hasUnsavedPath) return;
     const handler = (e: BeforeUnloadEvent) => {
@@ -288,14 +305,16 @@ function DiscoveryContent() {
       const anchor = (e.target as HTMLElement).closest("a");
       if (!anchor) return;
       const href = anchor.getAttribute("href");
-      if (!href || !href.startsWith("/") || href.startsWith("/discovery")) return;
+      if (!href || !href.startsWith("/") || href.startsWith("/discovery"))
+        return;
       e.preventDefault();
       e.stopPropagation();
       setPendingHref(href);
       setNavPromptName("");
     };
     document.addEventListener("click", handler, { capture: true });
-    return () => document.removeEventListener("click", handler, { capture: true });
+    return () =>
+      document.removeEventListener("click", handler, { capture: true });
   }, [hasUnsavedPath]);
 
   // Measure selected card positions and compute SVG connector paths
@@ -386,14 +405,38 @@ function DiscoveryContent() {
     [loadSimilar],
   );
 
+  // Auto-start chain when seedId param is present (must be after startChain definition)
+  useEffect(() => {
+    if (!seedId || chain.length > 0) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(
+          `/api/similar?songId=${encodeURIComponent(seedId)}`,
+        );
+        if (!res.ok || cancelled) return;
+        const json = await res.json();
+        if (cancelled) return;
+        if (json.seed) {
+          startChain(json.seed);
+        }
+      } catch {
+        // D-04: if seedId fetch fails, chain opens empty
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [seedId, chain.length, startChain]);
+
   const selectSong = useCallback(
     async (depth: number, idx: number) => {
       const selectedSong = chain[depth].songs[idx];
 
       // Update selectedIdx at depth, truncate beyond it, add loading column
-      const truncated = chain.slice(0, depth + 1).map((col, i) =>
-        i === depth ? { ...col, selectedIdx: idx } : col,
-      );
+      const truncated = chain
+        .slice(0, depth + 1)
+        .map((col, i) => (i === depth ? { ...col, selectedIdx: idx } : col));
       const withLoading: Column[] = [
         ...truncated,
         { songs: [], selectedIdx: null, isLoading: true },
@@ -476,14 +519,18 @@ function DiscoveryContent() {
       <Dialog
         open={!!pendingHref}
         onOpenChange={(open) => {
-          if (!open) { setPendingHref(null); setNavPromptName(""); }
+          if (!open) {
+            setPendingHref(null);
+            setNavPromptName("");
+          }
         }}
       >
         <DialogContent showCloseButton={false}>
           <DialogHeader>
             <DialogTitle>Unsaved path</DialogTitle>
             <DialogDescription>
-              You have a {activePath.length}-song discovery path. Save it as a playlist before leaving?
+              You have a {activePath.length}-song discovery path. Save it as a
+              playlist before leaving?
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={saveAndNavigate} className="flex flex-col gap-2 pt-1">
@@ -518,7 +565,10 @@ function DiscoveryContent() {
               type="button"
               variant="ghost"
               size="default"
-              onClick={() => { setPendingHref(null); setNavPromptName(""); }}
+              onClick={() => {
+                setPendingHref(null);
+                setNavPromptName("");
+              }}
               className="flex-1"
             >
               Stay on page
@@ -531,7 +581,7 @@ function DiscoveryContent() {
       <div className="flex-none flex flex-col gap-4 p-6 pb-4 max-w-6xl w-full mx-auto">
         <div className="flex items-center justify-between border-b border-border/60 pb-3">
           <div className="flex items-center gap-2.5">
-            <h1 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            <h1 className="text-sm font-semibold uppercase tracking-widest text-foreground">
               Discovery
             </h1>
             {hasChain && (
@@ -550,24 +600,24 @@ function DiscoveryContent() {
         <SeedSearch onSelect={startChain} />
 
         {/* Ranking legend */}
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 border border-border/40 bg-muted/10 rounded-sm px-3 py-2">
-          <span className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground/50 shrink-0">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border border-border/40 bg-muted/10 rounded-sm px-3 py-2.5">
+          <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/60 shrink-0">
             Ranked by
           </span>
-          <span className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground">
-            <span className="text-[color:var(--color-chart-4)] font-semibold">①</span>
+          <span className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground">
+            <span className="text-[color:var(--color-chart-3)] font-semibold">①</span>
             Camelot key compatibility
-            <span className="text-muted-foreground/40">— same / relative / adjacent (±1)</span>
+            <span className="text-muted-foreground/50">— same / relative / adjacent (±1)</span>
           </span>
-          <span className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground">
+          <span className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground">
             <span className="text-[color:var(--color-chart-3)] font-semibold">②</span>
             BPM proximity
-            <span className="text-muted-foreground/40">— within ±10% or ±20%</span>
+            <span className="text-muted-foreground/50">— within ±10% or ±20%</span>
           </span>
-          <span className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground">
-            <span className="text-muted-foreground/60 font-semibold">③</span>
+          <span className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground">
+            <span className="text-[color:var(--color-chart-3)] font-semibold">③</span>
             Shared tags
-            <span className="text-muted-foreground/40">— genre, feel, language hard-filtered</span>
+            <span className="text-muted-foreground/50">— genre, feel, language hard-filtered</span>
           </span>
         </div>
       </div>
@@ -575,10 +625,10 @@ function DiscoveryContent() {
       {/* Empty state */}
       {!hasChain && (
         <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center px-6 pb-24">
-          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground/50">
+            <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground/70">
             Search for a song to begin
           </p>
-          <p className="text-sm text-muted-foreground/40 max-w-sm leading-relaxed">
+          <p className="text-sm text-muted-foreground/60 max-w-sm leading-relaxed">
             Select a song from your catalog. It will branch into similar songs,
             which branch further — follow the chain or save your path as a
             playlist.
@@ -593,7 +643,10 @@ function DiscoveryContent() {
           className="flex-1 overflow-x-auto overflow-y-hidden px-6 pb-4"
           style={{ scrollbarWidth: "thin" }}
         >
-          <div ref={innerRef} className="relative flex items-start gap-0 min-w-max min-h-full pt-2">
+          <div
+            ref={innerRef}
+            className="relative flex items-start gap-0 min-w-max min-h-full pt-2"
+          >
             {/* SVG connector lines between selected cards */}
             {connectorPaths.length > 0 && (
               <svg

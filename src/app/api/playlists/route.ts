@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { playlists, playlistSongs } from "@/db/schema";
-import { and, eq, isNull, desc, count } from "drizzle-orm";
+import { and, eq, isNull, desc, count, sql } from "drizzle-orm";
 import { z } from "zod";
 import { randomUUID } from "crypto";
 import { requireUser } from "@/lib/auth";
@@ -34,9 +34,18 @@ export async function GET(request: Request) {
   try {
     const [data, [{ total }]] = await Promise.all([
       db
-        .select()
+        .select({
+          id: playlists.id,
+          name: playlists.name,
+          updatedAt: playlists.updatedAt,
+          userId: playlists.userId,
+          deletedAt: playlists.deletedAt,
+          songCount: sql<number>`cast(count(${playlistSongs.songId}) as integer)`,
+        })
         .from(playlists)
+        .leftJoin(playlistSongs, eq(playlistSongs.playlistId, playlists.id))
         .where(where)
+        .groupBy(playlists.id)
         .orderBy(desc(playlists.updatedAt))
         .limit(limit)
         .offset(offset),
@@ -51,6 +60,28 @@ export async function GET(request: Request) {
       { status: 500 },
     );
   }
+}
+
+async function resolvePlaylistName(userId: string, base: string): Promise<string> {
+  // Fetch all non-deleted playlists whose name equals the base or matches "base N"
+  const rows = await db
+    .select({ name: playlists.name })
+    .from(playlists)
+    .where(
+      and(
+        eq(playlists.userId, userId),
+        isNull(playlists.deletedAt),
+        sql`(${playlists.name} = ${base} OR ${playlists.name} LIKE ${base + " %"})`,
+      ),
+    );
+
+  const taken = new Set(rows.map((r) => r.name));
+  if (!taken.has(base)) return base;
+
+  // Find the lowest available "base N" (N >= 2)
+  let n = 2;
+  while (taken.has(`${base} ${n}`)) n++;
+  return `${base} ${n}`;
 }
 
 export async function POST(request: Request) {
@@ -69,6 +100,7 @@ export async function POST(request: Request) {
     }
 
     const { name, items } = result.data;
+    const resolvedName = await resolvePlaylistName(userId, name);
 
     const playlistId = randomUUID();
 
@@ -76,7 +108,7 @@ export async function POST(request: Request) {
       await tx.insert(playlists).values({
         id: playlistId,
         userId,
-        name: name,
+        name: resolvedName,
       });
 
       if (items.length > 0) {

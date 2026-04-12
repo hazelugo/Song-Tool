@@ -12,6 +12,7 @@ interface PlaylistSummary {
   id: string;
   name: string;
   updatedAt: string;
+  songCount: number;
 }
 
 const PAGE_SIZE = 25;
@@ -68,10 +69,12 @@ export default function ViewPlaylistsPage() {
     if (!res.ok) throw new Error("Failed to save playlist");
     const data = await res.json();
     toast.success(`"${name}" saved`);
+    setShowBuilder(false);
     router.push(`/playlists/${data.id}`);
   };
 
   const handleDelete = async (id: string, name: string) => {
+    if (!window.confirm(`Delete "${name}"? This cannot be undone.`)) return;
     setDeletingId(id);
     try {
       const res = await fetch(`/api/playlists/${id}`, { method: "DELETE" });
@@ -102,7 +105,7 @@ export default function ViewPlaylistsPage() {
     <div className="flex flex-col gap-4 p-6 max-w-6xl mx-auto w-full">
       {/* Header row */}
       <div className="flex items-center justify-between border-b border-border/60 pb-3">
-        <h1 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+        <h1 className="text-sm font-semibold uppercase tracking-widest text-foreground">
           Playlists
         </h1>
         <Button
@@ -137,9 +140,14 @@ export default function ViewPlaylistsPage() {
                   className="flex-1 flex items-center justify-between px-4 py-3 min-w-0"
                 >
                   <span className="font-medium text-sm truncate">{playlist.name}</span>
-                  <span className="text-[10px] font-mono text-muted-foreground tabular-nums shrink-0 ml-4">
-                    {new Date(playlist.updatedAt).toLocaleDateString()}
-                  </span>
+                  <div className="flex items-center gap-3 shrink-0 ml-4">
+                    <span className="text-xs font-mono text-muted-foreground tabular-nums">
+                      {playlist.songCount} {playlist.songCount !== 1 ? "songs" : "song"}
+                    </span>
+                    <span className="text-[10px] font-mono text-muted-foreground tabular-nums">
+                      Last updated {new Date(playlist.updatedAt).toLocaleDateString()}
+                    </span>
+                  </div>
                 </Link>
                 <div className="pr-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                   <Button

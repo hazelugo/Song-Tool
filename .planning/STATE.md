@@ -1,40 +1,41 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: complete
-stopped_at: Phase 4 complete — all plans executed by Gemini
-last_updated: "2026-03-13T00:00:00.000Z"
-last_activity: 2026-03-11 — Phases 2, 3, 4 executed by Gemini; planning files backfilled 2026-03-13
+milestone: v1.1
+milestone_name: (unscoped)
+status: idle
+stopped_at: v1.0 milestone complete
+last_updated: "2026-04-11T05:24:15.928Z"
+last_activity: 2026-04-11
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 11
-  completed_plans: 11
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-09)
+See: .planning/PROJECT.md (updated 2026-04-11)
 
 **Core value:** Find songs that share musical DNA — match by BPM, key, key signature, or chord progressions — so building a set that flows is fast and musical.
-**Current focus:** v1.0 COMPLETE — all 4 phases shipped
+**Current focus:** Planning v1.1 — run `/gsd-new-milestone` to scope next work
 
 ## Current Position
 
-Phase: 4 of 4 (Playlist Builder) — COMPLETE
-Plan: 4 of 4 in current phase — COMPLETE
-Status: v1.0 milestone complete
-Last activity: 2026-03-11 — Phase 4 (Playlist Builder) fully implemented by Gemini
+Phase: — (between milestones)
+Status: v1.0 MVP shipped 2026-04-11
 
-Progress: [██████████] 100%
+Last activity: 2026-04-11
+
+Progress: [          ] 0% (v1.1 not yet scoped)
 
 ## Performance Metrics
 
 **Velocity:**
+
 - Total plans completed: 11
 - Average duration: ~45min
 - Total execution time: ~8 hours
@@ -49,6 +50,7 @@ Progress: [██████████] 100%
 | 04-playlist-builder | 4 | ~220min | ~55min |
 
 **Recent Trend:**
+
 - Last 5 plans: 03-02, 04-01, 04-02, 04-03, 04-04
 - Trend: Steady velocity, Phases 2–4 executed by Gemini
 
@@ -57,6 +59,9 @@ Progress: [██████████] 100%
 | Phase 01-foundation P01 | 18 | 3 tasks | 22 files |
 | Phase 01-foundation P02 | 2327 | 2 tasks | 8 files |
 | Phase 01-foundation P02 | 15 | 3 tasks | 8 files |
+| Phase 04-playlist-builder P05 | 8 | 2 tasks | 3 files |
+| Phase 04-playlist-builder P06 | 12 | 1 tasks | 1 files |
+| Phase 04-playlist-builder P07 | 532 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -89,6 +94,11 @@ Recent decisions affecting current work:
 - [Phase 04-playlist-builder]: Camelot Wheel suggestions: BPM ±15 (1pt) + key compatibility 2-3pt; top 10 returned
 - [Phase 04-playlist-builder]: ExportMenu is client-side blob download (no server streaming endpoint)
 - [Phase 04-playlist-builder]: Playlist detail page is Next.js server component; PlaylistEditor hydrates as 'use client'
+- [Phase 04-playlist-builder]: setShowBuilder(false) before router.push — builder overlay blocks navigation without dismiss
+- [Phase 04-playlist-builder]: PlaylistBuilder Save button awaits onSave to prevent race condition mid-unmount
+- [Phase 04-playlist-builder]: PlaylistBuilder: DragOverlay with opacity-30 placeholder and itemSongIds Set exclusion filter matches PlaylistEditor UX pattern
+- [Phase 04-playlist-builder]: PlaylistActions client wrapper isolates open/close state while keeping page.tsx as server component
+- [Phase 04-playlist-builder]: SuggestionsPanel converted to fully controlled component — open/onOpenChange props
 
 ### Pending Todos
 
@@ -100,6 +110,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-13T00:00:00.000Z
-Stopped at: v1.0 milestone complete — planning files backfilled for Phases 2-4
-Resume file: N/A — all phases complete. Next work: v2 planning or fix /api/discovery endpoint.
+Last session: 2026-04-10T04:09:39.775Z
+Stopped at: Completed 04-07-PLAN.md
+Resume file: None

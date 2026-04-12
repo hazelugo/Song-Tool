@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   DndContext,
@@ -10,6 +10,8 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
+  DragStartEvent,
+  DragOverlay,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -71,7 +73,7 @@ function SortablePlaylistItem({
       style={style}
       className={cn(
         "flex items-center gap-3 p-3 rounded-md border bg-card transition-all hover:border-primary/50",
-        isDragging ? "opacity-50 ring-2 ring-primary ring-offset-2" : "",
+        isDragging ? "opacity-30" : "",
       )}
     >
       <div
@@ -110,15 +112,23 @@ export function PlaylistBuilder({
   const [name, setName] = useState(initialName);
   const [items, setItems] = useState<PlaylistItem[]>(initialItems);
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
 
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
+    setActiveId(null);
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
@@ -156,14 +166,22 @@ export function PlaylistBuilder({
     setItems(items.filter((item) => item.id !== id));
   };
 
-  const filteredSongs = availableSongs.filter((song) => {
+  // Build a Set of song IDs already in the playlist to exclude from library
+  const itemSongIds = useMemo(
+    () => new Set(items.map((item) => item.song.id)),
+    [items],
+  );
+
+  const filteredSongs = useMemo(() => {
     const term = searchQuery.toLowerCase();
-    return (
-      song.name.toLowerCase().includes(term) ||
-      song.musicalKey.toLowerCase().includes(term) ||
-      song.bpm.toString().includes(term)
+    return availableSongs.filter(
+      (song) =>
+        !itemSongIds.has(song.id) &&
+        (song.name.toLowerCase().includes(term) ||
+          song.musicalKey.toLowerCase().includes(term) ||
+          song.bpm.toString().includes(term)),
     );
-  });
+  }, [availableSongs, searchQuery, itemSongIds]);
 
   const libraryScrollRef = useRef<HTMLDivElement>(null);
   const rowVirtualizer = useVirtualizer({
@@ -172,6 +190,8 @@ export function PlaylistBuilder({
     estimateSize: () => 60,
     overscan: 5,
   });
+
+  const activeItem = activeId ? items.find((i) => i.id === activeId) : null;
 
   return (
     <div className="flex h-full flex-col">
@@ -252,7 +272,7 @@ export function PlaylistBuilder({
                   <Trash2 className="h-4 w-4 mr-2" /> Delete
                 </Button>
               )}
-              <Button onClick={() => onSave(name, items)}>Save Playlist</Button>
+              <Button onClick={async () => { await onSave(name, items); }}>Save Playlist</Button>
             </div>
           </div>
 
@@ -267,7 +287,9 @@ export function PlaylistBuilder({
                 <DndContext
                   sensors={sensors}
                   collisionDetection={closestCenter}
+                  onDragStart={handleDragStart}
                   onDragEnd={handleDragEnd}
+                  onDragCancel={() => setActiveId(null)}
                 >
                   <SortableContext
                     items={items.map((i) => i.id)}
@@ -281,6 +303,22 @@ export function PlaylistBuilder({
                       />
                     ))}
                   </SortableContext>
+
+                  <DragOverlay dropAnimation={null}>
+                    {activeItem ? (
+                      <div className="flex items-center gap-3 p-3 rounded-md border bg-card shadow-lg">
+                        <div className="cursor-grabbing text-muted-foreground">
+                          <GripVertical className="h-5 w-5" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-medium">{activeItem.song.name}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {activeItem.song.bpm} BPM • {activeItem.song.musicalKey}
+                          </div>
+                        </div>
+                      </div>
+                    ) : null}
+                  </DragOverlay>
                 </DndContext>
               )}
             </div>

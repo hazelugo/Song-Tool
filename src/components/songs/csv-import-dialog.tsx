@@ -79,7 +79,8 @@ function mapRow(raw: Record<string, string>): Partial<SongFormValues> & { tags: 
     : [];
 
   return {
-    name: get("name"),
+    name: get("name", "songname", "song_name", "title"),
+    artist: get("artist", "artistname", "artist_name") || undefined,
     bpm: get("bpm") as any,
     musicalKey: get("key", "musicalkey", "musical_key") as any,
     keySignature: get("keysig", "keysignature", "key_sig", "key_signature") as any,
@@ -142,14 +143,16 @@ export function CsvImportDialog({ onSuccess }: { onSuccess: () => void }) {
       const rawRows = parseCsv(text);
       const parsed: ParsedRow[] = rawRows.map((raw, i) => {
         const mapped = mapRow(raw);
+        const extraErrors: string[] = [];
+        if (!mapped.artist) extraErrors.push("artist: required");
         const result = songApiSchema.safeParse(mapped);
-        if (result.success) {
+        if (result.success && extraErrors.length === 0) {
           return { index: i + 1, mapped, validated: result.data, errors: [] };
         }
-        const errors = result.error.issues.map(
-          (issue) => `${issue.path.join(".")}: ${issue.message}`,
-        );
-        return { index: i + 1, mapped, validated: null, errors };
+        const schemaErrors = result.success
+          ? []
+          : result.error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`);
+        return { index: i + 1, mapped, validated: null, errors: [...extraErrors, ...schemaErrors] };
       });
       setRows(parsed);
       setStep("preview");
@@ -220,6 +223,7 @@ export function CsvImportDialog({ onSuccess }: { onSuccess: () => void }) {
             <div className="flex flex-col gap-4 py-2">
               <p className="text-sm text-muted-foreground">
                 CSV must have headers. Required:{" "}
+                <code className="text-xs bg-muted px-1 rounded">artist</code>,{" "}
                 <code className="text-xs bg-muted px-1 rounded">name</code>,{" "}
                 <code className="text-xs bg-muted px-1 rounded">bpm</code>,{" "}
                 <code className="text-xs bg-muted px-1 rounded">key</code>,{" "}
@@ -292,6 +296,7 @@ export function CsvImportDialog({ onSuccess }: { onSuccess: () => void }) {
                   <thead className="bg-muted/50 sticky top-0">
                     <tr>
                       <th className="px-2 py-1.5 text-left font-medium w-8">#</th>
+                      <th className="px-2 py-1.5 text-left font-medium">Artist</th>
                       <th className="px-2 py-1.5 text-left font-medium">Name</th>
                       <th className="px-2 py-1.5 text-left font-medium w-14">BPM</th>
                       <th className="px-2 py-1.5 text-left font-medium w-16">Key</th>
@@ -309,6 +314,7 @@ export function CsvImportDialog({ onSuccess }: { onSuccess: () => void }) {
                         )}
                       >
                         <td className="px-2 py-1.5 text-muted-foreground">{row.index}</td>
+                        <td className="px-2 py-1.5 max-w-[120px] truncate">{String(row.mapped.artist ?? "")}</td>
                         <td className="px-2 py-1.5 max-w-[160px] truncate">{String(row.mapped.name)}</td>
                         <td className="px-2 py-1.5">{String(row.mapped.bpm)}</td>
                         <td className="px-2 py-1.5">{String(row.mapped.musicalKey)}</td>

@@ -62,6 +62,7 @@ export const songs = pgTable(
     id: uuid("id").defaultRandom().primaryKey(),
     userId: uuid("user_id").notNull().default("f47ac10b-58cc-4372-a567-0e02b2c3d479"),
     name: text("name").notNull(),
+    artist: text("artist"),
     bpm: integer("bpm").notNull(),
     musicalKey: musicalKeyEnum("musical_key").notNull(),
     keySignature: keySignatureEnum("key_signature").notNull(),

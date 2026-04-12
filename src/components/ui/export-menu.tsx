@@ -13,9 +13,11 @@ import {
 
 interface ExportSong {
   name: string;
+  artist?: string | null;
   bpm: number | null;
   musicalKey: string | null;
   keySignature: string | null;
+  timeSignature?: string | null;
   lyrics?: string | null;
   tags?: { name: string }[];
 }
@@ -41,12 +43,14 @@ function toSafeFilename(name: string) {
 
 export function ExportMenu({ playlistName, songs }: ExportMenuProps) {
   const handleCsv = () => {
-    const headers = ["Name", "BPM", "Key", "Key Signature", "Tags"];
+    const headers = ["Artist", "Name", "BPM", "Key", "Key Signature", "Time Signature", "Tags"];
     const rows = songs.map((s) => [
+      `"${(s.artist ?? "").replace(/"/g, '""')}"`,
       `"${s.name.replace(/"/g, '""')}"`,
       s.bpm ?? "",
       s.musicalKey ?? "",
       s.keySignature ?? "",
+      s.timeSignature ? `="` + s.timeSignature.replace(/"/g, '""') + `"` : "",
       `"${(s.tags ?? []).map((t) => t.name).join(", ")}"`,
     ]);
     const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
@@ -59,9 +63,11 @@ export function ExportMenu({ playlistName, songs }: ExportMenuProps) {
       exportedAt: new Date().toISOString(),
       songs: songs.map((s) => ({
         name: s.name,
+        artist: s.artist ?? null,
         bpm: s.bpm,
         musicalKey: s.musicalKey,
         keySignature: s.keySignature,
+        timeSignature: s.timeSignature ?? null,
         tags: (s.tags ?? []).map((t) => t.name),
       })),
     };
@@ -79,16 +85,21 @@ export function ExportMenu({ playlistName, songs }: ExportMenuProps) {
           ? `${s.musicalKey} ${s.keySignature ?? ""}`.trim()
           : "—";
         const bpm = s.bpm ?? "—";
+        const timeSig = s.timeSignature ?? "—";
         const tags = (s.tags ?? []).map((t) => t.name).join(", ") || "—";
         const lyricsHtml = lyricsToHtml(s.lyrics);
         return `<div class="page">
           <div class="song-header">
             <span class="song-number">${i + 1}</span>
-            <h2 class="song-title">${s.name.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</h2>
+            <div>
+              <h2 class="song-title">${s.name.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</h2>
+              ${s.artist ? `<span class="song-artist">${s.artist.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</span>` : ""}
+            </div>
           </div>
           <div class="song-meta">
             <span>Key: <strong>${key}</strong></span>
             <span>BPM: <strong>${bpm}</strong></span>
+            <span>Time Sig: <strong>${timeSig}</strong></span>
             <span>Tags: ${tags}</span>
           </div>
           <div class="lyrics">${lyricsHtml}</div>
@@ -113,9 +124,10 @@ export function ExportMenu({ playlistName, songs }: ExportMenuProps) {
       gap: 16px;
     }
     .page:last-child { page-break-after: avoid; }
-    .song-header { display: flex; align-items: baseline; gap: 12px; border-bottom: 2px solid #000; padding-bottom: 10px; }
-    .song-number { font-size: 13px; color: #999; width: 20px; flex-shrink: 0; }
+    .song-header { display: flex; align-items: flex-start; gap: 12px; border-bottom: 2px solid #000; padding-bottom: 10px; }
+    .song-number { font-size: 13px; color: #999; width: 20px; flex-shrink: 0; margin-top: 8px; }
     .song-title { font-size: 26px; font-weight: bold; }
+    .song-artist { font-size: 14px; color: #555; display: block; margin-top: 2px; }
     .song-meta { display: flex; gap: 24px; font-size: 12px; color: #555; text-transform: uppercase; letter-spacing: 0.05em; }
     .song-meta strong { color: #000; }
     .lyrics { font-size: 15px; line-height: 1.8; margin-top: 8px; flex: 1; }
@@ -141,12 +153,14 @@ export function ExportMenu({ playlistName, songs }: ExportMenuProps) {
           ? `${s.musicalKey} ${s.keySignature ?? ""}`.trim()
           : "—";
         const bpm = s.bpm ?? "—";
+        const timeSig = s.timeSignature ?? "—";
         const tags = (s.tags ?? []).map((t) => t.name).join(", ") || "—";
         return `<tr>
           <td>${i + 1}</td>
-          <td>${s.name.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</td>
+          <td>${s.name.replace(/</g, "&lt;").replace(/>/g, "&gt;")}${s.artist ? `<br /><span class="artist">${s.artist.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</span>` : ""}</td>
           <td>${key}</td>
           <td>${bpm}</td>
+          <td>${timeSig}</td>
           <td>${tags}</td>
         </tr>`;
       })
@@ -165,13 +179,14 @@ export function ExportMenu({ playlistName, songs }: ExportMenuProps) {
     td { padding: 8px; border-bottom: 1px solid #ddd; font-size: 14px; vertical-align: top; }
     tr:last-child td { border-bottom: none; }
     td:first-child { color: #999; width: 28px; }
+    .artist { font-size: 12px; color: #666; }
     @media print { body { margin: 20px; } }
   </style>
 </head><body>
   <h1>${playlistName.replace(/</g, "&lt;")}</h1>
   <p class="meta">${songs.length} song${songs.length !== 1 ? "s" : ""} &middot; Printed ${new Date().toLocaleDateString()}</p>
   <table>
-    <thead><tr><th>#</th><th>Song</th><th>Key</th><th>BPM</th><th>Tags</th></tr></thead>
+    <thead><tr><th>#</th><th>Song</th><th>Key</th><th>BPM</th><th>Time Sig</th><th>Tags</th></tr></thead>
     <tbody>${rows}</tbody>
   </table>
 </body></html>`;

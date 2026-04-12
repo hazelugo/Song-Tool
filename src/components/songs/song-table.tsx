@@ -17,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowUpDown, ArrowUp, ArrowDown, Youtube, Music2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -58,6 +58,8 @@ interface SongTableProps {
   // Server-side sorting — omit to use client-side sorting
   sorting?: SortingState;
   onSortingChange?: (s: SortingState) => void;
+  // Row selection
+  onSelectionChange?: (selected: SongWithTags[]) => void;
 }
 
 function SortableHeader({ column, label }: { column: any; label: string }) {
@@ -79,8 +81,24 @@ function buildColumns(
 ): ColumnDef<SongWithTags>[] {
   return [
   {
+    id: "select",
+    header: () => null,
+    meta: { className: "w-8" },
+    enableSorting: false,
+    cell: ({ row }) => (
+      <input
+        type="checkbox"
+        checked={row.getIsSelected()}
+        onChange={row.getToggleSelectedHandler()}
+        onClick={(e) => e.stopPropagation()}
+        className="size-3.5 cursor-pointer accent-primary"
+        aria-label="Select song"
+      />
+    ),
+  },
+  {
     accessorKey: "name",
-    header: ({ column }) => <SortableHeader column={column} label="Name" />,
+    header: ({ column }) => <SortableHeader column={column} label="Title" />,
     // No fixed width — expands to fill available space alongside Tags
     cell: ({ row }) => {
       const song = row.original;
@@ -117,6 +135,18 @@ function buildColumns(
           )}
         </div>
       );
+    },
+  },
+  {
+    accessorKey: "artist",
+    header: () => (
+      <span className="text-xs uppercase tracking-widest font-medium text-muted-foreground">Artist</span>
+    ),
+    enableSorting: false,
+    meta: { className: "hidden md:table-cell" },
+    cell: ({ getValue }) => {
+      const v = getValue<string | null>();
+      return v ? <span className="text-sm text-muted-foreground">{v}</span> : null;
     },
   },
   {
@@ -197,10 +227,12 @@ export function SongTable({
   onPageChange,
   sorting: sortingProp,
   onSortingChange,
+  onSelectionChange,
 }: SongTableProps) {
   const [localSorting, setLocalSorting] = useState<SortingState>([]);
   const [embedSong, setEmbedSong] = useState<SongWithTags | null>(null);
   const [embedType, setEmbedType] = useState<"youtube" | "spotify" | null>(null);
+  const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
 
   const isManual = pageCount !== undefined && pageIndex !== undefined && onPageChange !== undefined;
   const isManualSort = sortingProp !== undefined && onSortingChange !== undefined;
@@ -216,6 +248,22 @@ export function SongTable({
       }
     : setLocalSorting;
 
+  // Clear selection when data changes (page turn, filter change)
+  useEffect(() => {
+    setRowSelection({});
+  }, [data]);
+
+  // Notify parent of selection changes
+  useEffect(() => {
+    if (!onSelectionChange) return;
+    const selectedIds = new Set(
+      Object.entries(rowSelection).filter(([, v]) => v).map(([k]) => k),
+    );
+    onSelectionChange(data.filter((s) => selectedIds.has(s.id)));
+  // data intentionally excluded: the clear effect above handles data changes
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rowSelection, onSelectionChange]);
+
   const columns = buildColumns((song, type) => {
     setEmbedSong(song);
     setEmbedType(type);
@@ -224,10 +272,14 @@ export function SongTable({
   const table = useReactTable({
     data,
     columns,
+    getRowId: (row) => row.id,
     state: {
       sorting,
+      rowSelection,
       ...(isManual ? { pagination: { pageIndex, pageSize: 25 } } : {}),
     },
+    enableRowSelection: true,
+    onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     ...(isManualSort ? { manualSorting: true } : { getSortedRowModel: getSortedRowModel() }),

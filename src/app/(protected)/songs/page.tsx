@@ -10,10 +10,8 @@ import { SongFilters } from "@/components/songs/song-filters";
 import { CsvImportDialog } from "@/components/songs/csv-import-dialog";
 import {
   PlaylistBuilder,
-  PlaylistItem,
+  type PlaylistItem,
 } from "@/components/playlist-builder";
-import { buildSimilarQuery } from "@/lib/similar-query";
-
 export const dynamic = "force-dynamic";
 
 function SongsPageContent() {
@@ -25,6 +23,8 @@ function SongsPageContent() {
   );
   const searchParams = useSearchParams();
   const [showPlaylistBuilder, setShowPlaylistBuilder] = useState(false);
+  const [selectedSongs, setSelectedSongs] = useState<SongWithTags[]>([]);
+  const [initialPlaylistItems, setInitialPlaylistItems] = useState<PlaylistItem[]>([]);
   const router = useRouter();
   const playlistId = searchParams.get("id");
   const [pageIndex, setPageIndex] = useState(0);
@@ -105,6 +105,7 @@ function SongsPageContent() {
     return (
       <PlaylistBuilder
         availableSongs={songs}
+        initialItems={initialPlaylistItems}
         onSave={savePlaylist}
         onClose={() => setShowPlaylistBuilder(false)}
       />
@@ -115,16 +116,31 @@ function SongsPageContent() {
     <div className="flex flex-col gap-4 p-6 max-w-6xl mx-auto w-full bg-card border border-border/40 rounded-sm">
       {/* Header row — DAW toolbar style */}
       <div className="flex items-center justify-between border-b border-border/60 pb-3">
-        <h1 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Songs</h1>
+        <h1 className="text-sm font-semibold uppercase tracking-widest text-foreground">Songs</h1>
         <div className="flex items-center gap-2">
           <Button
             variant="default"
             size="sm"
-            onClick={() => setShowPlaylistBuilder(true)}
+            onClick={() => {
+              if (selectedSongs.length > 0) {
+                setInitialPlaylistItems(
+                  selectedSongs.map((song, i) => ({
+                    id: crypto.randomUUID(),
+                    song,
+                    rank: i + 1,
+                  })),
+                );
+              } else {
+                setInitialPlaylistItems([]);
+              }
+              setShowPlaylistBuilder(true);
+            }}
             disabled={songs.length === 0}
             className="h-7 text-xs rounded-sm"
           >
-            Save as Playlist
+            {selectedSongs.length > 0
+              ? `Save ${selectedSongs.length} as Playlist`
+              : "Save as Playlist"}
           </Button>
           <CsvImportDialog onSuccess={loadSongs} />
           <Button variant="default" onClick={openAddSheet} size="sm" className="h-7 text-xs rounded-sm">
@@ -163,6 +179,7 @@ function SongsPageContent() {
           onPageChange={setPageIndex}
           sorting={sorting}
           onSortingChange={handleSortingChange}
+          onSelectionChange={setSelectedSongs}
         />
       )}
 
@@ -175,9 +192,7 @@ function SongsPageContent() {
         onFindSimilar={
           selectedSong
             ? () =>
-                router.push(
-                  `/discovery?q=${encodeURIComponent(buildSimilarQuery(selectedSong))}`,
-                )
+                router.push(`/discovery?seedId=${selectedSong.id}`)
             : undefined
         }
       />

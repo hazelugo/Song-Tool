@@ -32,7 +32,8 @@
       "Bash(npx -y gemini-mcp-tool --help)",
       "Bash(npx gemini-mcp-tool:*)",
       "Read(//c/Users/Hector/.gemini//**)",
-      "Read(//c/Users/Hector/.gemini/**)"
+      "Read(//c/Users/Hector/.gemini/**)",
+      "mcp__gemini-cli__brainstorm"
     ]
   }
 }

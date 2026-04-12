@@ -20,14 +20,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
 import { TagInput } from "./tag-input";
+import { LyricsEditor } from "./lyrics-editor";
 import Link from "next/link";
 import { Timer } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -48,7 +42,6 @@ export function SongForm({
 }: SongFormProps) {
   const [tags, setTags] = useState<string[]>(defaultValues?.tags ?? []);
   const [lyricsOpen, setLyricsOpen] = useState(false);
-  const [draftLyrics, setDraftLyrics] = useState("");
 
   const form = useForm<SongFormInput, unknown, SongFormValues>({
     resolver: zodResolver(songSchema),
@@ -270,10 +263,7 @@ export function SongForm({
               <Label>Lyrics</Label>
               <button
                 type="button"
-                onClick={() => {
-                  setDraftLyrics(form.getValues("lyrics") ?? "");
-                  setLyricsOpen(true);
-                }}
+                onClick={() => setLyricsOpen(true)}
                 className="text-xs text-primary hover:underline"
               >
                 Edit lyrics
@@ -288,10 +278,7 @@ export function SongForm({
             type="button"
             variant="ghost"
             size="sm"
-            onClick={() => {
-              setDraftLyrics("");
-              setLyricsOpen(true);
-            }}
+            onClick={() => setLyricsOpen(true)}
             className="text-muted-foreground"
           >
             + Add lyrics
@@ -304,38 +291,12 @@ export function SongForm({
         {isSubmitting ? "Saving..." : "Save Song"}
       </Button>
 
-      {/* Lyrics editor dialog */}
-      <Dialog open={lyricsOpen} onOpenChange={setLyricsOpen}>
-        <DialogContent className="max-w-2xl h-[80vh] flex flex-col gap-0 p-0">
-          <DialogHeader className="px-6 pt-6 pb-4 border-b">
-            <DialogTitle>Lyrics</DialogTitle>
-          </DialogHeader>
-          <Textarea
-            value={draftLyrics}
-            onChange={(e) => setDraftLyrics(e.target.value)}
-            placeholder="Enter lyrics..."
-            className="flex-1 resize-none rounded-none border-0 focus-visible:ring-0 font-mono text-sm leading-relaxed px-6 py-4"
-          />
-          <DialogFooter className="px-6 py-4 border-t">
-            <Button
-              type="button"
-              variant="default"
-              onClick={() => setLyricsOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              onClick={() => {
-                form.setValue("lyrics", draftLyrics, { shouldDirty: true });
-                setLyricsOpen(false);
-              }}
-            >
-              Save lyrics
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <LyricsEditor
+        open={lyricsOpen}
+        onOpenChange={setLyricsOpen}
+        value={form.watch("lyrics") ?? ""}
+        onChange={(v) => form.setValue("lyrics", v, { shouldDirty: true })}
+      />
     </form>
   );
 }

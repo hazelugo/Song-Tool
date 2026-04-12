@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight, X, ScrollText } from "lucide-react";
 import { getCamelotPosition, formatCamelot } from "@/lib/camelot";
 import { cn } from "@/lib/utils";
 import type { SongWithTags } from "@/db/schema";
+import { LyricsRenderer } from "@/components/songs/lyrics-renderer";
 
 interface Props {
   playlistName: string;
@@ -17,6 +18,7 @@ interface Props {
 export function LiveMode({ playlistName, songs, backHref }: Props) {
   const [index, setIndex] = useState(0);
   const [showLyrics, setShowLyrics] = useState(false);
+  const [transposeSteps, setTransposeSteps] = useState(0);
   const song = songs[index];
   const router = useRouter();
 
@@ -26,9 +28,10 @@ export function LiveMode({ playlistName, songs, backHref }: Props) {
     [songs.length],
   );
 
-  // Reset lyrics view when changing songs
+  // Reset lyrics view and transpose when changing songs
   useEffect(() => {
     setShowLyrics(false);
+    setTransposeSteps(0);
   }, [index]);
 
   useEffect(() => {
@@ -102,7 +105,7 @@ export function LiveMode({ playlistName, songs, backHref }: Props) {
 
         {showLyrics ? (
           /* Lyrics view */
-          <div className="flex-1 flex flex-col min-h-0 py-8 gap-6">
+          <div className="flex-1 flex flex-col min-h-0 py-8 gap-4">
             <div className="text-center shrink-0">
               <h2 className="text-xl font-bold tracking-tight">{song.name}</h2>
               <p className="text-[11px] font-mono text-muted-foreground mt-1">
@@ -110,11 +113,29 @@ export function LiveMode({ playlistName, songs, backHref }: Props) {
                 {camelot && ` · ${formatCamelot(camelot)}`}
                 {` · ${song.bpm} BPM`}
               </p>
+              {/* Transpose controls */}
+              <div className="flex items-center justify-center gap-1 mt-3">
+                <button
+                  onClick={() => setTransposeSteps((n) => n - 1)}
+                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-foreground/10 font-mono text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  −
+                </button>
+                <span className="w-14 text-center text-[11px] font-mono tabular-nums text-muted-foreground">
+                  {transposeSteps === 0 ? "0 st" : transposeSteps > 0 ? `+${transposeSteps} st` : `${transposeSteps} st`}
+                </span>
+                <button
+                  onClick={() => setTransposeSteps((n) => n + 1)}
+                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-foreground/10 font-mono text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  +
+                </button>
+              </div>
             </div>
             <div className="flex-1 overflow-y-auto px-4">
-              <pre className="whitespace-pre-wrap font-sans text-sm sm:text-base leading-relaxed text-foreground/90 max-w-2xl mx-auto text-center">
-                {song.lyrics}
-              </pre>
+              <div className="max-w-2xl mx-auto">
+                <LyricsRenderer text={song.lyrics ?? ""} transposedSteps={transposeSteps} />
+              </div>
             </div>
           </div>
         ) : (

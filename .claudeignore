@@ -1,0 +1,26 @@
+# Build output
+.next/
+tsconfig.tsbuildinfo
+
+# Dependencies
+node_modules/
+
+# Lock files
+package-lock.json
+
+# Test artifacts
+test-results/
+playwright-report/
+
+# Drizzle migration metadata snapshots
+drizzle/meta/
+
+# Static assets
+public/
+
+# OS/editor noise
+.DS_Store
+.vscode/
+
+# Git internals
+.git/

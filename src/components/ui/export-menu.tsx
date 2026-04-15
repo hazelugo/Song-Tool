@@ -1,6 +1,7 @@
 "use client";
 
 import { Download, Printer } from "lucide-react";
+import { lyricsToHtml, LYRICS_PRINT_CSS } from "@/lib/chordpro";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -86,13 +87,7 @@ export function ExportMenu({ playlistName, songs }: ExportMenuProps) {
         const bpm = s.bpm ?? "—";
         const timeSig = s.timeSignature ?? "—";
         const tags = (s.tags ?? []).map((t) => t.name).join(", ") || "—";
-        const lyricsHtml = s.lyrics
-          ? s.lyrics
-              .replace(/&/g, "&amp;")
-              .replace(/</g, "&lt;")
-              .replace(/>/g, "&gt;")
-              .replace(/\n/g, "<br />")
-          : '<span class="no-lyrics">No lyrics saved</span>';
+        const lyricsHtml = lyricsToHtml(s.lyrics);
         return `<div class="page">
           <div class="song-header">
             <span class="song-number">${i + 1}</span>
@@ -135,8 +130,8 @@ export function ExportMenu({ playlistName, songs }: ExportMenuProps) {
     .song-artist { font-size: 14px; color: #555; display: block; margin-top: 2px; }
     .song-meta { display: flex; gap: 24px; font-size: 12px; color: #555; text-transform: uppercase; letter-spacing: 0.05em; }
     .song-meta strong { color: #000; }
-    .lyrics { font-size: 15px; line-height: 1.8; white-space: pre-wrap; margin-top: 8px; flex: 1; }
-    .no-lyrics { color: #aaa; font-style: italic; }
+    .lyrics { font-size: 15px; line-height: 1.8; margin-top: 8px; flex: 1; }
+    ${LYRICS_PRINT_CSS}
     @media print {
       .page { padding: 32px 40px; }
     }

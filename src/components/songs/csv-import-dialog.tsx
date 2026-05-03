@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Upload, CheckCircle2, XCircle, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { songApiSchema, MUSICAL_KEYS, TIME_SIGNATURES } from "@/lib/validations/song";
-import type { SongFormValues } from "@/lib/validations/song";
+import type { SongFormValues, SongFormInput } from "@/lib/validations/song";
 
 // ---------------------------------------------------------------------------
 // CSV parsing
@@ -64,7 +64,7 @@ function parseCsv(text: string): Record<string, string>[] {
 }
 
 // Maps flexible CSV header names → internal field names
-function mapRow(raw: Record<string, string>): Partial<SongFormValues> & { tags: string[] } {
+function mapRow(raw: Record<string, string>): Partial<SongFormInput> & { tags: string[] } {
   const get = (...keys: string[]) => {
     for (const k of keys) {
       const v = raw[k];
@@ -81,10 +81,10 @@ function mapRow(raw: Record<string, string>): Partial<SongFormValues> & { tags: 
   return {
     name: get("name", "songname", "song_name", "title"),
     artist: get("artist", "artistname", "artist_name") || undefined,
-    bpm: get("bpm") as any,
-    musicalKey: get("key", "musicalkey", "musical_key") as any,
-    keySignature: get("keysig", "keysignature", "key_sig", "key_signature") as any,
-    timeSignature: (get("timesig", "timesignature", "time_sig", "time_signature") || "4/4") as any,
+    bpm: get("bpm"),
+    musicalKey: get("key", "musicalkey", "musical_key") as (typeof MUSICAL_KEYS)[number],
+    keySignature: get("keysig", "keysignature", "key_sig", "key_signature") as "major" | "minor",
+    timeSignature: (get("timesig", "timesignature", "time_sig", "time_signature") || "4/4") as (typeof TIME_SIGNATURES)[number],
     chordProgressions: get("chords", "chord", "chordprogressions", "chord_progressions"),
     lyrics: get("lyrics") || undefined,
     youtubeUrl: get("youtube", "youtubeurl", "youtube_url") || "",

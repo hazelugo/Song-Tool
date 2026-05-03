@@ -60,7 +60,7 @@ export const songs = pgTable(
   "songs",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    userId: uuid("user_id").notNull().default("f47ac10b-58cc-4372-a567-0e02b2c3d479"),
+    userId: uuid("user_id").notNull(),
     name: text("name").notNull(),
     artist: text("artist"),
     bpm: integer("bpm").notNull(),
@@ -87,6 +87,8 @@ export const songs = pgTable(
   (t) => [
     index("idx_songs_lyrics_search").using("gin", t.lyricsSearch),
     index("idx_songs_user_id").on(t.userId),
+    index("idx_songs_bpm").on(t.bpm),
+    index("idx_songs_artist").on(t.artist),
     index("idx_songs_musical_key").on(t.musicalKey),
     index("idx_songs_key_signature").on(t.keySignature),
     index("idx_songs_time_signature").on(t.timeSignature),

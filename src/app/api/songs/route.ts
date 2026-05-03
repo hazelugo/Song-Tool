@@ -13,7 +13,7 @@ const PAGE_SIZE = 25;
 function parseChordProgressions(raw: string): string[] {
   if (!raw.trim()) return [];
   return raw
-    .split(/[,\s]+/)
+    .split(/\s*,\s*/)
     .map((s) => s.trim())
     .filter(Boolean);
 }

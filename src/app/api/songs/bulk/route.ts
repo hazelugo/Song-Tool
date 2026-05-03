@@ -4,6 +4,7 @@ import { songs, tags } from "@/db/schema";
 import { songApiSchema } from "@/lib/validations/song";
 import { z } from "zod";
 import { requireUser } from "@/lib/auth";
+import { errMsg } from "@/lib/utils";
 
 function parseChordProgressions(raw: string): string[] {
   if (!raw.trim()) return [];
@@ -55,6 +56,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ imported }, { status: 201 });
   } catch (err) {
     console.error("POST /api/songs/bulk error:", err);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to import songs", detail: errMsg(err) }, { status: 500 });
   }
 }

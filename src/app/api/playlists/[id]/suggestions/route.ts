@@ -4,6 +4,7 @@ import { playlists, playlistSongs, songs } from "@/db/schema";
 import { and, eq, notInArray, isNull, between } from "drizzle-orm";
 import { getKeyCompatibility } from "@/lib/camelot";
 import { requireUser } from "@/lib/auth";
+import { errMsg } from "@/lib/utils";
 const BPM_RANGE = 15;
 
 export async function GET(
@@ -118,6 +119,6 @@ export async function GET(
     return NextResponse.json(scored.slice(0, 10));
   } catch (err) {
     console.error(`GET /api/playlists/${id}/suggestions error:`, err);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch playlist suggestions", detail: errMsg(err) }, { status: 500 });
   }
 }

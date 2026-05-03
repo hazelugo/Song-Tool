@@ -2,8 +2,8 @@ import { z } from "zod";
 import { MUSICAL_KEYS, TIME_SIGNATURES } from "./song";
 
 export const filterSchema = z.object({
-  bpmMin: z.coerce.number().int().min(1).max(500).optional(),
-  bpmMax: z.coerce.number().int().min(1).max(500).optional(),
+  bpmMin: z.coerce.number().transform(Math.round).pipe(z.number().min(1).max(500)).optional(),
+  bpmMax: z.coerce.number().transform(Math.round).pipe(z.number().min(1).max(500)).optional(),
   key: z.enum(MUSICAL_KEYS).optional(),
   keySig: z.enum(["major", "minor"] as const).optional(),
   timeSig: z.enum(TIME_SIGNATURES).optional(),

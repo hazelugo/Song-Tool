@@ -137,6 +137,11 @@ export function CsvImportDialog({ onSuccess }: { onSuccess: () => void }) {
 
   function processFile(file: File) {
     if (!file.name.endsWith(".csv")) return;
+    if (file.size > 5 * 1024 * 1024) {
+      setImportError("File too large — maximum size is 5MB");
+      setStep("preview");
+      return;
+    }
     const reader = new FileReader();
     reader.onload = (e) => {
       const text = e.target?.result as string;

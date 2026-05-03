@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { songs } from "@/db/schema";
 import { and, isNull, eq, ilike, asc } from "drizzle-orm";
 import { requireUser } from "@/lib/auth";
+import { errMsg } from "@/lib/utils";
 
 export async function GET(request: Request) {
   const { userId, error: authError } = await requireUser();
@@ -28,6 +29,6 @@ export async function GET(request: Request) {
     return NextResponse.json(results);
   } catch (err) {
     console.error("GET /api/songs/search error:", err);
-    return NextResponse.json({ error: "Search failed" }, { status: 500 });
+    return NextResponse.json({ error: "Search failed", detail: errMsg(err) }, { status: 500 });
   }
 }

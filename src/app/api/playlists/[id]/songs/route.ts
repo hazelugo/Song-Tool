@@ -4,6 +4,7 @@ import { playlists, playlistSongs } from "@/db/schema";
 import { and, eq, max, sql } from "drizzle-orm";
 import { z } from "zod";
 import { requireUser } from "@/lib/auth";
+import { errMsg } from "@/lib/utils";
 
 async function verifyPlaylistOwner(id: string, userId: string) {
   return db.query.playlists.findFirst({
@@ -61,7 +62,7 @@ export async function POST(
     return NextResponse.json({ ok: true }, { status: 201 });
   } catch (err) {
     console.error("POST /api/playlists/[id]/songs error:", err);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to add songs to playlist", detail: errMsg(err) }, { status: 500 });
   }
 }
 
@@ -114,6 +115,6 @@ export async function PUT(
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("PUT /api/playlists/[id]/songs error:", err);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to reorder playlist songs", detail: errMsg(err) }, { status: 500 });
   }
 }

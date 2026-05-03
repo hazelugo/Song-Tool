@@ -1,0 +1,1 @@
+ALTER TABLE "tags" ADD CONSTRAINT "uq_tags_song_id_name" UNIQUE("song_id","name");

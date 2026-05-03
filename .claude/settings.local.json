@@ -33,7 +33,18 @@
       "Bash(npx gemini-mcp-tool:*)",
       "Read(//c/Users/Hector/.gemini//**)",
       "Read(//c/Users/Hector/.gemini/**)",
-      "mcp__gemini-cli__brainstorm"
+      "mcp__gemini-cli__brainstorm",
+      "Bash(gh --version)",
+      "Bash(gh auth *)",
+      "PowerShell(gh *)",
+      "Bash(git checkout *)",
+      "Bash(git push *)",
+      "Bash(git branch *)",
+      "Bash(npx drizzle-kit *)"
     ]
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "supabase"
+  ]
 }

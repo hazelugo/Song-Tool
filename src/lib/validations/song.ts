@@ -41,7 +41,7 @@ export const MUSICAL_KEYS = [
 export const songSchema = z.object({
   name: z.string().min(1, "Song name is required").max(255),
   artist: z.string().max(255).optional(),
-  bpm: z.coerce.number().int().min(1).max(500),
+  bpm: z.coerce.number().transform(Math.round).pipe(z.number().min(1).max(500)),
   musicalKey: z.enum(MUSICAL_KEYS, {
     message: "Select a key",
   }),

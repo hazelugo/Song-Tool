@@ -7,6 +7,7 @@ import type { SQL } from "drizzle-orm";
 import { filterSchema } from "@/lib/validations/filter";
 import { songApiSchema } from "@/lib/validations/song"; // Keep for POST
 import { requireUser } from "@/lib/auth";
+import { errMsg } from "@/lib/utils";
 
 const PAGE_SIZE = 25;
 
@@ -100,7 +101,7 @@ export async function GET(request: Request) {
   } catch (err) {
     console.error("GET /api/songs error:", err);
     return NextResponse.json(
-      { error: "Failed to fetch songs" },
+      { error: "Failed to fetch songs", detail: errMsg(err) },
       { status: 500 },
     );
   }
@@ -127,27 +128,35 @@ export async function POST(request: Request) {
     } = parsed.data;
     const chordProgressions = parseChordProgressions(rawChords);
 
-    const newSong = await db.transaction(async (tx) => {
-      const [song] = await tx
-        .insert(songs)
-        .values({ ...songData, chordProgressions, userId })
-        .returning();
-      const normalizedTags = [
-        ...new Set(tagNames.map((t) => t.toLowerCase().trim())),
-      ].filter(Boolean);
-      if (normalizedTags.length > 0) {
-        await tx
-          .insert(tags)
-          .values(normalizedTags.map((name) => ({ songId: song.id, name })));
-      }
-      return song;
-    });
+    const [newSong] = await db
+      .insert(songs)
+      .values({ ...songData, chordProgressions, userId })
+      .returning();
 
-    return NextResponse.json(newSong, { status: 201 });
+    const normalizedTags = [
+      ...new Set(tagNames.map((t) => t.toLowerCase().trim())),
+    ].filter(Boolean);
+
+    let tagWarning: string | undefined;
+    if (normalizedTags.length > 0) {
+      try {
+        await db
+          .insert(tags)
+          .values(normalizedTags.map((name) => ({ songId: newSong.id, name })))
+          .onConflictDoNothing();
+      } catch {
+        tagWarning = "Song created but tags could not be saved";
+      }
+    }
+
+    return NextResponse.json(
+      tagWarning ? { ...newSong, warning: tagWarning } : newSong,
+      { status: 201 },
+    );
   } catch (err) {
     console.error("POST /api/songs error:", err);
     return NextResponse.json(
-      { error: "Failed to create song" },
+      { error: "Failed to create song", detail: errMsg(err) },
       { status: 500 },
     );
   }

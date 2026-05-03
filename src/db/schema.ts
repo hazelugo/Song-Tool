@@ -9,6 +9,7 @@ import {
   timestamp,
   jsonb,
   index,
+  unique,
   customType,
   primaryKey,
 } from "drizzle-orm/pg-core";
@@ -105,7 +106,10 @@ export const tags = pgTable(
     name: text("name").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (t) => [index("idx_tags_song_id").on(t.songId)],
+  (t) => [
+    index("idx_tags_song_id").on(t.songId),
+    unique("uq_tags_song_id_name").on(t.songId, t.name),
+  ],
 );
 
 export const playlists = pgTable(

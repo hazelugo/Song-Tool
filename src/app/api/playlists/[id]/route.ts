@@ -4,6 +4,7 @@ import { playlists, playlistSongs } from "@/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { requireUser } from "@/lib/auth";
+import { errMsg } from "@/lib/utils";
 
 export async function GET(
   request: Request,
@@ -41,7 +42,7 @@ export async function GET(
   } catch (err) {
     console.error(`GET /api/playlists/${id} error:`, err);
     return NextResponse.json(
-      { error: "Failed to fetch playlist" },
+      { error: "Failed to fetch playlist", detail: errMsg(err) },
       { status: 500 },
     );
   }
@@ -77,7 +78,7 @@ export async function PATCH(
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error(`PATCH /api/playlists/${id} error:`, err);
-    return NextResponse.json({ error: "Failed to update playlist" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to update playlist", detail: errMsg(err) }, { status: 500 });
   }
 }
 
@@ -107,7 +108,7 @@ export async function DELETE(
   } catch (err) {
     console.error(`DELETE /api/playlists/${id} error:`, err);
     return NextResponse.json(
-      { error: "Failed to delete playlist" },
+      { error: "Failed to delete playlist", detail: errMsg(err) },
       { status: 500 },
     );
   }

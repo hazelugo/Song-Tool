@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { songs } from "@/db/schema";
 import { and, isNull, eq, notInArray } from "drizzle-orm";
 import { requireUser } from "@/lib/auth";
+import { errMsg } from "@/lib/utils";
 import { getKeyCompatibility } from "@/lib/camelot";
 import type { SongWithTags } from "@/db/schema";
 
@@ -105,7 +106,7 @@ export async function GET(request: Request) {
   } catch (err) {
     console.error("GET /api/similar error:", err);
     return NextResponse.json(
-      { error: "Failed to find similar songs" },
+      { error: "Failed to find similar songs", detail: errMsg(err) },
       { status: 500 },
     );
   }

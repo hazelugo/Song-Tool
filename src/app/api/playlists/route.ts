@@ -5,6 +5,7 @@ import { and, eq, isNull, desc, count, sql } from "drizzle-orm";
 import { z } from "zod";
 import { randomUUID } from "crypto";
 import { requireUser } from "@/lib/auth";
+import { errMsg } from "@/lib/utils";
 
 const PAGE_SIZE = 25;
 
@@ -56,7 +57,7 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error("GET /api/playlists error:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Failed to fetch playlists", detail: errMsg(error) },
       { status: 500 },
     );
   }
@@ -129,7 +130,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("POST /api/playlists error:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Failed to create playlist", detail: errMsg(error) },
       { status: 500 },
     );
   }

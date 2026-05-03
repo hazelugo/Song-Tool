@@ -4,11 +4,12 @@ import { songs, tags } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { songApiSchema } from "@/lib/validations/song";
 import { requireUser } from "@/lib/auth";
+import { errMsg } from "@/lib/utils";
 
 function parseChordProgressions(raw: string): string[] {
   if (!raw.trim()) return [];
   return raw
-    .split(/[,\s]+/)
+    .split(/\s*,\s*/)
     .map((s) => s.trim())
     .filter(Boolean);
 }
@@ -59,7 +60,7 @@ export async function PUT(
   } catch (err) {
     console.error("PUT /api/songs/[id] error:", err);
     return NextResponse.json(
-      { error: "Failed to update song" },
+      { error: "Failed to update song", detail: errMsg(err) },
       { status: 500 },
     );
   }
@@ -83,7 +84,7 @@ export async function DELETE(
   } catch (err) {
     console.error("DELETE /api/songs/[id] error:", err);
     return NextResponse.json(
-      { error: "Failed to delete song" },
+      { error: "Failed to delete song", detail: errMsg(err) },
       { status: 500 },
     );
   }

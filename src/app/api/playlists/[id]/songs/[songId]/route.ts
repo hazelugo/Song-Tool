@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { playlists, playlistSongs } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { requireUser } from "@/lib/auth";
+import { errMsg } from "@/lib/utils";
 
 // DELETE /api/playlists/[id]/songs/[songId] — remove a song from a playlist
 export async function DELETE(
@@ -32,6 +33,6 @@ export async function DELETE(
     return new Response(null, { status: 204 });
   } catch (err) {
     console.error("DELETE /api/playlists/[id]/songs/[songId] error:", err);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to remove song from playlist", detail: errMsg(err) }, { status: 500 });
   }
 }

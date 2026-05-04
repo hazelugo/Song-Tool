@@ -41,7 +41,9 @@
       "Bash(git push *)",
       "Bash(git branch *)",
       "Bash(npx drizzle-kit *)",
-      "Bash(Remove-Item *)"
+      "Bash(Remove-Item *)",
+      "PowerShell(New-Item *)",
+      "PowerShell(vercel *)"
     ]
   },
   "enableAllProjectMcpServers": true,

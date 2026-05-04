@@ -23,6 +23,8 @@ import {
   Timer,
   Piano,
   LogOut,
+  Sparkles,
+  GitBranch,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { createClient } from "@/lib/supabase/client";
@@ -30,7 +32,8 @@ import { useRouter } from "next/navigation";
 
 const navItems = [
   { title: "Songs", url: "/songs", icon: Music },
-  { title: "Discovery", url: "/discovery", icon: Search },
+  { title: "Discovery", url: "/discovery", icon: Sparkles },
+  { title: "Chain", url: "/chain", icon: GitBranch },
   { title: "Playlists", url: "/playlists", icon: ListMusic },
   { title: "Metronome", url: "/metronome", icon: Timer },
   { title: "Chord Pads", url: "/chords", icon: Piano },

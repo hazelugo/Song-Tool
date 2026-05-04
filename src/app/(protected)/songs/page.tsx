@@ -191,7 +191,7 @@ function SongsPageContent() {
         onFindSimilar={
           selectedSong
             ? () =>
-                router.push(`/discovery?seedId=${selectedSong.id}`)
+                router.push(`/chain?seedId=${selectedSong.id}`)
             : undefined
         }
       />

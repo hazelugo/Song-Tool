@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -32,6 +32,7 @@ interface SongFormProps {
   onSubmit: (values: SongFormValues) => Promise<void>;
   isSubmitting: boolean;
   metronomeHref?: string;
+  onDirtyChange?: (isDirty: boolean) => void;
 }
 
 export function SongForm({
@@ -39,9 +40,11 @@ export function SongForm({
   onSubmit,
   isSubmitting,
   metronomeHref,
+  onDirtyChange,
 }: SongFormProps) {
   const [tags, setTags] = useState<string[]>(defaultValues?.tags ?? []);
   const [lyricsOpen, setLyricsOpen] = useState(false);
+  const initialTagsRef = useRef<string[]>(defaultValues?.tags ?? []);
 
   const form = useForm<SongFormInput, unknown, SongFormValues>({
     resolver: zodResolver(songSchema),
@@ -60,6 +63,13 @@ export function SongForm({
       ...defaultValues,
     },
   });
+
+  useEffect(() => {
+    const tagsChanged =
+      tags.length !== initialTagsRef.current.length ||
+      !tags.every((t) => initialTagsRef.current.includes(t));
+    onDirtyChange?.(form.formState.isDirty || tagsChanged);
+  }, [form.formState.isDirty, tags, onDirtyChange]);
 
   const handleSubmit = form.handleSubmit(async (values) => {
     await onSubmit({ ...values, tags });

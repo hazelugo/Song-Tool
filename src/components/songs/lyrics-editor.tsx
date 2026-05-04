@@ -118,7 +118,7 @@ export function LyricsEditor({ open, onOpenChange, value, onChange }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) handleCancel(); }}>
-      <DialogContent className="max-w-2xl h-[80vh] flex flex-col gap-0 p-0">
+      <DialogContent className="sm:max-w-2xl md:max-w-3xl h-[80vh] flex flex-col gap-0 p-0">
         {/* Header + tab toggle */}
         <DialogHeader className="px-6 pt-5 pb-3 border-b shrink-0">
           <div className="flex items-center justify-between">

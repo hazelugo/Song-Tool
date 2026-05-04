@@ -1,11 +1,19 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { SongForm } from "./song-form";
 import { DeleteConfirm } from "./delete-confirm";
 import type { SongWithTags } from "@/db/schema";
@@ -46,14 +54,38 @@ export function SongSheet({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
+  const [showDiscard, setShowDiscard] = useState(false);
 
   const isEditMode = !!song;
+
+  // Reset dirty state whenever the sheet opens fresh
+  useEffect(() => {
+    if (open) {
+      setIsDirty(false);
+      setShowDiscard(false);
+    }
+  }, [open]);
+
+  // Intercept overlay/Escape closes — show confirmation if form has unsaved changes
+  const handleSheetOpenChange = (next: boolean) => {
+    if (!next && isDirty) {
+      setShowDiscard(true);
+      return;
+    }
+    onOpenChange(next);
+  };
+
+  const handleDiscard = () => {
+    setShowDiscard(false);
+    setIsDirty(false);
+    onOpenChange(false);
+  };
 
   const handleSubmit = async (values: SongFormValues) => {
     setIsSubmitting(true);
     setError(null);
     try {
-      // API expects chordProgressions as string (which is what values has)
       const payload = { ...values };
       const url = isEditMode ? `/api/songs/${song.id}` : "/api/songs";
       const method = isEditMode ? "PUT" : "POST";
@@ -72,6 +104,7 @@ export function SongSheet({
         return;
       }
 
+      setIsDirty(false);
       onOpenChange(false);
       onSuccess();
     } catch {
@@ -91,6 +124,7 @@ export function SongSheet({
         setError("Failed to delete song");
         return;
       }
+      setIsDirty(false);
       onOpenChange(false);
       onSuccess();
     } catch {
@@ -101,45 +135,66 @@ export function SongSheet({
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="overflow-y-auto sm:max-w-md">
-        <SheetHeader>
-          <SheetTitle>{isEditMode ? "Edit Song" : "Add Song"}</SheetTitle>
-          {isEditMode && onFindSimilar && (
-            <button
-              type="button"
-              onClick={onFindSimilar}
-              className="text-xs text-primary hover:underline text-left w-fit"
-            >
-              Find similar songs →
-            </button>
-          )}
-        </SheetHeader>
+    <>
+      <Sheet open={open} onOpenChange={handleSheetOpenChange}>
+        <SheetContent className="overflow-y-auto sm:max-w-md">
+          <SheetHeader>
+            <SheetTitle>{isEditMode ? "Edit Song" : "Add Song"}</SheetTitle>
+            {isEditMode && onFindSimilar && (
+              <button
+                type="button"
+                onClick={onFindSimilar}
+                className="text-xs text-primary hover:underline text-left w-fit"
+              >
+                Find similar songs →
+              </button>
+            )}
+          </SheetHeader>
 
-        <div className="px-4 pb-4 space-y-6 pt-6">
-          {/* Key the form on song ID — forces full remount and reset between add/edit */}
-          <SongForm
-            key={song?.id ?? "new"}
-            defaultValues={song ? toFormValues(song) : undefined}
-            onSubmit={handleSubmit}
-            isSubmitting={isSubmitting}
-            metronomeHref={
-              isEditMode
-                ? `/metronome?bpm=${song.bpm}&timeSig=${encodeURIComponent(song.timeSignature)}`
-                : undefined
-            }
-          />
+          <div className="px-4 pb-4 space-y-6 pt-6">
+            <SongForm
+              key={song?.id ?? "new"}
+              defaultValues={song ? toFormValues(song) : undefined}
+              onSubmit={handleSubmit}
+              isSubmitting={isSubmitting}
+              onDirtyChange={setIsDirty}
+              metronomeHref={
+                isEditMode
+                  ? `/metronome?bpm=${song.bpm}&timeSig=${encodeURIComponent(song.timeSignature)}`
+                  : undefined
+              }
+            />
 
-          {error && <p className="text-sm text-destructive">{error}</p>}
+            {error && <p className="text-sm text-destructive">{error}</p>}
 
-          {/* Delete only shown in edit mode */}
-          {isEditMode && (
-            <div className="pt-4 border-t">
-              <DeleteConfirm onConfirm={handleDelete} isDeleting={isDeleting} />
-            </div>
-          )}
-        </div>
-      </SheetContent>
-    </Sheet>
+            {isEditMode && (
+              <div className="pt-4 border-t">
+                <DeleteConfirm onConfirm={handleDelete} isDeleting={isDeleting} />
+              </div>
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Unsaved-changes confirmation — shown when user tries to close with a dirty form */}
+      <Dialog open={showDiscard} onOpenChange={(o) => { if (!o) setShowDiscard(false); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Unsaved changes</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            You have unsaved changes. If you close now, they&apos;ll be lost.
+          </p>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setShowDiscard(false)}>
+              Keep editing
+            </Button>
+            <Button variant="destructive" onClick={handleDiscard}>
+              Discard changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

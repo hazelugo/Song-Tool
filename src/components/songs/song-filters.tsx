@@ -17,9 +17,9 @@ import {
 import { ChevronDown } from "lucide-react";
 import { MUSICAL_KEYS, TIME_SIGNATURES } from "@/lib/validations/song";
 
-const ADVANCED_KEYS = ["chord"] as const;
+const ADVANCED_KEYS = ["chord", "tag"] as const;
 
-const FILTER_KEYS = ["bpmMin", "bpmMax", "key", "keySig", "timeSig", "chord", "lyric"] as const; // order doesn't matter here
+const FILTER_KEYS = ["bpmMin", "bpmMax", "key", "keySig", "timeSig", "chord", "lyric", "tag"] as const;
 
 function SongFiltersContent() {
   const router = useRouter();
@@ -265,7 +265,7 @@ function SongFiltersContent() {
           )}
         </button>
 
-        {/* Advanced filters — Chord only */}
+        {/* Advanced filters — Chord + Tag */}
         {showAdvanced && (
           <div className="flex flex-wrap items-end gap-x-4 gap-y-3 p-3 border-t border-border/40">
             {/* Chord */}
@@ -283,6 +283,24 @@ function SongFiltersContent() {
                 defaultValue={searchParams.get("chord") ?? ""}
                 onChange={(e) => debouncedUpdate("chord", e.target.value)}
                 className="h-10 md:h-7 text-xs rounded-sm font-mono"
+              />
+            </div>
+
+            {/* Tag */}
+            <div className="flex flex-col gap-1 flex-1 min-w-[120px]">
+              <Label
+                htmlFor="tag"
+                className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium"
+              >
+                Tag
+              </Label>
+              <Input
+                key={`tag-${resetKey}`}
+                id="tag"
+                placeholder="e.g. ballad, opener..."
+                defaultValue={searchParams.get("tag") ?? ""}
+                onChange={(e) => debouncedUpdate("tag", e.target.value)}
+                className="h-10 md:h-7 text-xs rounded-sm"
               />
             </div>
           </div>

@@ -26,7 +26,6 @@ function SongsPageContent() {
   const [selectedSongs, setSelectedSongs] = useState<SongWithTags[]>([]);
   const [initialPlaylistItems, setInitialPlaylistItems] = useState<PlaylistItem[]>([]);
   const router = useRouter();
-  const playlistId = searchParams.get("id");
   const [pageIndex, setPageIndex] = useState(0);
   const [total, setTotal] = useState(0);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -38,7 +37,7 @@ function SongsPageContent() {
       const response = await fetch("/api/playlists", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, items, id: playlistId }),
+        body: JSON.stringify({ name, items }),
       });
       if (!response.ok) {
         const error = await response.json();

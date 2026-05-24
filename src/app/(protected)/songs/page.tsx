@@ -112,11 +112,11 @@ function SongsPageContent() {
   }
 
   return (
-    <div className="flex flex-col gap-4 p-6 max-w-6xl mx-auto w-full bg-card border border-border/40 rounded-sm">
+    <div className="flex flex-col gap-4 p-3 sm:p-6 max-w-6xl mx-auto w-full bg-card border border-border/40 rounded-sm">
       {/* Header row — DAW toolbar style */}
       <div className="flex items-center justify-between border-b border-border/60 pb-3">
         <h1 className="text-sm font-semibold uppercase tracking-widest text-foreground">Songs</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center flex-wrap gap-2">
           <Button
             variant="default"
             size="sm"
@@ -135,14 +135,14 @@ function SongsPageContent() {
               setShowPlaylistBuilder(true);
             }}
             disabled={songs.length === 0}
-            className="h-7 text-xs rounded-sm"
+            className="h-10 md:h-7 text-xs rounded-sm"
           >
             {selectedSongs.length > 0
               ? `Save ${selectedSongs.length} as Playlist`
               : "Save as Playlist"}
           </Button>
           <CsvImportDialog onSuccess={loadSongs} />
-          <Button variant="default" onClick={openAddSheet} size="sm" className="h-7 text-xs rounded-sm">
+          <Button variant="default" onClick={openAddSheet} size="sm" className="h-10 md:h-7 text-xs rounded-sm">
             Add Song
           </Button>
         </div>
@@ -162,7 +162,7 @@ function SongsPageContent() {
           <p className="text-muted-foreground text-sm">No songs match your filters</p>
           <Button
             size="sm"
-            className="h-7 text-xs rounded-sm"
+            className="h-10 md:h-7 text-xs rounded-sm"
             onClick={() => router.replace("/songs")}
           >
             Clear filters

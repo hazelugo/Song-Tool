@@ -93,7 +93,7 @@ function DiscoveryContent() {
   }
 
   return (
-    <div className="flex flex-col gap-6 p-6 max-w-4xl mx-auto w-full">
+    <div className="flex flex-col gap-6 p-3 sm:p-6 max-w-4xl mx-auto w-full">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-border/60 pb-3">
         <div className="flex items-center gap-2.5">
@@ -138,7 +138,7 @@ function DiscoveryContent() {
         <Button
           type="submit"
           disabled={!prompt.trim() || isLoading}
-          className="self-start h-8 text-xs rounded-sm px-4"
+          className="self-start h-10 md:h-8 text-xs rounded-sm px-4"
         >
           {isLoading ? (
             <span className="flex items-center gap-2">

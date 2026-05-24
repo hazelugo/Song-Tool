@@ -566,7 +566,7 @@ function ChainContent() {
       </Dialog>
 
       {/* Header + search */}
-      <div className="flex-none flex flex-col gap-4 p-6 pb-4 max-w-6xl w-full mx-auto">
+      <div className="flex-none flex flex-col gap-4 p-3 pb-3 sm:p-6 sm:pb-4 max-w-6xl w-full mx-auto">
         <div className="flex items-center justify-between border-b border-border/60 pb-3">
           <div className="flex items-center gap-2.5">
             <h1 className="text-sm font-semibold uppercase tracking-widest text-foreground">
@@ -628,7 +628,7 @@ function ChainContent() {
       {hasChain && (
         <div
           ref={scrollRef}
-          className="flex-1 overflow-x-auto overflow-y-hidden px-6 pb-4"
+          className="flex-1 overflow-x-auto overflow-y-hidden px-3 pb-3 sm:px-6 sm:pb-4"
           style={{ scrollbarWidth: "thin" }}
         >
           <div
@@ -711,7 +711,7 @@ function ChainContent() {
 
       {/* Sticky bottom bar */}
       {activePath.length > 1 && (
-        <div className="flex-none border-t border-border/60 bg-background/95 backdrop-blur-sm px-6 pt-4 pb-6">
+        <div className="flex-none border-t border-border/60 bg-background/95 backdrop-blur-sm px-3 pt-3 pb-4 sm:px-6 sm:pt-4 sm:pb-6">
           <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 sm:justify-between">
             <div className="flex items-center gap-2 overflow-x-auto min-w-0 flex-1">
               <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/50 shrink-0">

@@ -27,12 +27,12 @@ export default function Home() {
       </p>
 
       {/* CTA row */}
-      <div className="flex gap-3">
+      <div className="flex flex-wrap justify-center gap-3">
         <Link
           href="/songs"
           className={
             buttonVariants({ variant: "default", size: "sm" }) +
-            " rounded-sm text-xs h-7"
+            " rounded-sm text-xs h-10 sm:h-7"
           }
         >
           Browse Songs
@@ -41,7 +41,7 @@ export default function Home() {
           href="/discovery"
           className={
             buttonVariants({ variant: "default", size: "sm" }) +
-            " rounded-sm text-xs h-7"
+            " rounded-sm text-xs h-10 sm:h-7"
           }
         >
           Discovery
@@ -50,7 +50,7 @@ export default function Home() {
           href="/playlists"
           className={
             buttonVariants({ variant: "default", size: "sm" }) +
-            " rounded-sm text-xs h-7"
+            " rounded-sm text-xs h-10 sm:h-7"
           }
         >
           Playlists

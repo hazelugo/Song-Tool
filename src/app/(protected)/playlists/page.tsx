@@ -102,7 +102,7 @@ export default function ViewPlaylistsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-4 p-6 max-w-6xl mx-auto w-full">
+    <div className="flex flex-col gap-4 p-3 sm:p-6 max-w-6xl mx-auto w-full">
       {/* Header row */}
       <div className="flex items-center justify-between border-b border-border/60 pb-3">
         <h1 className="text-sm font-semibold uppercase tracking-widest text-foreground">
@@ -144,7 +144,7 @@ export default function ViewPlaylistsPage() {
                     <span className="text-xs font-mono text-muted-foreground tabular-nums">
                       {playlist.songCount} {playlist.songCount !== 1 ? "songs" : "song"}
                     </span>
-                    <span className="text-[10px] font-mono text-muted-foreground tabular-nums">
+                    <span className="hidden sm:inline text-[10px] font-mono text-muted-foreground tabular-nums">
                       Last updated {new Date(playlist.updatedAt).toLocaleDateString()}
                     </span>
                   </div>

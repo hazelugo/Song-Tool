@@ -15,7 +15,7 @@ High-impact files (most imported, changes here affect many other files):
 - src/lib/validations/song.ts (imported by 12 files)
 - src/lib/auth.ts (imported by 11 files)
 - src/components/ui/input.tsx (imported by 8 files)
-- src/lib/camelot.ts (imported by 6 files)
+- src/lib/harmonic.ts
 
 Required environment variables (no defaults):
 - BASE_URL (playwright.config.ts)

@@ -24,7 +24,6 @@ import { GripVertical, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { getCamelotPosition, formatCamelot } from "@/lib/camelot";
 import { generateRank } from "@/lib/ranking";
 
 interface Song {
@@ -62,10 +61,6 @@ interface ItemRowProps {
 }
 
 function ItemRow({ song, index, onRemove, isRemoving, isDragOverlay }: ItemRowProps) {
-  const camelot = song.musicalKey && song.keySignature
-    ? getCamelotPosition(song.musicalKey, song.keySignature)
-    : null;
-
   return (
     <div
       className={cn(
@@ -84,11 +79,6 @@ function ItemRow({ song, index, onRemove, isRemoving, isDragOverlay }: ItemRowPr
           <span className="text-xs text-muted-foreground">{song.artist}</span>
         )}
         <div className="flex gap-2 items-center mt-0.5 flex-wrap">
-          {camelot && (
-            <span className="font-mono text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded-sm font-semibold">
-              {formatCamelot(camelot)}
-            </span>
-          )}
           <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded-sm text-muted-foreground">
             {song.musicalKey} {song.keySignature}
           </span>

@@ -594,7 +594,7 @@ function ChainContent() {
           </span>
           <span className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground">
             <span className="text-[color:var(--color-chart-3)] font-semibold">①</span>
-            Camelot key compatibility
+            Harmonic key compatibility
             <span className="text-muted-foreground/50">— same / relative / adjacent (±1)</span>
           </span>
           <span className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground">

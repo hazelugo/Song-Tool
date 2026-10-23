@@ -2,7 +2,6 @@
 
 import { Badge } from "@/components/ui/badge";
 import type { SongWithTags } from "@/db/schema";
-import { getCamelotPosition, formatCamelot } from "@/lib/camelot";
 import { Youtube, ExternalLink } from "lucide-react";
 
 function bpmStyle(bpm: number) {
@@ -18,8 +17,6 @@ interface SongCardProps {
 }
 
 export function SongCard({ song, onClick, onFindSimilar }: SongCardProps) {
-  const camelot = getCamelotPosition(song.musicalKey, song.keySignature);
-  const camelotLabel = camelot ? formatCamelot(camelot) : null;
   const rawChords = (song.chordProgressions as string[]) ?? [];
   const chords = rawChords.flatMap((item) =>
     item.includes(",") || item.includes(" ")
@@ -43,9 +40,6 @@ export function SongCard({ song, onClick, onFindSimilar }: SongCardProps) {
         )}
         <Badge variant="secondary" className="text-xs font-mono rounded-sm px-1.5 py-0 gap-1 h-5">
           {song.musicalKey} {song.keySignature}
-          {camelotLabel && (
-            <span className="opacity-50 font-mono">· {camelotLabel}</span>
-          )}
         </Badge>
         <Badge variant="outline" className="text-xs font-mono rounded-sm px-1.5 py-0 h-5 tabular-nums">
           {song.timeSignature}

@@ -2,7 +2,6 @@
 
 import { cn } from "@/lib/utils";
 import type { SongWithTags } from "@/db/schema";
-import { getCamelotPosition, formatCamelot } from "@/lib/camelot";
 import { Youtube, ExternalLink } from "lucide-react";
 
 const LANGUAGE_TAGS = ["spanish", "english"];
@@ -15,8 +14,6 @@ interface ChainCardProps {
 }
 
 export function ChainCard({ song, isSelected, isSeed, onClick }: ChainCardProps) {
-  const camelot = getCamelotPosition(song.musicalKey, song.keySignature);
-  const camelotLabel = camelot ? formatCamelot(camelot) : null;
   const langTag = song.tags.find((t) =>
     LANGUAGE_TAGS.includes(t.name.toLowerCase()),
   );
@@ -44,11 +41,6 @@ export function ChainCard({ song, isSelected, isSeed, onClick }: ChainCardProps)
         <span className="text-[10px] font-mono px-1.5 rounded-sm bg-muted/60 border border-border/40 h-4 inline-flex items-center leading-none">
           {song.musicalKey} {song.keySignature}
         </span>
-        {camelotLabel && (
-          <span className="text-[10px] font-mono text-muted-foreground px-1.5 rounded-sm bg-muted/30 border border-border/25 h-4 inline-flex items-center leading-none">
-            {camelotLabel}
-          </span>
-        )}
       </div>
 
       {/* Song name */}

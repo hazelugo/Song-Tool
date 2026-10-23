@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, X, ScrollText } from "lucide-react";
-import { getCamelotPosition, formatCamelot } from "@/lib/camelot";
 import { cn } from "@/lib/utils";
 import type { SongWithTags } from "@/db/schema";
 import { LyricsRenderer } from "@/components/songs/lyrics-renderer";
@@ -50,7 +49,6 @@ export function LiveMode({ playlistName, songs, backHref }: Props) {
 
   if (!song) return null;
 
-  const camelot = getCamelotPosition(song.musicalKey, song.keySignature);
   const hasLyrics = !!song.lyrics?.trim();
 
   return (
@@ -110,7 +108,6 @@ export function LiveMode({ playlistName, songs, backHref }: Props) {
               <h2 className="text-xl font-bold tracking-tight">{song.name}</h2>
               <p className="text-[11px] font-mono text-muted-foreground mt-1">
                 {song.musicalKey} {song.keySignature}
-                {camelot && ` · ${formatCamelot(camelot)}`}
                 {` · ${song.bpm} BPM`}
               </p>
               {/* Transpose controls */}
@@ -153,9 +150,6 @@ export function LiveMode({ playlistName, songs, backHref }: Props) {
                 label="KEY"
                 value={`${song.musicalKey} ${song.keySignature}`}
               />
-              {camelot && (
-                <DataField label="CAMELOT" value={formatCamelot(camelot)} />
-              )}
               <DataField label="TIME" value={song.timeSignature} />
             </div>
 

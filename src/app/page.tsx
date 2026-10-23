@@ -63,7 +63,6 @@ export default function Home() {
           ["BPM", "128"],
           ["KEY", "F# min"],
           ["TIME", "4/4"],
-          ["CAMELOT", "2A"],
         ].map(([label, val]) => (
           <div key={label} className="flex flex-col items-center gap-0.5">
             <span className="text-[9px] uppercase tracking-[0.25em] font-medium">

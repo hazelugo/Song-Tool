@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { playlists, playlistSongs, songs } from "@/db/schema";
 import { and, eq, notInArray, isNull, between } from "drizzle-orm";
-import { getKeyCompatibility } from "@/lib/camelot";
+import { getKeyCompatibility } from "@/lib/harmonic";
 import { requireUser } from "@/lib/auth";
 import { errMsg } from "@/lib/utils";
 const BPM_RANGE = 15;

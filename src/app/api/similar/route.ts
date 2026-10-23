@@ -4,7 +4,7 @@ import { songs } from "@/db/schema";
 import { and, isNull, eq, notInArray } from "drizzle-orm";
 import { requireUser } from "@/lib/auth";
 import { errMsg } from "@/lib/utils";
-import { getKeyCompatibility } from "@/lib/camelot";
+import { getKeyCompatibility } from "@/lib/harmonic";
 import type { SongWithTags } from "@/db/schema";
 
 const LANGUAGE_TAGS = ["spanish", "english"];

@@ -294,12 +294,12 @@ The filter schema in `src/lib/validations/filter.ts` validates URL query params 
 
 ---
 
-## Layer 11: Domain Logic — Camelot Wheel
+## Layer 11: Domain Logic — Circle of Fifths & Harmonic Compatibility
 
-The **Camelot Wheel** is a DJ/music production concept for harmonic mixing. Keys that are adjacent on the wheel sound good played together; incompatible keys clash. The wheel assigns each key a number (1–12) and letter (A = minor, B = major).
+Harmonic key compatibility is based on the **Circle of Fifths**. Keys that are adjacent on the circle sound good played together; incompatible keys clash. Each key maps to a position (1–12) and mode (major/minor).
 
-`src/lib/camelot.ts` implements this:
-- Maps all 17 enharmonic key spellings to Camelot positions
+`src/lib/harmonic.ts` implements this:
+- Maps all 17 enharmonic key spellings to Circle of Fifths positions
 - `getKeyCompatibility()` returns a score: 3 = same key, 2 = adjacent/relative, 0 = incompatible
 - Used by `GET /api/similar` to rank which songs in the catalog are harmonically compatible with a seed song
 
@@ -315,7 +315,7 @@ Playwright runs automated browser tests against a running app. Tests are in `tes
 The global auth setup creates a test user session once and reuses it across all e2e tests — this avoids re-logging in on every test run.
 
 ### Vitest (unit)
-Vitest handles unit tests for pure logic: the Camelot wheel functions, filter validation, chord parsing. Run with `npm run test:unit`.
+Vitest handles unit tests for pure logic: harmonic key compatibility, filter validation, chord parsing. Run with `npm run test:unit`.
 
 ---
 
@@ -369,7 +369,7 @@ src/
 │   └── schema.ts             # ALL table definitions — most important file
 └── lib/
     ├── auth.ts               # requireUser() helper
-    ├── camelot.ts            # Camelot Wheel harmonic logic
+    ├── harmonic.ts           # Circle of Fifths harmonic logic
     ├── supabase/             # client.ts + server.ts (two separate clients)
     └── validations/          # Zod schemas for songs, filters, playlists
 drizzle/                      # SQL migration files (committed to git)

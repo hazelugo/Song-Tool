@@ -34,7 +34,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SidebarProvider>
+          <SidebarProvider defaultOpen={false}>
             <AppSidebar />
             <main className="flex flex-col flex-1 min-h-0 overflow-y-auto p-3 sm:p-6">
               <SidebarTrigger className="mb-4" />

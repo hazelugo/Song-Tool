@@ -21,6 +21,9 @@ test("sidebar nav links navigate to placeholder pages", async ({ page }) => {
   await page.goto("/songs")
   await expect(page.getByRole("heading", { name: "Songs" })).toBeVisible()
 
+  // Open sidebar since it is hidden by default
+  await page.getByRole("button", { name: "Toggle Sidebar" }).click()
+
   await page.getByRole("link", { name: "Discovery" }).click()
   await expect(page.getByRole("heading", { name: "Discovery" })).toBeVisible()
 

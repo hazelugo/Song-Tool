@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { songSchema } from "../../src/lib/validations/song";
+import {
+  songSchema,
+  parseChordProgressions,
+  formatChordProgressions,
+} from "../../src/lib/validations/song";
 import { filterSchema } from "../../src/lib/validations/filter";
 
 describe("songSchema — BPM coercion", () => {
@@ -103,5 +107,50 @@ describe("filterSchema — BPM coercion", () => {
   it("accepts empty filter object", () => {
     const result = filterSchema.safeParse({});
     expect(result.success).toBe(true);
+  });
+});
+
+describe("parseChordProgressions", () => {
+  it("returns empty array for empty or whitespace string", () => {
+    expect(parseChordProgressions("")).toEqual([]);
+    expect(parseChordProgressions("   ")).toEqual([]);
+  });
+
+  it("splits single line by commas", () => {
+    expect(parseChordProgressions("Em, G, D, A")).toEqual(["Em", "G", "D", "A"]);
+  });
+
+  it("preserves multiple lines when line breaks are present", () => {
+    const input = "Verse: G, D, Em, C\nChorus: C, G, D, Em";
+    expect(parseChordProgressions(input)).toEqual([
+      "Verse: G, D, Em, C",
+      "Chorus: C, G, D, Em",
+    ]);
+  });
+
+  it("handles blank lines between chord sections", () => {
+    const input = "G D Em C\n\nC D G";
+    expect(parseChordProgressions(input)).toEqual([
+      "G D Em C",
+      "C D G",
+    ]);
+  });
+});
+
+describe("formatChordProgressions", () => {
+  it("formats single-chord array into comma-separated string", () => {
+    expect(formatChordProgressions(["Em", "G", "D", "A"])).toBe("Em, G, D, A");
+  });
+
+  it("formats multi-line progressions back with newlines", () => {
+    expect(
+      formatChordProgressions(["Verse: G, D, Em, C", "Chorus: C, G, D, Em"])
+    ).toBe("Verse: G, D, Em, C\nChorus: C, G, D, Em");
+  });
+
+  it("returns empty string for non-arrays or empty arrays", () => {
+    expect(formatChordProgressions([])).toBe("");
+    expect(formatChordProgressions(null)).toBe("");
+    expect(formatChordProgressions(undefined)).toBe("");
   });
 });

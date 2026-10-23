@@ -229,11 +229,17 @@ export function SongForm({
         <Textarea
           id="chordProgressions"
           {...form.register("chordProgressions")}
-          placeholder="e.g. G, D, Em, C (comma or space separated)"
-          rows={2}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.stopPropagation();
+            }
+          }}
+          placeholder={"e.g. G, D, Em, C\nEm, C, G, D"}
+          rows={3}
+          className="font-mono text-sm"
         />
         <p className="text-xs text-muted-foreground">
-          Enter chords separated by commas or spaces
+          Enter chords separated by commas, spaces, or press Enter for line breaks
         </p>
       </div>
 

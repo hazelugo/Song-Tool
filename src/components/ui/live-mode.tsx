@@ -165,9 +165,13 @@ export function LiveMode({ playlistName, songs, backHref }: Props) {
                 <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
                   Chords
                 </span>
-                <p className="font-mono text-xl sm:text-2xl text-foreground/80 tracking-wide">
-                  {(song.chordProgressions as string[]).join("  —  ")}
-                </p>
+                <div className="font-mono text-xl sm:text-2xl text-foreground/80 tracking-wide text-center whitespace-pre-wrap">
+                  {(song.chordProgressions as string[]).some(
+                    (c) => c.includes(",") || c.includes(" ") || c.includes(":") || c.includes("\n")
+                  )
+                    ? (song.chordProgressions as string[]).join("\n")
+                    : (song.chordProgressions as string[]).join("  —  ")}
+                </div>
               </div>
             )}
 

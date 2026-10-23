@@ -5,19 +5,11 @@ import { isNull, count } from "drizzle-orm";
 import { and, gte, lte, eq, ilike, exists, sql, asc, desc } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import { filterSchema } from "@/lib/validations/filter";
-import { songApiSchema } from "@/lib/validations/song"; // Keep for POST
+import { songApiSchema, parseChordProgressions } from "@/lib/validations/song"; // Keep for POST
 import { requireUser } from "@/lib/auth";
 import { errMsg } from "@/lib/utils";
 
 const PAGE_SIZE = 25;
-
-function parseChordProgressions(raw: string): string[] {
-  if (!raw.trim()) return [];
-  return raw
-    .split(/\s*,\s*/)
-    .map((s) => s.trim())
-    .filter(Boolean);
-}
 
 export async function GET(request: Request) {
   const { userId, error: authError } = await requireUser();

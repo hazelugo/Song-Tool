@@ -2,17 +2,9 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { songs, tags } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
-import { songApiSchema } from "@/lib/validations/song";
+import { songApiSchema, parseChordProgressions } from "@/lib/validations/song";
 import { requireUser } from "@/lib/auth";
 import { errMsg } from "@/lib/utils";
-
-function parseChordProgressions(raw: string): string[] {
-  if (!raw.trim()) return [];
-  return raw
-    .split(/\s*,\s*/)
-    .map((s) => s.trim())
-    .filter(Boolean);
-}
 
 export async function PUT(
   request: Request,

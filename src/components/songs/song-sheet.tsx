@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { SongForm } from "./song-form";
 import { DeleteConfirm } from "./delete-confirm";
 import type { SongWithTags } from "@/db/schema";
-import type { SongFormValues } from "@/lib/validations/song";
+import { type SongFormValues, formatChordProgressions } from "@/lib/validations/song";
 
 interface SongSheetProps {
   open: boolean;
@@ -34,9 +34,7 @@ function toFormValues(song: SongWithTags): Partial<SongFormValues> {
     musicalKey: song.musicalKey,
     keySignature: song.keySignature,
     timeSignature: song.timeSignature,
-    chordProgressions: Array.isArray(song.chordProgressions)
-      ? song.chordProgressions.join(", ")
-      : "",
+    chordProgressions: formatChordProgressions(song.chordProgressions),
     lyrics: song.lyrics ?? "",
     youtubeUrl: song.youtubeUrl ?? "",
     spotifyUrl: song.spotifyUrl ?? "",

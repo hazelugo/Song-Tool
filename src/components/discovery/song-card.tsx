@@ -20,7 +20,12 @@ interface SongCardProps {
 export function SongCard({ song, onClick, onFindSimilar }: SongCardProps) {
   const camelot = getCamelotPosition(song.musicalKey, song.keySignature);
   const camelotLabel = camelot ? formatCamelot(camelot) : null;
-  const chords = (song.chordProgressions as string[]) ?? [];
+  const rawChords = (song.chordProgressions as string[]) ?? [];
+  const chords = rawChords.flatMap((item) =>
+    item.includes(",") || item.includes(" ")
+      ? item.split(/[,\s]+/).map((s) => s.trim().replace(/^\[|\]$/g, "")).filter(Boolean)
+      : [item]
+  );
   const visibleChords = chords.slice(0, 4);
   const extraChords = chords.length - visibleChords.length;
 

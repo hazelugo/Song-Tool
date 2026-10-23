@@ -67,3 +67,44 @@ export const songApiSchema = songSchema;
 
 export type SongFormValues = z.infer<typeof songSchema>;
 export type SongFormInput = z.input<typeof songSchema>;
+
+/**
+ * Parses raw text input into stored chord progression strings.
+ * Preserves newlines so each line of chords/sections is kept distinct.
+ * If input is a single line, splits by commas as before for backwards compatibility.
+ */
+export function parseChordProgressions(raw: string): string[] {
+  if (!raw || !raw.trim()) return [];
+  if (raw.includes("\n")) {
+    return raw
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean);
+  }
+  return raw
+    .split(/\s*,\s*/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+/**
+ * Formats stored chord progressions back into textarea text for editing.
+ * Multi-line progressions are joined with newlines; single-chord arrays join with commas.
+ */
+export function formatChordProgressions(chordProgressions: unknown): string {
+  if (!Array.isArray(chordProgressions) || chordProgressions.length === 0) {
+    return "";
+  }
+  const items = chordProgressions.filter((c): c is string => typeof c === "string");
+  if (items.length === 0) return "";
+
+  const hasLineStructure = items.some(
+    (item) => item.includes(",") || item.includes(" ") || item.includes(":") || item.includes("\n")
+  );
+
+  if (hasLineStructure) {
+    return items.join("\n");
+  }
+
+  return items.join(", ");
+}

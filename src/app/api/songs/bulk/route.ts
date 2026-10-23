@@ -1,18 +1,10 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { songs, tags } from "@/db/schema";
-import { songApiSchema } from "@/lib/validations/song";
+import { songApiSchema, parseChordProgressions } from "@/lib/validations/song";
 import { z } from "zod";
 import { requireUser } from "@/lib/auth";
 import { errMsg } from "@/lib/utils";
-
-function parseChordProgressions(raw: string): string[] {
-  if (!raw.trim()) return [];
-  return raw
-    .split(/[,\s]+/)
-    .map((s) => s.trim())
-    .filter(Boolean);
-}
 
 const bulkSchema = z.object({
   songs: z.array(songApiSchema).min(1).max(500),
